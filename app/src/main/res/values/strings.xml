@@ -1,7 +1,22 @@
 <resources>
+
+    <string name="cantempty_nombre">Debe indicar el nombre del cliente</string>
+    <string name="toolong">Nombre demasiad largo!</string>
+    <string name="cantempty_apellido1">Debe indicar el primer apellido del cliente</string>
+    <string name="toolong_apellido1">Apellido demasiad largo!</string>
+    <string name="cantempty_apodo">Debe indicar el apodo del cliente</string>
+    <string name="toolong_apodo">Apodo demasiad largo!</string>
+
+
     <string name="app_name">El Chino</string>
     <string name="pedir_codigo_tv">Introduzca su codigo de cobrador...</string>
+
     <string name="pedir_codigo_et">CODIGO COBRADOR</string>
     <string name="mostrar_password">Ver password</string>
     <string name="submit">SUBMIT</string>
+    <string name="bt_registrar">REGISTRAR CLIENTE NUEVO</string>
+    <string name="bt_estado">ESTADO DEL CLIENTE</string>
+    <string name="bt_abonar">ABONAR</string>
+    <string name="bt_reFinanciar">RE-FINANCIAR</string>
+    <string name="nuevo_credito">NUEVO CREDITO</string>
 </resources>

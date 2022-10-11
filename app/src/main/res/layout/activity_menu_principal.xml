@@ -6,4 +6,80 @@
     android:layout_height="match_parent"
     tools:context=".MenuPrincipal">
 
+    <TextView
+        android:id="@+id/tv_saludoMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bt_nuevo_cliente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="registrar_cliente_nuevo"
+        android:text="@string/bt_registrar"
+        app:layout_constraintBottom_toTopOf="@+id/bt_estado_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.54" />
+
+    <Button
+        android:id="@+id/bt_estado_cliente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="estado_cliente"
+        android:text="@string/bt_estado"
+        app:layout_constraintBottom_toTopOf="@+id/bt_abonar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.728" />
+
+    <Button
+        android:id="@+id/bt_abonar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="abonar"
+        android:text="@string/bt_abonar"
+        app:layout_constraintBottom_toTopOf="@+id/bt_refinanciar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.814" />
+
+    <Button
+        android:id="@+id/bt_refinanciar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="refinanciar"
+        android:text="@string/bt_reFinanciar"
+        app:layout_constraintBottom_toTopOf="@+id/bt_nuevo_credito"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.845" />
+
+    <Button
+        android:id="@+id/bt_nuevo_credito"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="nuevo_credito"
+        android:text="@string/nuevo_credito"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.919" />
+
+    <TextView
+        android:id="@+id/tv_fecha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

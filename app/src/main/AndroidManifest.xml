@@ -21,6 +21,21 @@
         android:theme="@style/Theme.ElChino"
         tools:targetApi="31">
         <activity
+            android:name=".Nuevo_creditoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Re_financiarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AbonarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Estado_clienteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Registrar_cliente_nuevoActivity"
+            android:exported="false" />
+        <activity
             android:name=".MenuPrincipal"
             android:exported="false" />
         <activity

@@ -4,12 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,16 +39,69 @@ public class MenuPrincipal extends AppCompatActivity {
     private String spreadsheet_cobradores = "1y5wRGgrkH48EWgd2OWwon_Um42mxN94CdmJSi_XCwvM";
     private String readRowURL = "https://script.google.com/macros/s/AKfycbxJNCrEPYSw8CceTwPliCscUtggtQ2l_otieFmE/exec?spreadsheetId=";
     private String sheet_cobradores = "cobradores";
+    private Button bt_nuevo_cliente;
+    private Button bt_estado_cliente;
+    private Button bt_abonar;
+    private Button bt_refinanciar;
+    private Button bt_nuevo_credito;
+    private TextView tv_saludo;
+    private TextView tv_fecha;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_principal);
-
+        bt_nuevo_cliente = (Button) findViewById(R.id.bt_nuevo_cliente);
+        bt_estado_cliente = (Button) findViewById(R.id.bt_estado_cliente);
+        bt_abonar = (Button) findViewById(R.id.bt_abonar);
+        bt_refinanciar = (Button) findViewById(R.id.bt_refinanciar);
+        bt_nuevo_credito = (Button) findViewById(R.id.bt_nuevo_credito);
+        tv_saludo = (TextView) findViewById(R.id.tv_saludoMenu);
+        tv_fecha = (TextView) findViewById(R.id.tv_fecha);
         separar_fechaYhora();
-
+        tv_fecha.setText(fecha + "/" + mes + "/" + anio);
+        tv_saludo.setText("El Chino");
     }
 
+    public void abonar(View view){
+        Intent abonar = new Intent(this, AbonarActivity.class);
+        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        startActivity(abonar);
+        finish();
+        System.exit(0);
+    }
+
+    public void estado_cliente(View view){
+        Intent estado_cliente = new Intent(this, Estado_clienteActivity.class);
+        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        startActivity(estado_cliente);
+        finish();
+        System.exit(0);
+    }
+
+    public void registrar_cliente_nuevo(View view){
+        Intent registrar_cliente_nuevo = new Intent(this, Registrar_cliente_nuevoActivity.class);
+        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        startActivity(registrar_cliente_nuevo);
+        finish();
+        System.exit(0);
+    }
+
+    public void refinanciar(View view){
+        Intent refinanciar = new Intent(this, Re_financiarActivity.class);
+        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        startActivity(refinanciar);
+        finish();
+        System.exit(0);
+    }
+
+    public void nuevo_credito(View view){
+        Intent nuevo_credito = new Intent(this, Nuevo_creditoActivity.class);
+        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        startActivity(nuevo_credito);
+        finish();
+        System.exit(0);
+    }
 
     //Funciones comunes//
 
@@ -179,7 +234,9 @@ public class MenuPrincipal extends AppCompatActivity {
     }
 
     private void boton_atras() {
-        //ocultar_teclado();
+        //Intent main = new Intent(this, MainActivity.class);
+        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        //startActivity(main);
         finish();
         System.exit(0);
     }

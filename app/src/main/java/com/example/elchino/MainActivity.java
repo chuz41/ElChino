@@ -78,10 +78,8 @@ public class MainActivity extends AppCompatActivity {
         checkedTextView = findViewById(R.id.checkedTextView);
         checkedTextView.setText("Mostrar password");
         checkedTextView.setVisibility(View.INVISIBLE);
-
         separar_fechaYhora();
         check_activation();
-
     }
 
     private void menu_principal () {
@@ -125,13 +123,11 @@ public class MainActivity extends AppCompatActivity {
     public void check_box_listener(View view) {
         String texto = "";
         if (checkedTextView.isChecked()) {
-
             et_ID.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
             et_ID.setFocusableInTouchMode(true);
             texto = et_ID.getText().toString();
             et_ID.setText(texto);
         } else {
-
             et_ID.setTransformationMethod(PasswordTransformationMethod.getInstance());
             et_ID.setFocusableInTouchMode(true);
             texto = et_ID.getText().toString();
