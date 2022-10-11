@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/tv_esperar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/pedir_codigo_tv"
+        app:layout_constraintBottom_toTopOf="@+id/et_ID"
+        app:layout_constraintStart_toStartOf="@+id/et_ID" />
+
+    <EditText
+        android:id="@+id/et_ID"
+        android:layout_width="305dp"
+        android:layout_height="48dp"
+        android:hint="@string/pedir_codigo_et"
+        android:inputType="textPersonName|text|textCapWords"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.49" />
+
+    <Button
+        android:id="@+id/boton_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="submit"
+        android:text="@string/submit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_ID"
+        app:layout_constraintVertical_bias="0.193" />
+
+    <CheckBox
+        android:id="@+id/checkedTextView"
+        android:layout_width="182dp"
+        android:layout_height="29dp"
+        android:checked="false"
+        android:onClick="check_box_listener"
+        android:text="@string/mostrar_password"
+        app:layout_constraintStart_toStartOf="@+id/et_ID"
+        app:layout_constraintTop_toBottomOf="@+id/et_ID" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
