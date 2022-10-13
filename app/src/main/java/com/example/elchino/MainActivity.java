@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Cache;
+import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -33,7 +34,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.elchino.Util.TranslateUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -59,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
     private String cobrador = "a_sfile_cobrador_sfile_a.txt";
     private String spreadsheet_cobradores = "1y5wRGgrkH48EWgd2OWwon_Um42mxN94CdmJSi_XCwvM";
     private String readRowURL = "https://script.google.com/macros/s/AKfycbxJNCrEPYSw8CceTwPliCscUtggtQ2l_otieFmE/exec?spreadsheetId=";
+    private String addRowURL = "https://script.google.com/macros/s/AKfycbweyYb-DHVgyEdCWpKoTmvOxDGXleawjAN8Uw9AeJYbZ24t9arB/exec";
+    private HashMap<String, String> abajos = new HashMap<String, String>();
     private EditText et_ID;
     private TextView tv_esperar;
     private String sheet_cobradores = "cobradores";
@@ -66,6 +75,33 @@ public class MainActivity extends AppCompatActivity {
     private Button boton_submit;
     private String ID_cobrador;
     private CheckBox checkedTextView;
+    private String onlines = "onlines.txt";
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            check_onlines();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        try {
+            check_onlines();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        onStop();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +115,11 @@ public class MainActivity extends AppCompatActivity {
         checkedTextView.setText("Mostrar password");
         checkedTextView.setVisibility(View.INVISIBLE);
         separar_fechaYhora();
-        check_activation();
+        try {
+            check_activation();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void menu_principal () {
@@ -90,15 +130,25 @@ public class MainActivity extends AppCompatActivity {
         System.exit(0);
     }
 
-    private void crear_archivoS () {
-        /////////////////Se crea el archivo cobrador.txt///////////////
+    private void crear_archivoS () throws JSONException {
+
         String archivos[] = fileList();
+
+        /////////////////Se crea el archivo cobrador.txt///////////////
         if (archivo_existe(archivos, cobrador)) {
             check_activation();
         } else {
             crear_archivo(cobrador);
             agregar_linea_archivo("Cobrador1 FALSE " + fecha, cobrador);
             check_activation();
+        }
+        ////////////////////////////////////////////////////////////////
+
+        /////////////////Se crea el archivo onlines.txt///////////////
+        if (archivo_existe(archivos, onlines)) {
+            check_onlines();
+        } else {
+            crear_archivo(onlines);
         }
         ////////////////////////////////////////////////////////////////
     }
@@ -206,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
         return retorno;
     }
 
-    private void check_activation() {
+    private void check_activation() throws JSONException {
         ocultar_todo();
         String archivos[] = fileList();
         boolean crear = true;
@@ -252,6 +302,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
                 }
             } else {
                 //crear = true; (No hace falta hacer esto porque arriba se hizo!!!)
@@ -327,6 +378,7 @@ public class MainActivity extends AppCompatActivity {
                                                 guardar(contenido, cobrador);
                                                 Log.v("Debug_file_cobra", ".\n\nArchivo cobrador.txt:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
                                             } catch (IOException e) {
+                                                e.printStackTrace();
                                             }
                                             //Continua trabajando con la app.
                                             mostrar_todito();
@@ -353,7 +405,11 @@ public class MainActivity extends AppCompatActivity {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            check_activation();
+                            try {
+                                check_activation();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                             // Handle error
                         }
                     });
@@ -584,6 +640,7 @@ public class MainActivity extends AppCompatActivity {
             archivo.flush();
             archivo.close();
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -646,6 +703,7 @@ public class MainActivity extends AppCompatActivity {
                 br.close();
                 archivo.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         } else {
             crear_archivo(file_name);
@@ -657,6 +715,7 @@ public class MainActivity extends AppCompatActivity {
             archivo.write(ArchivoCompleto);
             archivo.flush();
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -675,6 +734,7 @@ public class MainActivity extends AppCompatActivity {
             archivo.flush();
             archivo.close();
         }catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -728,6 +788,7 @@ public class MainActivity extends AppCompatActivity {
                 br.close();
                 archivo.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return contenido;
@@ -756,4 +817,218 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     }
+
+    private void check_onlines () throws JSONException {
+        if (verificar_internet()) {
+            boolean flag = true;
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
+                //imprimir_archivo("facturas_online.txt");
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                //String contenido = "";
+                abajos.clear();
+                Integer countercito = 0;
+                while (linea != null) {
+                    countercito++;
+                    String count = String.valueOf(countercito);
+                    String[] split = linea.split(" ");
+                    if (split[0].equals("abajo")) {
+                        Log.v("OJOF_abajo: ", "\n\nLinea: " + linea + " Fin de linea!!!");
+                        abajos.put(count, split[1]);
+                        flag = false;
+                    /*} else if (split[0].equals("BORRADA")) {
+                        Log.v("OJOF_BORRADA: ", "\n\nLinea: " + linea + " Fin de linea!!!");
+                        //TODO: Pensar que hacer!!!*/
+                    } else if (split[0].equals("arriba")) {
+                        Log.v("OJOF_arriba: ", "\n\nLinea: " + linea + " Fin de linea!!!");
+                        //TODO: Pensar que hacer!!!
+                    } else {
+                        Log.v("OJOF_(error): ", "\n\n(No deberia llegar aqui!!!\n\nLinea: " + linea + " Fin de linea!!!");
+                        //Do nothing.
+                    }
+                    linea = br.readLine();
+                }
+                archivo.close();
+                br.close();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (flag) {
+                //mostrar_todo();
+                return;
+            } else {
+                //Do nothing. Continue with the work
+            }
+
+            abajiar();
+            //return objeto_json;
+        } else {
+
+        }
+    }
+
+    private void abajiar() throws JSONException {
+        String sp_clientes = "";
+        String sp_creditos = "";
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
+            //imprimir_archivo("facturas_online.txt");
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            int cont = 0;
+            while (linea != null) {
+                String[] split = linea.split(" ");
+                if (split[0].equals("Screditos")) {
+                    sp_creditos = split[1];
+                }
+                if (split[0].equals("Sclientes")) {
+                    sp_clientes = split[1];
+                }
+                linea = br.readLine();
+                cont++;
+            }
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String spid = "";
+        String sheet = "";
+        for (String key : abajos.keySet()) {
+            String json_string = "";
+            JSONObject jsonObject = new JSONObject();
+            String[] split_pre = abajos.get(key).split("_");
+            if (split_pre[1].equals("C")) {
+                spid = sp_clientes;
+                sheet = "clientes";
+            } else {
+                spid = sp_creditos;
+                sheet = "creditos";
+            }
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput(abajos.get(key)));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                while (linea != null && !linea.isEmpty()) {
+                    String[] split = linea.split("_separador_");
+                    json_string = json_string + split[1] + "_n_";
+                    linea = br.readLine();
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, split_pre[0]);
+            subir_archivo_resagado(jsonObject, abajos.get(key), key);
+            break;
+        }
+    }
+
+    private void subir_archivo_resagado (JSONObject jsonObject, String file, String key) {
+        RequestQueue queue;
+        queue = Volley.newRequestQueue(this);
+        //Llamada POST usando Volley:
+        RequestQueue requestQueue;
+
+        // Instantiate the cache
+        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+
+        // Set up the network to use HttpURLConnection as the HTTP client.
+        Network network = new BasicNetwork(new HurlStack());
+
+        // Instantiate the RequestQueue with the cache and network.
+        requestQueue = new RequestQueue(cache, network);
+
+        // Start the queue
+        requestQueue.start();
+
+        //Toast.makeText(this, "Debug:\nConsecutivo: " + Consecutivo + "\nconsecutivo: " + consecutivo + "\nDeben ser iguales.", Toast.LENGTH_LONG).show();
+
+        String url = addRowURL;
+
+        //ocultar_todo();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        String[] split = response.toString().split("\"");
+                        int length_split = split.length;
+                        Log.v("info_sub_file_resag: ", "\n\n" + response + "\n\n");
+                        if (length_split > 3) {//TODO: Corregir este if. Debe ser mas especifico y detectar si la respuesta no es correcta.
+                            for (int i = 0; i < length_split; i++) {
+                                Log.v("split[" + i + "]", split[i]);
+                            }
+                            if (split[2].equals(":")) {//TODO: Todo de arriba tiene que ver tambien con este.
+                                cambiar_bandera (file, key);
+                                try {
+                                    abajiar();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                String factura_num = split[15];
+                            }
+                        } else {
+                            //No se subio correctamente!
+                            String factura_num = split[15];
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+                        //mensaje_error_en_subida();
+
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        requestQueue.add(jsonObjectRequest);
+
+    }
+
+    private void cambiar_bandera (String file, String key) {
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String contenido = "";
+            while (linea != null) {
+                Log.v("cambiar_bandera_file", "  Linea: " + linea + "\n\n");
+                String[] split = linea.split(" ");
+                if (split[0].equals("arriba")) {
+                    //Dejar perder la linea
+                } else if (split[0].equals("abajo")) {
+                    if (split[1].equals(file)) {
+                        linea = linea.replace(split[0], "arriba");
+                        abajos.remove(key);
+                        contenido = contenido + linea + "\n";
+                    } else {
+                        contenido = contenido + linea + "\n";
+                    }
+                } else {
+                    //Do nothing. Nunca llega aqui.
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+            borrar_archivo(onlines);
+            guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
+            Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

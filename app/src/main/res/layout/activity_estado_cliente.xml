@@ -6,4 +6,93 @@
     android:layout_height="match_parent"
     tools:context=".Estado_clienteActivity">
 
+    <EditText
+        android:id="@+id/et_ID"
+        android:layout_width="305dp"
+        android:layout_height="48dp"
+        android:hint="@string/identificacion"
+        android:inputType="textPersonName|text|textCapWords"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.49" />
+
+    <TextView
+        android:id="@+id/tv_esperar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/identificacion_tv"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/et_ID"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.433" />
+
+    <TextView
+        android:id="@+id/tv_saludoEstado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bt_consultar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="consultar"
+        android:text="@string/consultar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_ID"
+        app:layout_constraintVertical_bias="0.213" />
+
+    <Button
+        android:id="@+id/bt_prestar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="nuevo_credito"
+        android:text="@string/bt_prestar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_esperar"
+        app:layout_constraintVertical_bias="0.83" />
+
+    <Button
+        android:id="@+id/bt_represtar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="refinanciar"
+        android:text="@string/bt_reFinanciar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_esperar"
+        app:layout_constraintVertical_bias="0.83" />
+
+    <Button
+        android:id="@+id/bt_abonar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/abonar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.447"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludoEstado"
+        app:layout_constraintTop_toBottomOf="@+id/tv_saludoEstado" />
+
+    <Button
+        android:id="@+id/bt_estado_cuenta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="estado_cuenta"
+        android:text="@string/estado_cuenta"
+        app:layout_constraintBottom_toTopOf="@+id/bt_prestar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_esperar" />
 </androidx.constraintlayout.widget.ConstraintLayout>

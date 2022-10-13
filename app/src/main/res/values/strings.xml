@@ -1,16 +1,56 @@
 <resources>
 
     <string name="cantempty_nombre">Debe indicar el nombre del cliente</string>
+    <string name="nombre_cliente">Nombre</string>
     <string name="toolong">Nombre demasiad largo!</string>
     <string name="cantempty_apellido1">Debe indicar el primer apellido del cliente</string>
     <string name="toolong_apellido1">Apellido demasiad largo!</string>
     <string name="cantempty_apodo">Debe indicar el apodo del cliente</string>
     <string name="toolong_apodo">Apodo demasiad largo!</string>
+    <string name="cantempty_tasa">Debe indicar la tasa de interes</string>
+    <string name="toolong_tasa">Tasa demasiado grande!</string>
+    <string name="toolow_tasa">Tasa incorrecta!</string>
+    <string name="toolow_monto">monto muy bajo!</string>
+    <string name="toolong_monto">monto demasiado alto!</string>
+    <string name="cantempty_monto">Debe indicar el monto del prestamo</string>
+    <string name="toolow_cedula">Identificacion invalida!!!</string>
+    <string name="toolong_cedula">Identificacion demasiado larga</string>
+    <string name="cantempty_cedula">Debe indicar el numero de identificacion del cliente...</string>
+    <string name="ID_cliente">Identificacion</string>
+    <string name="apellido1">Primer apellido</string>
+    <string name="apellido2">Segundo apellido</string>
+    <string name="apodo">Apodo</string>
+    <string name="confirm">Confirmar</string>
+    <string name="monto_cliente">Monto aprovado</string>
+    <string name="tasa_cliente">Tasa de interes (%)</string>
+    <string name="tasa_mora">Interes moratorio (%)</string>
+    <string name="toolow_edad">Fecha invalida!</string>
+    <string name="toolong_edad">Fecha invalida!</string>
+    <string name="cantempty_edad">Debe indicar la fecha de nacimiento</string>
+    <string name="fecha_nacimiento">Fecha de nacimiento dd/mm/aaaa</string>
+    <string name="sexo">Sexo</string>
+    <string name="cantempty_sexo">Debe indicar el sexo del cliente...</string>
+    <string name="toolong_sexo">Inforamcion incorrecta!!!</string>
+    <string name="direccion_cliente">Direccion... </string>
+    <string name="toolow_direccion">Direccion muy corta</string>
+    <string name="toolong_direccion">Direccion demasiado larga</string>
+    <string name="cantempty_direccion">Debe indicar la direccion exacta del cliente</string>
+    <string name="puntuacion_cliente">Puntuacion... </string>
+    <string name="toolow_puntuacion">Puntuacion muy corta</string>
+    <string name="toolong_puntuacion">Puntuacion demasiado larga</string>
+    <string name="cantempty_puntuacion">Debe indicar la direccion exacta del cliente</string>
+
+    <string name="identificacion">Identificacion...</string>
+    <string name="identificacion_tv">Digite la identificacion del cliente</string>
+    <string name="consultar">CONSULTAR</string>
+    <string name="bt_prestar">Nuevo credito</string>
+    <string name="bt_re_prestar">Refinanciar</string>
+    <string name="abonar">Abonar</string>
+    <string name="estado_cuenta">Ver estado de cuenta</string>
 
 
     <string name="app_name">El Chino</string>
     <string name="pedir_codigo_tv">Introduzca su codigo de cobrador...</string>
-
     <string name="pedir_codigo_et">CODIGO COBRADOR</string>
     <string name="mostrar_password">Ver password</string>
     <string name="submit">SUBMIT</string>
@@ -19,4 +59,5 @@
     <string name="bt_abonar">ABONAR</string>
     <string name="bt_reFinanciar">RE-FINANCIAR</string>
     <string name="nuevo_credito">NUEVO CREDITO</string>
+
 </resources>
