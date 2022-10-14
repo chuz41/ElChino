@@ -30,6 +30,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     private Button bt_abonar;
     private String cliente_ID = "";
     private Button bt_estado_cuenta;
+    private boolean flag_consultar = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,23 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                bt_consultar.setClickable(false);
+                bt_consultar.setEnabled(false);
+                String archivos[] = fileList();
+                boolean crear_lot = true;
+                for (int i = 0; i < archivos.length; i++) {
+                    Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(archivos[i]);
+                    boolean matchFound = matcher.find();
+                    if (matchFound) {
+                        if (s.length() >= 9) {
+                            bt_consultar.setEnabled(true);
+                            bt_consultar.setClickable(true);
+                            //String texto = et_ID.getText().toString();
+                            //et_ID.setBackgroundResource(R.drawable.);
+                        }
+                    }
+                }
                 //Poner letras verdes o algo asi cuando se encuentre un cliente!!!
             }
             @Override
@@ -72,8 +90,8 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     }
 
     public void consultar (View view) {
+        bt_consultar.setClickable(false);
         String archivos[] = fileList();
-        boolean crear_lot = true;
         String puntuacion_cliente = "";
         String archivoCompleto = "";
         for (int i = 0; i < archivos.length; i++) {

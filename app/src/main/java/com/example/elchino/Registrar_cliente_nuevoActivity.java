@@ -722,7 +722,8 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     }
 
     private void boton_atras() {
-        //ocultar_teclado();
+        Intent menu_principal = new Intent(this, MenuPrincipal.class);
+        startActivity(menu_principal);
         finish();
         System.exit(0);
     }
@@ -764,16 +765,6 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         monto_disponible.setVisibility(View.INVISIBLE);
         interes_mora.setVisibility(View.INVISIBLE);
         confirmar.setVisibility(View.INVISIBLE);
-    }
-
-    private void ocultar_todo() {
-        ocultar_todito();
-        //TODO: todo
-    }
-
-    private void mostrar_todo() {
-        mostrar_todito();
-        //TODO: todo
     }
 
     private String imprimir_archivo(String file_name){
