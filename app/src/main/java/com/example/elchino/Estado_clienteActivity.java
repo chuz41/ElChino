@@ -41,6 +41,8 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         et_ID = (EditText) findViewById(R.id.et_ID);
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
         bt_consultar = (Button) findViewById(R.id.bt_consultar);
+        bt_consultar.setClickable(false);
+        bt_consultar.setEnabled(false);
         bt_prestar = (Button) findViewById(R.id.bt_prestar);
         bt_represtar = (Button) findViewById(R.id.bt_represtar);
         bt_prestar.setVisibility(View.INVISIBLE);

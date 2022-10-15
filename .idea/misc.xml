@@ -10,6 +10,7 @@
         <entry key="app/src/main/res/layout/activity_nuevo_credito.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/activity_re_financiar.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/activity_registrar_cliente_nuevo.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/custom_spinner.xml" value="0.25" />
       </map>
     </option>
   </component>

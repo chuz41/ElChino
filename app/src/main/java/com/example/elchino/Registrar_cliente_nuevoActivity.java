@@ -1048,9 +1048,11 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             InputStreamReader archivo = new InputStreamReader(openFileInput(file));
             BufferedReader br = new BufferedReader(archivo);
             String linea = br.readLine();
-            String[] split = linea.split("_separador_");
-            id_cliente = split[1];
             while (linea != null && !linea.isEmpty()) {
+                String[] split = linea.split("_separador_");
+                if (split[0].equals("ID_cliente")) {
+                    id_cliente = split[1];
+                }
                 split = linea.split("_separador_");
                 json_string = json_string + split[1] + "_n_";
                 linea = br.readLine();
@@ -1066,6 +1068,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
     private void subir_nuevo_cliente (JSONObject jsonObject, String file) {
         if (verificar_internet()) {
+            agregar_linea_archivo("abajo " + file, onlines);
             RequestQueue queue;
             queue = Volley.newRequestQueue(this);
             //Llamada POST usando Volley:
@@ -1100,7 +1103,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
                                     Log.v("split[" + i + "]", split[i]);
                                 }
                                 if (split[2].equals(":")) {//TODO: Todo de arriba tiene que ver tambien con este.
-                                    mostrar_todito();
+                                    cambiar_bandera1(file);
                                     esperar("\"Cliente se ha registrado correctamente en el servidor.\"");
                                 } else {
 
@@ -1130,5 +1133,39 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    private void cambiar_bandera1 (String file) {
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String contenido = "";
+            while (linea != null) {
+                Log.v("cambiar_bandera_file", "  Linea: " + linea + "\n\n");
+                String[] split = linea.split(" ");
+                if (split[0].equals("arriba")) {
+                    //Dejar perder la linea
+                } else if (split[0].equals("abajo")) {
+                    if (split[1].equals(file)) {
+                        linea = linea.replace(split[0], "arriba");
+                        contenido = contenido + linea + "\n";
+                    } else {
+                        contenido = contenido + linea + "\n";
+                    }
+                } else {
+                    //Do nothing. Nunca llega aqui.
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+            borrar_archivo(onlines);
+            guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
+            mostrar_todito();
+            Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

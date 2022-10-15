@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                         tv_esperar.setText("Conectando, por favor espere...");
                         et_ID.setFocusableInTouchMode(false);
                         et_ID.setEnabled(false);
-                        ocultar_teclado();
+                        //ocultar_teclado();
                         boolean aceptado = verificar_codigo(codigo);
                         if (aceptado) {
                             check_activation_online(codigo);

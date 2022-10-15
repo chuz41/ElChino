@@ -16,6 +16,8 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -83,7 +85,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private TextView tv_saludo;
     private String monto_disponible = "";
     private Spinner sp_plazos;
-
     boolean flag_client_reciv = false;
     String cliente_recibido = "";
 
@@ -111,15 +112,53 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             //Do nothing.
         } else {
             flag_client_reciv = true;
-            consultar(null);
+            try {
+                consultar(null);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         text_listener();
     }
 
-    public void consultar (View view) {
-        bt_consultar.setClickable(false);
+    private void restar_disponible () {
+        String ArchivoCompleto = "";
+        int nuevo_monto = 0;
+        try {
+            String file_name = cliente_ID + "_C_.txt";
+            InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            while (linea != null) {
+                Log.v("restar_disponible", ".\n\nLinea:\n\n" + linea + "\n\n.");
+                String[] split = linea.split("_separador_");
+                if (split[0].equals("monto_disponible")) {
+                    nuevo_monto = Integer.parseInt(monto_disponible) - (monto_credito);
+                    linea = linea.replace(split[1], String.valueOf(nuevo_monto));
+                }
+                ArchivoCompleto = ArchivoCompleto + linea + "\n";
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+            borrar_archivo(file_name);
+            crear_archivo(file_name);
+            guardar(ArchivoCompleto, file_name);
+            Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
+        } catch (IOException e) {
+        }
+    }
 
-        if (tv_esperar.getText().toString().equals("Digite el monto del credito")) {
+    public void consultar (View view) throws JSONException, IOException {
+        bt_consultar.setClickable(false);
+        bt_consultar.setEnabled(false);
+
+        if (tv_esperar.getText().toString().equals("Escoja el plazo del credito")) {
+            restar_disponible();
+            generar_credito();
+        } else if (tv_esperar.getText().toString().equals("Digite el monto del credito")) {//TODO: Rechazar si supera el monto disponible del cliente.
             monto_credito = Integer.parseInt(et_ID.getText().toString());
             et_ID.setText("");
             et_ID.setFocusableInTouchMode(false);
@@ -129,8 +168,10 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             tv_esperar.setText("");
             tv_esperar.setVisibility(View.INVISIBLE);
             sp_plazos.setVisibility(View.VISIBLE);
-            llenar_spinner();
-            obtener_monto();
+            //tv_esperar.setText("Escoja el plazo del credito");
+            //restar_disponible();
+            //llenar_spinner();
+            obtener_plazo();
         } else if (tv_esperar.getText().toString().equals("Digite la identificacion del cliente")) {
             String archivos[] = fileList();
             String puntuacion_cliente = "";
@@ -198,34 +239,240 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         }
     }
 
+    private void llenar_spinner () {
+        //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
+        String plazos = "Escoja el plazo del credito_5 semanas_6 semanas_9 semanas_3 quincenas_5 quincenas";
+        String[] split = plazos.split("_");
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, R.layout.custom_spinner, split);
+        sp_plazos.setAdapter(adapter2);
+        bt_consultar.setClickable(false);
+        bt_consultar.setEnabled(false);
+        spinner_listener();
+    }
+
+    private void spinner_listener () {
+        sp_plazos.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        //Crear diccionario con la informacion de la loteria seleccionada
+                        String seleccion = sp_plazos.getSelectedItem().toString();
+                        if (seleccion.equals("Escoja el plazo del credito")) {
+                            bt_consultar.setClickable(false);
+                            bt_consultar.setEnabled(false);
+                            //Do nothing!
+                        }else {
+                            plazo = sp_plazos.getSelectedItem().toString();
+                            bt_consultar.setEnabled(true);
+                            bt_consultar.setClickable(true);
+                        }
+                    }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+    }
+
+    private String calcular_cuota () {
+        String flag = "";
+        int interes = 0;
+        int cuotas = 0;
+        String[] split = plazo.split(" ");
+        if (split[1].equals("semanas")) {
+            if (split[0].equals("5")) {
+                interes = 20;
+                cuotas = 5;
+            } else if (split[0].equals("6")) {
+                interes = 20;
+                cuotas = 6;
+            } else if (split[0].equals("9")) {
+                interes = 40;
+                cuotas = 9;
+            } else {
+                //Do nothing. Never come here!!!
+            }
+        } else if (split[1].equals("quincenas")) {
+            if (split[0].equals("3")) {
+                interes = 25;
+                cuotas = 3;
+            } else if (split[0].equals("5")) {
+                interes = 40;
+                cuotas = 5;
+            } else {
+                //Do nothing. Never come here!!!
+            }
+        } else {
+            //Do nothing. Never come here!!!
+        }
+        long monto_total = monto_credito + (monto_credito * (100 / interes));
+        long cuota = monto_total / cuotas;
+        int flag_int = (int) cuota;
+        flag = String.valueOf(flag_int);
+        return flag;
+    }
+
+    private String calcular_saldo () {
+        String flag = "";
+        int interes = 0;
+        String[] split = plazo.split(" ");
+        if (split[1].equals("semanas")) {
+            if (split[0].equals("5")) {
+                interes = 20;
+            } else if (split[0].equals("6")) {
+                interes = 20;
+            } else if (split[0].equals("9")) {
+                interes = 40;
+            } else {
+                //Do nothing. Never come here!!!
+            }
+        } else if (split[1].equals("quincenas")) {
+            if (split[0].equals("3")) {
+                interes = 25;
+            } else if (split[0].equals("5")) {
+                interes = 40;
+            } else {
+                //Do nothing. Never come here!!!
+            }
+        } else {
+            //Do nothing. Never come here!!!
+        }
+        long monto_total = monto_credito + (monto_credito * (100 / interes));
+        int flag_int = (int) monto_total;
+        flag = String.valueOf(flag_int);
+        return flag;
+    }
+
+    private String obtener_tasa () {
+        String flag = "";
+        int interes = 0;
+        String[] split = plazo.split(" ");
+        if (split[1].equals("semanas")) {
+            if (split[0].equals("5")) {
+                interes = 20;
+            } else if (split[0].equals("6")) {
+                interes = 20;
+            } else if (split[0].equals("9")) {
+                interes = 40;
+            } else {
+                //Do nothing. Never come here!!!
+            }
+        } else if (split[1].equals("quincenas")) {
+            if (split[0].equals("3")) {
+                interes = 25;
+            } else if (split[0].equals("5")) {
+                interes = 40;
+            } else {
+                //Do nothing. Never come here!!!
+            }
+        } else {
+            //Do nothing. Never come here!!!
+        }
+        flag = String.valueOf(interes);
+        return flag;
+    }
+
+    private String calcular_cuotas () {
+        String flag = "";
+        int cuotas = 0;
+        String[] split = plazo.split(" ");
+        if (split[1].equals("semanas")) {
+            if (split[0].equals("5")) {
+                cuotas = 5;
+            } else if (split[0].equals("6")) {
+                cuotas = 6;
+            } else if (split[0].equals("9")) {
+                cuotas = 9;
+            } else {
+                //Do nothing. Never come here!!!
+            }
+        } else if (split[1].equals("quincenas")) {
+            if (split[0].equals("3")) {
+                cuotas = 3;
+            } else if (split[0].equals("5")) {
+                cuotas = 5;
+            } else {
+                //Do nothing. Never come here!!!
+            }
+        } else {
+            //Do nothing. Never come here!!!
+        }
+        flag = String.valueOf(cuotas);
+        return flag;
+    }
+
+    private void generar_credito () throws IOException, JSONException {
+        String file_content = "";
+        file_content = file_content + "monto_credito_separador_" + monto_credito + "\n";
+        String monto_cuota = calcular_cuota();
+        file_content = file_content + "monto_cuota_separador_" + monto_cuota + "\n";
+        String fecha_credito = dia + "/" + mes + "/" + anio;
+        file_content = file_content + "fecha_credito_separador_" + fecha_credito + "\n";
+        String saldo_mas_intereses = calcular_saldo();
+        file_content = file_content + "saldo_mas_intereses_separador_" + saldo_mas_intereses + "\n";
+        String tasa_interes = obtener_tasa();
+        file_content = file_content + "tasa_separador_" + tasa_interes + "\n";
+        String credit_ID = obtener_id();
+        file_content = file_content + "ID_credito_separador_" + credit_ID + "\n";
+        String cuotass = calcular_cuotas();
+        file_content = file_content + "cuotas_separador_" + cuotass;
+        String file_name = credit_ID + ".txt";
+        crear_archivo(file_name);
+        guardar(file_content, file_name);
+        subir_archivo(file_name);
+    }
+
+    private String obtener_id () {
+        String flag = "";
+        String cliente_file = cliente_ID + "_C_.txt";
+        String lista_archivos = "";
+        String archivos[] = fileList();
+        for (int i = 0; i < archivos.length; i++) {
+            Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(archivos[i]);
+            boolean matchFound = matcher.find();
+            if (matchFound) {
+                lista_archivos = lista_archivos + archivos[i] + "_sep_";
+            }
+        }
+        int end_id = 0;
+        if (lista_archivos.equals("")) {
+            flag = "0";
+        } else {
+            String[] split = lista_archivos.split("_sep_");
+            int spl_long = split.length;
+            for (int i = 0; i < spl_long; i++) {
+                String[] splii = split[i].split("_P_");
+                end_id = end_id + Integer.parseInt(splii[1]);
+            }
+            flag = String.valueOf(end_id);
+        }
+        flag = cliente_ID + "_P_" + String.valueOf(flag) + "_P_";
+        return flag;
+    }
+
     private void nuevo_credito () {
         //Algoritmo principal
         tv_esperar.setVisibility(View.VISIBLE);
         tv_esperar.setText("Digite el monto del credito");
         et_ID.setEnabled(true);
-        et_ID.setText("");
+        //et_ID.setText(0);
         et_ID.setInputType(InputType.TYPE_CLASS_NUMBER);
         et_ID.setEnabled(false);
         bt_consultar.setText("CONFIRMAR");
         text_listener();
     }
 
-    private void obtener_monto () {
+    private void obtener_plazo () {
+
         tv_esperar.setVisibility(View.VISIBLE);
         tv_esperar.setText("Escoja el plazo del credito");
-        //et_ID.setEnabled(true);
-        //et_ID.setText("");
-        //et_ID.setInputType(InputType.TYPE_CLASS_NUMBER);
-        //et_ID.setEnabled(false);
         bt_consultar.setText("CONFIRMAR");
-        text_listener();
+        llenar_spinner();
+        //spinner_listener();
     }
 
     private void text_listener() {
-        et_ID.setText("");
-        et_ID.setEnabled(true);
-        et_ID.setFocusableInTouchMode(true);
-        et_ID.requestFocus();
+
         //Implementacion de un text listener
         et_ID.addTextChangedListener(new TextWatcher() {
             @Override
@@ -234,6 +481,10 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (tv_esperar.getText().toString().equals("Digite el monto del credito")) {
+                    //et_ID.setText("");
+                    et_ID.setEnabled(true);
+                    et_ID.setFocusableInTouchMode(true);
+                    et_ID.requestFocus();
                     if (Integer.parseInt(et_ID.getText().toString()) > Integer.parseInt(monto_disponible)) {
                         bt_consultar.setClickable(false);
                         bt_consultar.setEnabled(false);
@@ -242,10 +493,14 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                         bt_consultar.setEnabled(true);
                     }
                 } else if (tv_esperar.getText().toString().equals("Digite la identificacion del cliente")) {
+
+                    et_ID.setEnabled(true);
+                    et_ID.setFocusableInTouchMode(true);
+                    //et_ID.setText("");
+                    et_ID.requestFocus();
                     bt_consultar.setClickable(false);
                     bt_consultar.setEnabled(false);
                     String archivos[] = fileList();
-                    boolean crear_lot = true;
                     for (int i = 0; i < archivos.length; i++) {
                         Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
                         Matcher matcher = pattern.matcher(archivos[i]);
@@ -254,8 +509,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                             if (s.length() >= 9) {
                                 bt_consultar.setEnabled(true);
                                 bt_consultar.setClickable(true);
-                                //String texto = et_ID.getText().toString();
-                                //et_ID.setBackgroundResource(R.drawable.);
                             }
                         }
                     }
@@ -682,15 +935,15 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     */
     private void subir_archivo (String file) throws JSONException {
         ocultar_todito();
-        String sp_clientes = "";
+        String sp_creditos = "";
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
             BufferedReader br = new BufferedReader(archivo);
             String linea = br.readLine();
             while (linea != null) {
                 String[] split = linea.split(" ");
-                if (split[0].equals("Sclientes")) {
-                    sp_clientes = split[1];
+                if (split[0].equals("Screditos")) {
+                    sp_creditos = split[1];
                 }
                 linea = br.readLine();
             }
@@ -700,18 +953,20 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        String spid = sp_clientes;
+        String spid = sp_creditos;
         String json_string = "";
         JSONObject jsonObject = new JSONObject();
-        String sheet = "clientes";
-        String id_cliente = "";
+        String sheet = "creditos";
+        String id_credito = "";
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput(file));
             BufferedReader br = new BufferedReader(archivo);
             String linea = br.readLine();
-            String[] split = linea.split("_separador_");
-            id_cliente = split[1];
             while (linea != null && !linea.isEmpty()) {
+                String[] split = linea.split("_separador_");
+                if (split[0].equals("ID_credito")) {
+                    id_credito = split[1];
+                }
                 split = linea.split("_separador_");
                 json_string = json_string + split[1] + "_n_";
                 linea = br.readLine();
@@ -721,12 +976,13 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_cliente);
-        subir_nuevo_cliente(jsonObject, file);
+        jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_credito);
+        subir_nuevo_credito(jsonObject, file);
     }
 
-    private void subir_nuevo_cliente (JSONObject jsonObject, String file) {
+    private void subir_nuevo_credito (JSONObject jsonObject, String file) {
         if (verificar_internet()) {
+            agregar_linea_archivo("abajo " + file, onlines);
             RequestQueue queue;
             queue = Volley.newRequestQueue(this);
             //Llamada POST usando Volley:
@@ -761,7 +1017,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                                     Log.v("split[" + i + "]", split[i]);
                                 }
                                 if (split[2].equals(":")) {//TODO: Todo de arriba tiene que ver tambien con este.
-                                    mostrar_todito();
+                                    cambiar_bandera1(file);
                                     esperar("\"Cliente se ha registrado correctamente en el servidor.\"");
                                 } else {
 
@@ -791,5 +1047,39 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    private void cambiar_bandera1 (String file) {
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String contenido = "";
+            while (linea != null) {
+                Log.v("cambiar_bandera_file", "  Linea: " + linea + "\n\n");
+                String[] split = linea.split(" ");
+                if (split[0].equals("arriba")) {
+                    //Dejar perder la linea
+                } else if (split[0].equals("abajo")) {
+                    if (split[1].equals(file)) {
+                        linea = linea.replace(split[0], "arriba");
+                        contenido = contenido + linea + "\n";
+                    } else {
+                        contenido = contenido + linea + "\n";
+                    }
+                } else {
+                    //Do nothing. Nunca llega aqui.
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+            borrar_archivo(onlines);
+            guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
+            mostrar_todito();
+            Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
