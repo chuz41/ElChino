@@ -104,7 +104,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         bt_consultar = (Button) findViewById(R.id.bt_consultar);
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
         sp_plazos = (Spinner) findViewById(R.id.sp_plazos);
-        sp_plazos.setVisibility(View.VISIBLE);
+        sp_plazos.setVisibility(View.INVISIBLE);
         tv_saludo.setText("NUEVO CREDITO");
         //et_ID.setVisibility(View.INVISIBLE);
         separar_fechaYhora();
@@ -120,7 +120,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        text_listener();
+        //text_listener();
     }
 
     private void restar_disponible () {
@@ -193,6 +193,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                         BufferedReader br = new BufferedReader(archivo);
                         String linea = br.readLine();
                         while (linea != null) {
+                            Log.v("Digite_cedula", ".\n\nlinea:\n\n" + linea + "\n\n.");
                             String[] split = linea.split("_separador_");
                             if (split[0].equals("puntuacion_cliente")) {
                                 puntuacion_cliente = split[1];
@@ -200,7 +201,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                             if (split[0].equals("ID_cliente")) {
                                 cliente_ID = split[1];
                             }
-                            if (split[0].equals("monto_disponible_cliente")) {
+                            if (split[0].equals("monto_disponible")) {
                                 monto_disponible = split[1];
                             }
                             linea = linea.replace("_separador_", ": ");
@@ -241,7 +242,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
 
     private void llenar_spinner () {
         //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
-        String plazos = "Escoja el plazo del credito_5 semanas_6 semanas_9 semanas_3 quincenas_5 quincenas";
+        String plazos = "Escoja el plazo del credito_5 semanas (20%)_6 semanas (20%)_9 semanas (40%)_3 quincenas (25%)_5 quincenas (40%)";
         String[] split = plazos.split("_");
         ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, R.layout.custom_spinner, split);
         sp_plazos.setAdapter(adapter2);
@@ -265,6 +266,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                             plazo = sp_plazos.getSelectedItem().toString();
                             bt_consultar.setEnabled(true);
                             bt_consultar.setClickable(true);
+                            bt_consultar.setVisibility(View.VISIBLE);
+                            bt_consultar.setFocusableInTouchMode(true);
+                            bt_consultar.requestFocus();
                         }
                     }
                     @Override
@@ -455,10 +459,18 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         tv_esperar.setVisibility(View.VISIBLE);
         tv_esperar.setText("Digite el monto del credito");
         et_ID.setEnabled(true);
-        //et_ID.setText(0);
+        et_ID.setVisibility(View.VISIBLE);
+        et_ID.requestFocus();
         et_ID.setInputType(InputType.TYPE_CLASS_NUMBER);
-        et_ID.setEnabled(false);
+        et_ID.setClickable(true);
+        et_ID.setText("");
+        et_ID.setFocusableInTouchMode(true);
+        et_ID.requestFocus();
+        //et_ID.setText("0");
         bt_consultar.setText("CONFIRMAR");
+        bt_consultar.setVisibility(View.VISIBLE);
+        bt_consultar.setClickable(false);
+        bt_consultar.setEnabled(false);
         text_listener();
     }
 
@@ -481,19 +493,25 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (tv_esperar.getText().toString().equals("Digite el monto del credito")) {
-                    //et_ID.setText("");
-                    et_ID.setEnabled(true);
-                    et_ID.setFocusableInTouchMode(true);
-                    et_ID.requestFocus();
-                    if (Integer.parseInt(et_ID.getText().toString()) > Integer.parseInt(monto_disponible)) {
-                        bt_consultar.setClickable(false);
-                        bt_consultar.setEnabled(false);
+
+                    //et_ID.setVisibility(View.VISIBLE);
+                    //et_ID.setEnabled(true);
+                    //et_ID.setFocusableInTouchMode(true);
+                    //et_ID.requestFocus();
+                    if (String.valueOf(s).equals("")) {
+                        Log.v("text_listener\"\"", ".\n\nDigite el monto del credito\n\ns:\n\n-->" + s + "<--\n\n.");
+                        //Do nothing.
                     } else {
-                        bt_consultar.setClickable(true);
-                        bt_consultar.setEnabled(true);
+                        Log.v("text_listener", ".\n\nMonto disponible: " + monto_disponible + "\n\nmonto solicitado: " + String.valueOf(s) + "\n\ns:\n\n-->" + s + "<--\n\n.");
+                        if ((Integer.parseInt(String.valueOf(s))) > Integer.parseInt(monto_disponible)) {
+                            bt_consultar.setClickable(false);
+                            bt_consultar.setEnabled(false);
+                        } else {
+                            bt_consultar.setClickable(true);
+                            bt_consultar.setEnabled(true);
+                        }
                     }
                 } else if (tv_esperar.getText().toString().equals("Digite la identificacion del cliente")) {
-
                     et_ID.setEnabled(true);
                     et_ID.setFocusableInTouchMode(true);
                     //et_ID.setText("");
@@ -535,12 +553,12 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        salir();
+        salir(s);
     }
 
-    private void salir() {
+    private void salir(String s) {
         Intent menu_principal = new Intent(this, MenuPrincipal.class);
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        menu_principal.putExtra("mensaje", s);
         startActivity(menu_principal);
         finish();
         System.exit(0);

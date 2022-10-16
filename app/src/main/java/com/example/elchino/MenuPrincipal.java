@@ -67,6 +67,7 @@ public class MenuPrincipal extends AppCompatActivity {
     private TextView tv_saludo;
     private TextView tv_fecha;
     private boolean flag_salir = false;
+    private String mensaje_recibido = "";
 
     @Override
     protected void onPause() {
@@ -109,6 +110,12 @@ public class MenuPrincipal extends AppCompatActivity {
         separar_fechaYhora();
         tv_fecha.setText(fecha + "/" + mes + "/" + anio);
         tv_saludo.setText("El Chino");
+        mensaje_recibido = getIntent().getStringExtra( "mensaje");
+        if (mensaje_recibido.equals("") | (mensaje_recibido == null)) {
+            //Do nothing.
+        } else {
+            Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
+        }
         try {
             check_onlines();
         } catch (JSONException e) {

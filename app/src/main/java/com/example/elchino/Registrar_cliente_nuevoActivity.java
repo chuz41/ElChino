@@ -595,12 +595,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        salir();
+        salir(s);
     }
 
-    private void salir() {
+    private void salir(String s) {
         Intent menu_principal = new Intent(this, MenuPrincipal.class);
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        menu_principal.putExtra("mensaje", s);
         startActivity(menu_principal);
         finish();
         System.exit(0);

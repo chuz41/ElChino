@@ -207,7 +207,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
 
     private void boton_atras() {
         Intent menu_principal = new Intent(this, MenuPrincipal.class);
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        menu_principal.putExtra("mensaje", "");
         startActivity(menu_principal);
         finish();
         System.exit(0);
