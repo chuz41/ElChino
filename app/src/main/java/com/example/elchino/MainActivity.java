@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -76,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
     private String ID_cobrador;
     private CheckBox checkedTextView;
     private String onlines = "onlines.txt";
+    private Boolean flag_caja = false;
+    private String caja = "caja.txt";
 
     @Override
     protected void onPause() {
@@ -122,10 +125,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void menu_principal () {
-        Intent menuPrincipal = new Intent(this, MenuPrincipal.class);
-        //menuPrincipal.putExtra("var1", var1);
-        startActivity(menuPrincipal);
+    private void menu_principal (String messag) {
+        Intent menu_principal = new Intent(this, MenuPrincipal.class);
+        menu_principal.putExtra("mensaje", messag);
+        startActivity(menu_principal);
         finish();
         System.exit(0);
     }
@@ -149,6 +152,15 @@ public class MainActivity extends AppCompatActivity {
             check_onlines();
         } else {
             crear_archivo(onlines);
+        }
+        ////////////////////////////////////////////////////////////////
+
+        ////////////////////Se crea el archivo caja.txt/////////////////
+        if (archivo_existe(archivos, caja)) {
+            //check_onlines();
+        } else {
+            crear_archivo(caja);
+            flag_caja = true;
         }
         ////////////////////////////////////////////////////////////////
     }
@@ -218,6 +230,41 @@ public class MainActivity extends AppCompatActivity {
                         }
                     } else {
                         //
+                    }
+                } else if (tv_esperar.getText().toString().equals("Ingrese el monto inicial de caja...")) {
+                    if (s.toString().equals("")) {
+                        boton_submit.setClickable(false);
+                        boton_submit.setEnabled(false);
+                    } else if (s == null) {
+                        boton_submit.setClickable(false);
+                        boton_submit.setEnabled(false);
+                    } else {
+                        boton_submit.setEnabled(true);
+                        boton_submit.setClickable(true);
+                    }
+                } else if (tv_esperar.getText().toString().equals("Digite su password")) {
+                    Log.v("Digite_password", ".\n\nS: " + s + "\n\n.");
+                    if (s.toString().equals("")) {
+                        boton_submit.setClickable(false);
+                        boton_submit.setEnabled(false);
+                    } else if (s == null) {
+                        boton_submit.setClickable(false);
+                        boton_submit.setEnabled(false);
+                    } else {
+                        boton_submit.setEnabled(true);
+                        boton_submit.setClickable(true);
+                    }
+                } else if (tv_esperar.getText().toString().equals("Digite su usuario")) {
+                    Log.v("Digite_usuario", ".\n\nS: " + s + "\n\n.");
+                    if (s.toString().equals("")) {
+                        boton_submit.setClickable(false);
+                        boton_submit.setEnabled(false);
+                    } else if (s == null) {
+                        boton_submit.setClickable(false);
+                        boton_submit.setEnabled(false);
+                    } else {
+                        boton_submit.setEnabled(true);
+                        boton_submit.setClickable(true);
                     }
                 } else {
                     //Do nothing. Significa que esta pidiendo usuario y/o password
@@ -532,7 +579,11 @@ public class MainActivity extends AppCompatActivity {
                                             msg("password aceptado!!!");
                                             checkedTextView.setVisibility(View.INVISIBLE);
                                             boton_submit.setVisibility(View.INVISIBLE);
-                                            menu_principal();
+                                            if (flag_caja) {
+                                                pedir_caja();
+                                            } else {
+                                                menu_principal("");
+                                            }
                                             break;
                                         } else {
                                             msg("Password incorrecto. Trate de nuevo");
@@ -561,16 +612,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void pedir_caja () {
+        boton_submit.setVisibility(View.VISIBLE);
+        boton_submit.setClickable(true);
+        tv_esperar.setVisibility(View.VISIBLE);
+        tv_esperar.setText("Ingrese el monto inicial de caja...");
+        et_ID.setEnabled(true);
+        et_ID.setVisibility(View.VISIBLE);
+        et_ID.setText("");
+        et_ID.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+        et_ID.setInputType(InputType.TYPE_CLASS_NUMBER);
+        et_ID.setFocusableInTouchMode(true);
+        et_ID.setHint("MONTO CAJA INICIAL");
+        et_ID.requestFocus();
+        text_listener();
+    }
+
     private void autenticar_cobrador (String codigo) {
         ID_cobrador = codigo;
         ocultar_todito();
         boton_submit.setVisibility(View.VISIBLE);
-        boton_submit.setClickable(true);
+        boton_submit.setClickable(false);
+        boton_submit.setEnabled(false);
         tv_esperar.setText("Digite su usuario");
         et_ID.setEnabled(true);
         et_ID.setText("");
         et_ID.setFocusableInTouchMode(true);
         et_ID.setHint("USUARIO");
+        text_listener();
     }
 
     private void autenticar_cobrador2 (String codigo) {
@@ -578,7 +647,8 @@ public class MainActivity extends AppCompatActivity {
         ID_cobrador = codigo;
         ocultar_todito();
         boton_submit.setVisibility(View.VISIBLE);
-        boton_submit.setClickable(true);
+        boton_submit.setClickable(false);
+        boton_submit.setEnabled(false);
         checkedTextView.setVisibility(View.VISIBLE);
         tv_esperar.setText("Digite su password");
         et_ID.setEnabled(true);
@@ -586,9 +656,10 @@ public class MainActivity extends AppCompatActivity {
         et_ID.setText("");
         et_ID.setFocusableInTouchMode(true);
         et_ID.setHint("PASSWORD");
+        text_listener();
     }
 
-    public void submit(View view) {
+    public void submit(View view) throws IOException {
 
         et_ID.setFocusableInTouchMode(false);
         et_ID.setEnabled(false);
@@ -604,9 +675,25 @@ public class MainActivity extends AppCompatActivity {
             et_ID.setFocusableInTouchMode(false);
             et_ID.setEnabled(false);
             verificar_password(ID_cobrador);
+        } else if (tv_esperar.getText().toString().equals("Ingrese el monto inicial de caja...")) {
+            if (et_ID.getText().toString().equals("")) {
+                //Do nothing.
+            } else if (et_ID.getText() == null) {
+                //Do nothing.
+            } else {
+                tv_esperar.setText("Conectando, por favor espere...");
+                et_ID.setFocusableInTouchMode(false);
+                et_ID.setEnabled(false);
+                guardar_caja(et_ID.getText().toString());
+            }
         } else {
             //Do nothing.
         }
+    }
+
+    private void guardar_caja (String cajita) throws IOException {
+        guardar("caja " + cajita, caja);
+        menu_principal("Caja inicial: " + cajita);
     }
 
     //Funciones comunes//

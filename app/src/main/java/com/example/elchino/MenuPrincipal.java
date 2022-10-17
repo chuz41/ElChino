@@ -64,6 +64,7 @@ public class MenuPrincipal extends AppCompatActivity {
     private Button bt_abonar;
     private Button bt_refinanciar;
     private Button bt_nuevo_credito;
+    private Button bt_banca;
     private TextView tv_saludo;
     private TextView tv_fecha;
     private boolean flag_salir = false;
@@ -92,7 +93,11 @@ public class MenuPrincipal extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        onStop();
+        try {
+            check_onlines();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -103,6 +108,7 @@ public class MenuPrincipal extends AppCompatActivity {
         bt_nuevo_cliente = (Button) findViewById(R.id.bt_nuevo_cliente);
         bt_estado_cliente = (Button) findViewById(R.id.bt_estado_cliente);
         bt_abonar = (Button) findViewById(R.id.bt_abonar);
+        bt_banca = (Button) findViewById(R.id.bt_banca);
         bt_refinanciar = (Button) findViewById(R.id.bt_refinanciar);
         bt_nuevo_credito = (Button) findViewById(R.id.bt_nuevo_credito);
         tv_saludo = (TextView) findViewById(R.id.tv_saludoMenu);
@@ -127,6 +133,14 @@ public class MenuPrincipal extends AppCompatActivity {
         Intent abonar = new Intent(this, AbonarActivity.class);
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(abonar);
+        finish();
+        System.exit(0);
+    }
+
+    public void banca(View view){
+        Intent banca = new Intent(this, AbonarActivity.class);
+        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        startActivity(banca);
         finish();
         System.exit(0);
     }

@@ -45,8 +45,8 @@ import java.util.Map;
 
 public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
-    TextInputLayout nombre_cliente,apellido1_cliente,apellido2_cliente,apodo_cliente,edad_cliente,sexo_cliente,direccion_cliente,puntuacion_cliente,tasa_cliente,monto_disponible,interes_mora,ID_cliente;
-    private String u0,u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11;
+    TextInputLayout nombre_cliente,fecha_registro,telefono2_cliente,telefono1_cliente,apellido1_cliente,apellido2_cliente,apodo_cliente,edad_cliente,sexo_cliente,direccion_cliente,puntuacion_cliente,tasa_cliente,monto_disponible,interes_mora,ID_cliente;
+    private String u0,u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13,u14;
     private boolean flag_u0 = false;
     private boolean flag_u1 = false;
     private boolean flag_u2 = false;
@@ -59,6 +59,24 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     private boolean flag_u9 = false;
     private boolean flag_u10 = false;
     private boolean flag_u11 = false;
+    private boolean flag_u12 = false;
+    private boolean flag_u13 = false;
+    private boolean flag_u14 = false;
+    private String nombre_clienteS = "";
+    private String telefono1_clienteS = "";
+    private String telefono2_clienteS = "";
+    private String apellido1_clienteS = "";
+    private String apellido2_clienteS = "";
+    private String apodo_clienteS = "";
+    private String edad_clienteS = "";
+    private String sexo_clienteS = "";
+    private String direccion_clienteS = "";
+    private String puntuacion_clienteS = "";
+    private String tasa_clienteS = "";
+    private String monto_disponibleS = "";
+    private String interes_moraS = "";
+    private String ID_clienteS = "";
+    private String fecha_registroS = "";
     private String file_content = "";
     private EditText et_ID;
     private TextView tv_esperar;
@@ -86,6 +104,8 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         nombre_cliente = (TextInputLayout) findViewById(R.id.nombre_cliente);
         apellido1_cliente = (TextInputLayout) findViewById(R.id.apellido1_cliente);
         apellido2_cliente = (TextInputLayout) findViewById(R.id.apellido2_cliente);
+        telefono1_cliente = (TextInputLayout) findViewById(R.id.telefono1_cliente);
+        telefono2_cliente = (TextInputLayout) findViewById(R.id.telefono2_cliente);
         apodo_cliente = (TextInputLayout) findViewById(R.id.apodo_cliente);
         edad_cliente = (TextInputLayout) findViewById(R.id.edad_cliente);
         sexo_cliente = (TextInputLayout) findViewById(R.id.sexo_cliente);
@@ -94,6 +114,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         tasa_cliente = (TextInputLayout) findViewById(R.id.tasa_cliente);
         monto_disponible = (TextInputLayout) findViewById(R.id.monto_disponible);
         interes_mora = (TextInputLayout) findViewById(R.id.interes_mora);
+        fecha_registro = (TextInputLayout) findViewById(R.id.fecha_registro);
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
         confirmar = (Button) findViewById(R.id.bt_confirmar);
         et_ID = (EditText) findViewById(R.id.et_ID);
@@ -104,8 +125,9 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     public void confirm(View view) throws IOException, JSONException {
         confirmar.setClickable(false);
         confirmar.setEnabled(false);
-        if (!ID_cliente() | !nombre_cliente() | !apellido1_cliente() | !apellido2_cliente() | !apodo_cliente() | !edad_cliente() |
-                !sexo_cliente() | !direccion_cliente() | !puntuacion_cliente() | !tasa_cliente() | !monto_disponible() | !interes_mora()){
+        if (!ID_cliente() | !nombre_cliente() | !apellido1_cliente() | !apellido2_cliente() | !apodo_cliente() |
+                !edad_cliente() | !sexo_cliente() | !direccion_cliente() | !puntuacion_cliente() |
+                !tasa_cliente() | !monto_disponible() | !interes_mora() | !telefono1_cliente() | !telefono2_cliente() | !fecha_registro()){
             Toast.makeText(this, "Debe llenar todos los campos! ", Toast.LENGTH_LONG).show();
             confirmar.setClickable(true);
             confirmar.setEnabled(true);
@@ -152,7 +174,16 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             //Se crea una linea de texto que se va a agregar al archivo nuevo que se va a crear.
             //String linea = "Comision_vendedor  " + u7 + "\n";
             //nuevo_archivo = nuevo_archivo + linea;
+            Log.v("ID_cliente", ".\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\n.");
             if (flag_u0) {
+                if (u0.equals(ID_clienteS)) {
+                    //Do nothing.
+                } else {
+                    Log.v("ID_cliente_sep_1", ".\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\nfile_content:\n\n" + file_content + "\n\n.");
+                    file_content.replace("ID_cliente_separador_" + ID_clienteS, "ID_cliente_separador_" + u0);
+                    Log.v("ID_cliente_sep_2", ".\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\nfile_content:\n\n" + file_content + "\n\n.");
+                }
+                ID_clienteS = u0;
                 return true;
             } else {
                 String linea = "ID_cliente_separador_" + u0;
@@ -186,6 +217,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             nombre_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u1) {
+                if (u1.equals(nombre_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("nombre_cliente_separador_" + nombre_clienteS, "nombre_cliente_separador_" + u1);
+                }
+                nombre_clienteS = u1;
                 return true;
             } else {
                 String linea = "nombre_cliente_separador_" + u1;
@@ -219,6 +256,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             apellido1_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u2) {
+                if (u2.equals(apellido1_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("apellido1_cliente_separador_" + apellido1_clienteS, "apellido1_cliente_separador_" + u2);
+                }
+                apellido1_clienteS = u2;
                 return true;
             } else {
                 String linea = "apellido1_cliente_separador_" + u2;
@@ -252,6 +295,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             apellido2_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u3) {
+                if (u3.equals(apellido2_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("apellido2_cliente_separador_" + apellido2_clienteS, "apellido2_cliente_separador_" + u3);
+                }
+                apellido2_clienteS = u3;
                 return true;
             } else {
                 String linea = "apellido2_cliente_separador_" + u3;
@@ -285,11 +334,107 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             apodo_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u4) {
+                if (u4.equals(apodo_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("apodo_cliente_separador_" + apodo_clienteS, "apodo_cliente_separador_" + u4);
+                }
+                apodo_clienteS = u4;
                 return true;
             } else {
                 String linea = "apodo_cliente_separador_" + u4;
                 file_content = file_content + linea + "\n";
                 flag_u4 = true;
+                return true;
+            }
+        }
+
+    }
+
+    public boolean telefono1_cliente () {
+        if (telefono1_cliente.getEditText()!=null){
+            u12 = telefono1_cliente.getEditText().getText().toString().trim();
+        }
+
+        if (u12.isEmpty()) {
+
+            telefono1_cliente.setError(getText(R.string.cantempty_telefono));
+            return false;
+
+        }
+
+        else if (u12.length() > 8) {
+
+            telefono1_cliente.setError(getText(R.string.toolong_telefono));
+            return false;
+        }
+
+        else if (u12.length() < 8) {
+
+            telefono1_cliente.setError(getText(R.string.toolow_telefono));
+            return false;
+        }
+
+        else {
+            telefono1_cliente.setError(null);
+            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
+            if (flag_u12) {
+                if (u12.equals(telefono1_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("telefono1_cliente_separador_" + telefono1_clienteS, "telefono1_cliente_separador_" + u12);
+                }
+                telefono1_clienteS = u12;
+                return true;
+            } else {
+                String linea = "telefono1_cliente_separador_" + u12;
+                file_content = file_content + linea + "\n";
+                flag_u12 = true;
+                return true;
+            }
+        }
+
+    }
+
+    public boolean telefono2_cliente () {
+        if (telefono2_cliente.getEditText()!=null){
+            u13 = telefono2_cliente.getEditText().getText().toString().trim();
+        }
+
+        if (u13.isEmpty()) {
+
+            telefono2_cliente.setError(getText(R.string.cantempty_telefono));
+            return false;
+
+        }
+
+        else if (u13.length() > 8) {
+
+            telefono2_cliente.setError(getText(R.string.toolong_telefono));
+            return false;
+        }
+
+        else if (u13.length() < 8) {
+
+            telefono2_cliente.setError(getText(R.string.toolow_telefono));
+            return false;
+        }
+
+        else {
+            telefono2_cliente.setError(null);
+            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
+            if (flag_u13) {
+                if (u13.equals(telefono2_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("telefono2_cliente_separador_" + telefono2_clienteS, "telefono2_cliente_separador_" + u13);
+                }
+                telefono2_clienteS = u13;
+                return true;
+            } else {
+                String linea = "telefono2_cliente_separador_" + u13;
+                file_content = file_content + linea + "\n";
+                flag_u13 = true;
                 return true;
             }
         }
@@ -324,11 +469,62 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             edad_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u8) {
+                if (u8.equals(edad_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("edad_cliente_separador_" + edad_clienteS, "edad_cliente_separador_" + u8);
+                }
+                edad_clienteS = u8;
                 return true;
             } else {
                 String linea = "edad_cliente_separador_" + u8;
                 file_content = file_content + linea + "\n";
                 flag_u8 = true;
+                return true;
+            }
+        }
+
+    }
+
+    public boolean fecha_registro () {//Se llena con un onClick listener!!!
+        if (fecha_registro.getEditText()!=null){
+            u14 = fecha_registro.getEditText().getText().toString().trim();
+        }
+
+        if (u14.isEmpty()) {
+
+            fecha_registro.setError(getText(R.string.cantempty_edad));
+            return false;
+
+        }
+
+        else if (u14.length() > 10) {
+
+            fecha_registro.setError(getText(R.string.toolong_edad));
+            return false;
+        }
+
+        else if (u14.length() < 10) {
+
+            fecha_registro.setError(getText(R.string.toolow_edad));
+            return false;
+        }
+
+        else {
+            fecha_registro.setError(null);
+            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
+            if (flag_u14) {
+                if (u14.equals(fecha_registroS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("fecha_registro_separador_" + fecha_registroS, "fecha_registro_separador_" + u14);
+                }
+                fecha_registroS = u14;
+                return true;
+            } else {
+                String linea = "fecha_registro_separador_" + u14;
+                file_content = file_content + linea + "\n";
+                flag_u14 = true;
                 return true;
             }
         }
@@ -357,6 +553,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             sexo_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u9) {
+                if (u9.equals(sexo_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("sexo_cliente_separador_" + sexo_clienteS, "sexo_cliente_separador_" + u9);
+                }
+                sexo_clienteS = u9;
                 return true;
             } else {
                 String linea = "sexo_cliente_separador_" + u9;
@@ -396,6 +598,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             direccion_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u10) {
+                if (u10.equals(direccion_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("direccion_cliente_separador_" + direccion_clienteS, "direccion_cliente_separador_" + u10);
+                }
+                direccion_clienteS = u10;
                 return true;
             } else {
                 String linea = "direccion_cliente_separador_" + u10;
@@ -443,6 +651,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             //String linea = "Comision_vendedor  " + u7 + "\n";
             //nuevo_archivo = nuevo_archivo + linea;
             if (flag_u5) {
+                if (u5.equals(tasa_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("tasa_cliente_separador_" + tasa_clienteS, "tasa_cliente_separador_" + u5);
+                }
+                tasa_clienteS = u5;
                 return true;
             } else {
                 String linea = "tasa_cliente_separador_" + u5;
@@ -485,6 +699,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             //String linea = "Comision_vendedor  " + u7 + "\n";
             //nuevo_archivo = nuevo_archivo + linea;
             if (flag_u6) {
+                if (u6.equals(monto_disponibleS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("monto_disponible_separador_" + monto_disponibleS, "monto_disponible_separador_" + u6);
+                }
+                monto_disponibleS = u6;
                 return true;
             } else {
                 String linea = "monto_disponible_separador_" + u6;
@@ -532,6 +752,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             //String linea = "Comision_vendedor  " + u7 + "\n";
             //nuevo_archivo = nuevo_archivo + linea;
             if (flag_u7) {
+                if (u7.equals(interes_moraS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("interes_mora_separador_" + interes_moraS, "interes_mora_separador_" + u7);
+                }
+                interes_moraS = u7;
                 return true;
             } else {
                 String linea = "interes_mora_separador_" + u7;
@@ -571,6 +797,12 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             puntuacion_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u11) {
+                if (u11.equals(puntuacion_clienteS)) {
+                    //Do nothing.
+                } else {
+                    file_content.replace("puntuacion_cliente_separador_" + puntuacion_clienteS, "puntuacion_cliente_separador_" + u11);
+                }
+                puntuacion_clienteS = u11;
                 return true;
             } else {
                 String linea = "puntuacion_cliente_separador_" + u11;
@@ -745,6 +977,9 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         monto_disponible.setVisibility(View.VISIBLE);
         interes_mora.setVisibility(View.VISIBLE);
         confirmar.setVisibility(View.VISIBLE);
+        telefono1_cliente.setVisibility(View.VISIBLE);
+        telefono2_cliente.setVisibility(View.VISIBLE);
+        fecha_registro.setVisibility(View.VISIBLE);
     }
 
     private void ocultar_todito() {
@@ -765,6 +1000,9 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         monto_disponible.setVisibility(View.INVISIBLE);
         interes_mora.setVisibility(View.INVISIBLE);
         confirmar.setVisibility(View.INVISIBLE);
+        telefono1_cliente.setVisibility(View.INVISIBLE);
+        telefono2_cliente.setVisibility(View.INVISIBLE);
+        fecha_registro.setVisibility(View.INVISIBLE);
     }
 
     private String imprimir_archivo(String file_name){
@@ -1038,7 +1276,6 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         String spid = sp_clientes;
         String json_string = "";
         JSONObject jsonObject = new JSONObject();
@@ -1052,9 +1289,9 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
                 String[] split = linea.split("_separador_");
                 if (split[0].equals("ID_cliente")) {
                     id_cliente = split[1];
+                } else {
+                    json_string = json_string + split[1] + "_n_";
                 }
-                split = linea.split("_separador_");
-                json_string = json_string + split[1] + "_n_";
                 linea = br.readLine();
             }
             br.close();
@@ -1106,23 +1343,19 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
                                     cambiar_bandera1(file);
                                     esperar("\"Cliente se ha registrado correctamente en el servidor.\"");
                                 } else {
-
+                                    //Nunca debe llegar aqui!!!
                                 }
                             } else {
                                 //No se subio correctamente!
                             }
-
                         }
                     }, new Response.ErrorListener() {
-
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             // TODO: Handle error
                             //mensaje_error_en_subida();
-
                         }
                     });
-
             // Add the request to the RequestQueue.
             requestQueue.add(jsonObjectRequest);
         } else {//No hay internet!!!
@@ -1130,9 +1363,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             //msg("Para registrar al vendedor en el servidor, debe estar conectado a internet.");
             mostrar_todito();
             esperar("\"Para registrar al vendedor en el servidor, debe estar conectado a internet.\"");
-
         }
-
     }
 
     private void cambiar_bandera1 (String file) {
