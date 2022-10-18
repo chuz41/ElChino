@@ -109,6 +109,7 @@ public class MenuPrincipal extends AppCompatActivity {
         bt_estado_cliente = (Button) findViewById(R.id.bt_estado_cliente);
         bt_abonar = (Button) findViewById(R.id.bt_abonar);
         bt_banca = (Button) findViewById(R.id.bt_banca);
+        bt_banca.setText("ENTREGAR/RECIBIR FONDOS DE BANCA");
         bt_refinanciar = (Button) findViewById(R.id.bt_refinanciar);
         bt_nuevo_credito = (Button) findViewById(R.id.bt_nuevo_credito);
         tv_saludo = (TextView) findViewById(R.id.tv_saludoMenu);
@@ -138,7 +139,9 @@ public class MenuPrincipal extends AppCompatActivity {
     }
 
     public void banca(View view){
-        Intent banca = new Intent(this, AbonarActivity.class);
+        Intent banca = new Intent(this, BancaActivity.class);
+        banca.putExtra("msg", "");
+        banca.putExtra("cliente_recivido", "");
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(banca);
         finish();

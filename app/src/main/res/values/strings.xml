@@ -50,6 +50,12 @@
     <string name="bt_prestar">Nuevo credito</string>
     <string name="bt_re_prestar">Refinanciar</string>
     <string name="abonar">Abonar</string>
+    <string name="recibir_fondos">Recibir fondos de Banca</string>
+    <string name="abonar_fondos">Entregar dinero a Banca</string>
+    <string name="recibir">RECIBIR</string>
+    <string name="banca_reciv_entreg">ENTREGAR/RECIBIR FONDOS</string>
+    <string name="monto...">Monto...</string>
+    <string name="abonar_recibir">Digite el monto...</string>
     <string name="estado_cuenta">Ver estado de cuenta</string>
     <string name="fecha_registro">Fecha de registro del cliente</string>
 

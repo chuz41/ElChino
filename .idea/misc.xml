@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/layout/activity_abonar.xml" value="0.35625" />
+        <entry key="app/src/main/res/layout/activity_banca.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_estado_cliente.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.5" />
         <entry key="app/src/main/res/layout/activity_menu_principal.xml" value="0.33" />
