@@ -1,17 +1,22 @@
 package com.example.elchino;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.autofill.AutofillValue;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +33,7 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.elchino.Util.TranslateUtil;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
@@ -84,6 +90,9 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     private String mes;
     private String anio;
     private String fecha;
+    private int mes_selected;
+    private int anio_selected;
+    private int fecha_selected;
     private String hora;
     private String minuto;
     private String nombre_dia;
@@ -95,6 +104,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     private String sheet_cobradores = "cobradores";
     private Button confirmar;
     private String onlines = "onlines.txt";
+    private TextInputEditText tiet_fecha_nacimiento;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +116,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         apellido2_cliente = (TextInputLayout) findViewById(R.id.apellido2_cliente);
         telefono1_cliente = (TextInputLayout) findViewById(R.id.telefono1_cliente);
         telefono2_cliente = (TextInputLayout) findViewById(R.id.telefono2_cliente);
+        tiet_fecha_nacimiento = (TextInputEditText) findViewById(R.id.tiet_fecha_nacimiento);
         apodo_cliente = (TextInputLayout) findViewById(R.id.apodo_cliente);
         edad_cliente = (TextInputLayout) findViewById(R.id.edad_cliente);
         sexo_cliente = (TextInputLayout) findViewById(R.id.sexo_cliente);
@@ -120,6 +131,60 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         et_ID = (EditText) findViewById(R.id.et_ID);
         et_ID.setVisibility(View.INVISIBLE);
         separar_fechaYhora();
+    }
+
+    public void select_fecha_nacimiento (View view) {
+        //tiet_fecha_nacimiento.setClickable(false);
+        //tiet_fecha_nacimiento.setEnabled(false);
+        final Calendar c = Calendar.getInstance();
+        final boolean[] edad_permitida = {true};
+        mes_selected = (c.get(Calendar.MONTH));
+        //Toast.makeText(this, "mes selected: " + mes_selected, Toast.LENGTH_LONG).show();
+        anio_selected = c.get(Calendar.YEAR);
+        fecha_selected = c.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                String i_s = String.valueOf(i);
+                String i1_s = String.valueOf(i1 + 1);
+                String i2_s = String.valueOf(i2);
+                if (i_s.length() == 1) {
+                    i_s = "0" + i_s;
+                }
+                if (i1_s.length() == 1) {
+                    i1_s = "0" + i1_s;
+                }
+                if (i2_s.length() == 1) {
+                    i2_s = "0" + i2_s;
+                }
+                tiet_fecha_nacimiento.setText(i2_s + "/" + i1_s + "/" + i_s);
+                //edad_cliente.autofill(AutofillValue.forText(String.valueOf(i2) + "/" + String.valueOf(i1+1) + "/" + String.valueOf(i)));
+                mes_selected = i1+1;
+                anio_selected = i;
+                fecha_selected = i2;
+                //Generamos numero comparador:
+                int comparador_selected = anio_selected;
+                comparador_selected = comparador_selected * 100;
+                comparador_selected = comparador_selected + mes_selected;
+                comparador_selected = comparador_selected * 100;
+                comparador_selected = comparador_selected + fecha_selected;
+                int comparador = Integer.parseInt(anio);
+                comparador = comparador * 100;
+                comparador = comparador + meses.get(mes);
+                comparador = comparador * 100;
+                comparador = comparador + Integer.parseInt(fecha);
+                if (comparador_selected > (comparador - 16)) {
+                    edad_permitida[0] = false;
+                } else {
+                    mes_selected = (c.get(Calendar.MONTH));
+                    anio_selected = c.get(Calendar.YEAR);
+                    fecha_selected = c.get(Calendar.DAY_OF_MONTH);
+                    Log.v("select_fecha", String.valueOf(fecha_selected) + "/" + String.valueOf(mes_selected + 1) + "/" + String.valueOf(anio_selected));
+                }
+            }
+        },anio_selected,mes_selected,fecha_selected);
+        datePickerDialog.show();
     }
 
     public void confirm(View view) throws IOException, JSONException {
@@ -441,47 +506,80 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
     }
 
-    public boolean edad_cliente () {//Se llena con un onClick listener!!!
+    public boolean edad_cliente () {//Se llena con un onClick listener!!!\
+
+        int anio_selected_n = 0;
+        int mes_selected_n = 0;
+        int fecha_selected_n = 0;
+        String[] split;
+
         if (edad_cliente.getEditText()!=null){
+
             u8 = edad_cliente.getEditText().getText().toString().trim();
+
         }
+
+        //Generamos numero comparador:
+
+        int comparador_selected = anio_selected_n;
+        comparador_selected = comparador_selected * 100;
+        comparador_selected = comparador_selected + mes_selected_n;
+        comparador_selected = comparador_selected * 100;
+        comparador_selected = comparador_selected + fecha_selected_n;
+        int comparador = Integer.parseInt(anio);
+        comparador = comparador * 100;
+        comparador = comparador + meses.get(mes);
+        comparador = comparador * 100;
+        comparador = comparador + Integer.parseInt(fecha);
 
         if (u8.isEmpty()) {
 
             edad_cliente.setError(getText(R.string.cantempty_edad));
             return false;
 
-        }
+        } else if (comparador_selected > (comparador - 16)) {
 
-        else if (u8.length() > 10) {
+            edad_cliente.setError(getText(R.string.muy_joven));
+            return false;
+
+        } else if (u8.length() > 10) {
 
             edad_cliente.setError(getText(R.string.toolong_edad));
             return false;
-        }
 
-        else if (u8.length() < 10) {
+        } else if (u8.length() < 10) {
 
             edad_cliente.setError(getText(R.string.toolow_edad));
             return false;
-        }
 
-        else {
+        } else {
+
             edad_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u8) {
+
                 if (u8.equals(edad_clienteS)) {
+
                     //Do nothing.
+
                 } else {
+
                     file_content.replace("edad_cliente_separador_" + edad_clienteS, "edad_cliente_separador_" + u8);
+
                 }
+
                 edad_clienteS = u8;
                 return true;
+
             } else {
+
                 String linea = "edad_cliente_separador_" + u8;
                 file_content = file_content + linea + "\n";
                 flag_u8 = true;
                 return true;
+
             }
+
         }
 
     }

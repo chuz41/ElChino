@@ -96,8 +96,9 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         String archivos[] = fileList();
         String puntuacion_cliente = "";
         String archivoCompleto = "";
+        String consultador = et_ID.getText().toString() + "_C_";
         for (int i = 0; i < archivos.length; i++) {
-            Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
+            Pattern pattern = Pattern.compile(consultador, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(archivos[i]);
             boolean matchFound = matcher.find();
             if (matchFound) {

@@ -132,7 +132,8 @@ public class MenuPrincipal extends AppCompatActivity {
 
     public void abonar(View view){
         Intent abonar = new Intent(this, AbonarActivity.class);
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        abonar.putExtra("msg", "");
+        abonar.putExtra("cliente_recivido", "");
         startActivity(abonar);
         finish();
         System.exit(0);

@@ -1,5 +1,6 @@
 package com.example.elchino;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -46,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -89,6 +92,8 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private String cliente_recibido = "";
     private String caja = "caja.txt";
     private String credit_ID = "";
+    private String interes_mora = "";
+    private String puntuacion_cliente = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +161,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void consultar (View view) throws JSONException, IOException {
         bt_consultar.setClickable(false);
         bt_consultar.setEnabled(false);
@@ -181,13 +187,12 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             obtener_plazo();
         } else if (tv_esperar.getText().toString().equals("Digite la identificacion del cliente")) {
             String archivos[] = fileList();
-            String puntuacion_cliente = "";
             String archivoCompleto = "";
             String file_to_consult = "";
             if (flag_client_reciv) {
-                file_to_consult = cliente_recibido;
+                file_to_consult = cliente_recibido + "_C_";
             } else {
-                file_to_consult = et_ID.getText().toString();
+                file_to_consult = et_ID.getText().toString() + "_C_";
             }
             for (int i = 0; i < archivos.length; i++) {
                 Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
@@ -210,6 +215,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                             }
                             if (split[0].equals("monto_disponible")) {
                                 monto_disponible = split[1];
+                            }
+                            if (split[0].equals("interes_mora")) {
+                                interes_mora = split[1];
                             }
                             linea = linea.replace("_separador_", ": ");
                             linea = linea.replace("_cliente", "");
@@ -413,14 +421,29 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         return flag;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private String obtener_proximo_abono () {
-        String flag = "alguna fecha";
+        String flag = "";
+        int factor_semanas = 0;
+        String[] piezas = plazo.split(" ");
+        if (piezas[1].equals("quincenas")) {
+            factor_semanas = 2;
+        } else if (piezas[1].equals("semanas")) {
+            factor_semanas = 2;
+        } else {
+            factor_semanas = -1;
+            //flag = "ERROR";
+        }
 
-
+        String fecha_mostrar2 = LocalDate.now().plusWeeks(factor_semanas).toString();
+        String[] partes = fecha_mostrar2.split("-");
+        fecha_mostrar2 = partes[2] + "/" + partes[1] + "/" + partes[0];
+        flag = fecha_mostrar2;
 
         return flag;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void generar_credito () throws IOException, JSONException {
         String file_content = "";
         file_content = file_content + "monto_credito_separador_" + monto_credito + "\n";
@@ -438,6 +461,10 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         file_content = file_content + "cuotas_separador_" + cuotass + "\n";
         credit_ID = obtener_id();
         file_content = file_content + "ID_credito_separador_" + credit_ID + "\n";
+        String morosidad = "D";
+        file_content = file_content + "morosidad_separador_" + morosidad + "\n";
+        String plazo_presentar = plazo.replace(" ", "_");
+        file_content = file_content + "plazo_separador_" + plazo_presentar + "\n";
         String file_name = credit_ID + ".txt";
         crear_archivo(file_name);
         guardar(file_content, file_name);

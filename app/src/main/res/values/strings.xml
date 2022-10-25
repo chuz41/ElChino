@@ -40,6 +40,7 @@
     <string name="toolong_puntuacion">Puntuacion demasiado larga</string>
     <string name="cantempty_puntuacion">Debe indicar la direccion exacta del cliente</string>
     <string name="telefono_cliente"># de telefono... </string>
+    <string name="telefono_cliente2">Telefono adicional... </string>
     <string name="toolow_telefono">Numero de telefono muy corto</string>
     <string name="toolong_telefono">Numero demasiado largo</string>
     <string name="cantempty_telefono">Debe indicar la direccion exacta del cliente</string>
@@ -58,6 +59,7 @@
     <string name="abonar_recibir">Digite el monto...</string>
     <string name="estado_cuenta">Ver estado de cuenta</string>
     <string name="fecha_registro">Fecha de registro del cliente</string>
+    <string name="muy_joven">Acreedor debe ser mayor de 15 anios.</string>
 
 
     <string name="app_name">El Chino</string>

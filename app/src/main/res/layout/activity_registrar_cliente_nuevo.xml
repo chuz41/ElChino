@@ -161,6 +161,8 @@
             android:id="@+id/edad_cliente"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
+            android:onClick="select_fecha_nacimiento"
             app:counterEnabled="true"
             app:counterMaxLength="10"
             app:counterOverflowTextColor="@color/red"
@@ -170,11 +172,14 @@
             app:errorTextColor="@color/red">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tiet_fecha_nacimiento"
                 style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
                 android:hint="@string/fecha_nacimiento"
-                android:inputType="date" />
+                android:inputType="date"
+                android:onClick="select_fecha_nacimiento" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
