@@ -95,6 +95,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private String interes_mora = "";
     private String puntuacion_cliente = "";
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,16 +125,14 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             cliente_ID = cliente_recibido;
             try {
                 consultar(null);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
         }
         text_listener();
     }
 
-    private void restar_disponible () {
+    private void restar_disponible () {//TODO: Se debe actualizar la informacion en internet.
         String ArchivoCompleto = "";
         int nuevo_monto = 0;
         try {
@@ -429,7 +428,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         if (piezas[1].equals("quincenas")) {
             factor_semanas = 2;
         } else if (piezas[1].equals("semanas")) {
-            factor_semanas = 2;
+            factor_semanas = 1;
         } else {
             factor_semanas = -1;
             //flag = "ERROR";
@@ -447,29 +446,57 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private void generar_credito () throws IOException, JSONException {
         String file_content = "";
         file_content = file_content + "monto_credito_separador_" + monto_credito + "\n";
+        String plazo_presentar = plazo.replace(" ", "_");
+        file_content = file_content + "plazo_separador_" + plazo_presentar + "\n";
         String monto_cuota = calcular_cuota();
         file_content = file_content + "monto_cuota_separador_" + monto_cuota + "\n";
         String fecha_credito = dia + "/" + mes + "/" + anio;
         file_content = file_content + "fecha_credito_separador_" + fecha_credito + "\n";
+        String proximo_abono = obtener_proximo_abono();
+        file_content = file_content + "proximo_abono_separador_" + proximo_abono + "\n";
         String saldo_mas_intereses = calcular_saldo();
         file_content = file_content + "saldo_mas_intereses_separador_" + saldo_mas_intereses + "\n";
         String tasa_interes = obtener_tasa();
         file_content = file_content + "tasa_separador_" + tasa_interes + "\n";
-        String proximo_abono = obtener_proximo_abono();
-        file_content = file_content + "proximo_abono_separador_" + proximo_abono + "\n";
         String cuotass = calcular_cuotas();
         file_content = file_content + "cuotas_separador_" + cuotass + "\n";
         credit_ID = obtener_id();
         file_content = file_content + "ID_credito_separador_" + credit_ID + "\n";
         String morosidad = "D";
         file_content = file_content + "morosidad_separador_" + morosidad + "\n";
-        String plazo_presentar = plazo.replace(" ", "_");
-        file_content = file_content + "plazo_separador_" + plazo_presentar + "\n";
+        String cuadratura = "";
+        String sema_quince = "";
+        String[] split = plazo_presentar.split("_");
+        if (split[1].equals("semanas")) {
+            sema_quince = "semana";
+        } else if (split[1].equals("quincenas")) {
+            sema_quince = "quincena";
+        } else {
+            //do nothing here!!
+        }
+        for (int i = 0; i < Integer.parseInt(cuotass); i++) {
+
+            /*if () {
+
+            } else if () {
+
+            } else {
+
+            }*///TODO: Hacer aqui el algoritmo que calcula las fechas de la cuadratura.
+
+            String fechita = "00/00/0000";
+            cuadratura = cuadratura + sema_quince + "_" + String.valueOf(i + 1) + "_" + monto_cuota + "_" + fechita + "__";
+
+        }
+        file_content = file_content + "cuadratura_separador_" + cuadratura + "\n";
+        file_content = file_content + "intereses_moratorios_separador_0";
+
         String file_name = credit_ID + ".txt";
         crear_archivo(file_name);
         guardar(file_content, file_name);
         actualizar_caja();
         subir_archivo(file_name);
+
     }
 
     private void actualizar_caja () {

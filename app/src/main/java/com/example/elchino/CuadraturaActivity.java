@@ -1,10 +1,8 @@
 package com.example.elchino;
 
 import static java.time.temporal.ChronoUnit.DAYS;
-
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +23,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Cache;
 import com.android.volley.Network;
 import com.android.volley.Request;
@@ -38,17 +35,13 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.elchino.Util.TranslateUtil;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
@@ -57,7 +50,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AbonarActivity extends AppCompatActivity {
+public class CuadraturaActivity extends AppCompatActivity {
 
     private Integer monto_abono = 0;
     private Integer monto_cuota = 0;
@@ -104,75 +97,59 @@ public class AbonarActivity extends AppCompatActivity {
     private String puntuacion_cliente = "";
     private String presentar_et_esperar = "";
     private String cuadratura = "";
-
     private Spinner sp_plazos;
+    private Button sequi1;
+    private Button sequi2;
+    private Button sequi3;
+    private Button sequi4;
+    private Button sequi5;
+    private Button sequi6;
+    private Button sequi7;
+    private Button sequi8;
+    private Button sequi9;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_abonar);
+        setContentView(R.layout.activity_cuadratura);
         String mensaje_recibido = getIntent().getStringExtra( "msg");
+        cuadratura = getIntent().getStringExtra( "cuadratura");
         if (mensaje_recibido.equals("")) {
             //Do nothing.
         } else {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
         }
         cliente_recibido = getIntent().getStringExtra( "cliente_recivido");
-        abono_cero = getIntent().getStringExtra( "abono_cero");
-        tv_esperar = (TextView) findViewById(R.id.tv_esperar);
-        et_ID = (EditText) findViewById(R.id.et_ID);
-        bt_consultar = (Button) findViewById(R.id.bt_consultar_ab);
-        bt_consultar.setClickable(false);
-        bt_consultar.setEnabled(false);
+        //tv_esperar = (TextView) findViewById(R.id.tv_esperar);
+        sequi1 = (Button) findViewById(R.id.sequi1);
+        sequi2 = (Button) findViewById(R.id.sequi2);
+        sequi3 = (Button) findViewById(R.id.sequi3);
+        sequi4 = (Button) findViewById(R.id.sequi4);
+        sequi5 = (Button) findViewById(R.id.sequi5);
+        sequi6 = (Button) findViewById(R.id.sequi6);
+        sequi7 = (Button) findViewById(R.id.sequi7);
+        sequi8 = (Button) findViewById(R.id.sequi8);
+        sequi9 = (Button) findViewById(R.id.sequi9);
+        sequi1.setVisibility(View.INVISIBLE);
+        sequi2.setVisibility(View.INVISIBLE);
+        sequi3.setVisibility(View.INVISIBLE);
+        sequi4.setVisibility(View.INVISIBLE);
+        sequi5.setVisibility(View.INVISIBLE);
+        sequi6.setVisibility(View.INVISIBLE);
+        sequi7.setVisibility(View.INVISIBLE);
+        sequi8.setVisibility(View.INVISIBLE);
+        sequi9.setVisibility(View.INVISIBLE);
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
-        tv_saludo.setText("ABONO A CREDITO");
-        sp_plazos = (Spinner) findViewById(R.id.sp_plazos);
-        sp_plazos.setVisibility(View.INVISIBLE);
-        separar_fechaYhora();
-
-        if (cliente_recibido.equals("")) {
-            //Do nothing.
-        } else if (cliente_recibido.equals("CERO")) {
-
-        } else {
-            flag_client_reciv = true;
-            cliente_ID = cliente_recibido;
-            try {
-                consultar(null);
-            } catch (JSONException | InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        tv_saludo.setText("ESTADO DE CUENTA\n\nCliente ID: " + cliente_recibido);
         text_listener();
+        separar_fechaYhora();
+        //actualizar_cuadratura();
     }
 
-/*    private String obtener_morosidad (String file) {
-        String flag = "";
-        InputStreamReader archivo = null;
-        try {
-            archivo = new InputStreamReader(openFileInput(file));
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            while (linea != null) {
-                Log.v("Obteniendo morosidad", ".\n\nLinea:\n\n" + linea + "\n\n.");
-                String[] split = linea.split("_separador_");
-                if (split[0].equals("morosidad")) {
-                    flag = split[1];
-                } else {
-                    //Continue with the execution!!!
-                }
-                linea = br.readLine();
-            }
-            br.close();
-            archivo.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return flag;
-    }*/
+    private void actualizar_cuadratura() {
+
+        //mostrar_cuadratura();
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private String obtener_cuotas_morosas (String cuotas_pendientes, String plazo, String fecha_proximo_abono) {
@@ -521,14 +498,14 @@ public class AbonarActivity extends AppCompatActivity {
         } else if (tv_esperar.getText().toString().equals("Prestamo a consultar:")){
             bt_consultar.setClickable(false);
             bt_consultar.setEnabled(false);
-            Log.v("Prestamo_a_consultar", ".\n\nPrestamo que se va a abonar: " + et_ID.getText().toString() + "\n\n.");
+            Log.v("Prestamo_a_consultar", ".\n\nPrestamo que se va a actualizar: " + et_ID.getText().toString() + "\n\n.");
             String[] parts_prestamo = et_ID.getText().toString().split(" ");
             int monto_a_pagar = 0;
             cantidad_cuotas_pendientes = Integer.parseInt(parts_prestamo[3]);
             morosidad = parts_prestamo[2];
             monto_cuota = obtener_monto_cuota(parts_prestamo[0]);
             //archivo_prestamo = file_name; Checked!!!
-            if (Integer.parseInt(parts_prestamo[3]) == 0) {
+            /*if (Integer.parseInt(parts_prestamo[3]) == 0) {
                 monto_a_pagar = monto_cuota;
             } else {
                 //morosidad
@@ -538,7 +515,7 @@ public class AbonarActivity extends AppCompatActivity {
                     //monto a pagar
                     monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + Integer.parseInt(interes_mora_total);
                 }
-            }
+            }*/
             esperar_un_ratito(monto_a_pagar);
 
         } else {
@@ -560,8 +537,8 @@ public class AbonarActivity extends AppCompatActivity {
         String contenido = "";
         String fecha_next_abono = "";
         int factor_semanas = 0;
-        int monto_ingresado = Integer.parseInt(et_ID.getText().toString());
-        actualizar_caja(monto_ingresado);
+        int monto_ingresado = 0;
+        //actualizar_caja(monto_ingresado);
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
             BufferedReader br = new BufferedReader(archivo);
@@ -604,11 +581,10 @@ public class AbonarActivity extends AppCompatActivity {
             Log.v("antes_de_cuadra_chang", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
             cuadratura = obtener_cuadratura(cuadratura, fecha_next_abono, factor_semanas, monto_ingresado);//Aqui se obtiene la verdadera y final morosidad.
             Log.v("despues_de_cuadra_chang", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
-            cuotas = obtener_cuotas_nuevas(cuadratura);
+            //cuotas = obtener_cuotas_nuevas(cuadratura);
             saldo_mas_intereses = Integer.parseInt(obtener_saldo_plus(cuadratura));
 
             actualizar_archivo_credito();
-
 
         } catch (IOException e) {
         }
@@ -626,19 +602,7 @@ public class AbonarActivity extends AppCompatActivity {
             while (linea != null) {
                 String[] split = linea.split("_separador_");
 
-                if (split[0].equals("cuadratura")) {
-                    linea = linea.replace(split[1], cuadratura);
-                    contenido = contenido + linea + "\n";
-                } else if (split[0].equals("proximo_abono")) {
-                    linea = linea.replace(split[1], proximo_abono);
-                    contenido = contenido + linea + "\n";
-                } else if (split[0].equals("saldo_mas_intereses")) {
-                    linea = linea.replace(split[1], String.valueOf(saldo_mas_intereses));
-                    contenido = contenido + linea + "\n";
-                } else if (split[0].equals("cuotas")) {
-                    linea = linea.replace(split[1], cuotas);
-                    contenido = contenido + linea + "\n";
-                } else if (split[0].equals("morosidad")) {
+                if (split[0].equals("morosidad")) {
                     linea = linea.replace(split[1], morosidad);
                     contenido = contenido + linea + "\n";
                 } else if (split[0].equals("intereses_moratorios")) {
@@ -686,9 +650,6 @@ public class AbonarActivity extends AppCompatActivity {
 
                 if (split[0].equals("puntuacion")) {
                     linea = linea.replace(split[1], String.valueOf(puntuacion_cliente));
-                    contenido = contenido + linea + "\n";
-                } else if (split[0].equals("monto_disponible")) {
-                    linea = linea.replace(split[1], String.valueOf(monto_disponible));
                     contenido = contenido + linea + "\n";
                 } else {
                     contenido = contenido + linea + "\n";
@@ -753,23 +714,24 @@ public class AbonarActivity extends AppCompatActivity {
         String flag = "";
         int monto_temporal = monto_ingresado - Integer.parseInt(interes_mora_total);
 
-        if (monto_temporal < 0) {//No alcanzo siquiera para pagar los intereses. Debe retornar
+        if (monto_temporal < 0) {//No alcanzo siquiera para pagar los intereses. Debe retornar TODO: Revisar
 
 
-            LocalDate hoy_LD = LocalDate.now();
-            String[] split2 = fecha_next_abono.split("/");
-            String fecha_nx_abo = split2[2] + "-" + split2[1] + "-" + split2[0];
-            LocalDate fecha_nx_abo_LD = LocalDate.parse(fecha_nx_abo);
-            String diferencia_fechas = String.valueOf(DAYS.between(fecha_nx_abo_LD, hoy_LD));
-            int interes_mora_diario = Integer.parseInt(interes_mora_total) / Integer.parseInt(diferencia_fechas);
-            int dias_pagados = monto_ingresado / interes_mora_diario;
-            LocalDate fecha_nextr = fecha_nx_abo_LD.plusDays(dias_pagados);
+
+            //LocalDate hoy_LD = LocalDate.now();
+            //String[] split2 = fecha_next_abono.split("/");
+            //String fecha_nx_abo = split2[2] + "-" + split2[1] + "-" + split2[0];
+            //LocalDate fecha_nx_abo_LD = LocalDate.parse(fecha_nx_abo);
+            //String diferencia_fechas = String.valueOf(DAYS.between(fecha_nx_abo_LD, hoy_LD));
+            //int interes_mora_diario = Integer.parseInt(interes_mora_total) / Integer.parseInt(diferencia_fechas);
+            //int dias_pagados = monto_ingresado / interes_mora_diario;
+            //LocalDate fecha_nextr = fecha_nx_abo_LD.plusDays(dias_pagados);
 
 
-            interes_mora_total = String.valueOf(Integer.parseInt(interes_mora_total) - monto_ingresado);
-            proximo_abono = fecha_nextr.toString();
-            String[] split = proximo_abono.split("-");
-            proximo_abono = split[2] + "/" + split[1] + "/" + split[0];
+            //interes_mora_total = String.valueOf(Integer.parseInt(interes_mora_total) - monto_ingresado);
+            //proximo_abono = fecha_nextr.toString();
+            //String[] split = proximo_abono.split("-");
+            //proximo_abono = split[2] + "/" + split[1] + "/" + split[0];
             //monto_disponible = "0";
             morosidad = "M";
             flag = cuadratura;
@@ -779,95 +741,20 @@ public class AbonarActivity extends AppCompatActivity {
         } else if (monto_temporal == 0) {//Aqui paga el monto completo, solo de los intereses moratorios, no abona nada a los abonos ordinarios. Debe retornar
 
             flag = cuadratura;
-            proximo_abono = LocalDate.now().toString();
-            String[] split = proximo_abono.split("-");
-            proximo_abono = split[2] + "/" + split[1] + "/" + split[0];
-            morosidad = "M";
+            //proximo_abono = LocalDate.now().toString();
+            //String[] split = proximo_abono.split("-");
+            //proximo_abono = split[2] + "/" + split[1] + "/" + split[0];
+            morosidad = "D";
             //monto_disponible = "0";
             interes_mora_total = "0";
             return flag;
 
-        } else if (monto_temporal > 0) {//Aqui paga el monto de los intereses y ademas, paga tambien parte o to-do lo de las cuotas pendientes y/o futuras.
-
-            String[] split = cuadratura.split("__");
-            monto_disponible = monto_disponible + monto_temporal;
-            int largo_split = split.length;
-            for (int i = 0; i < largo_split; i++) {
-
-                String[] split_1 = split[i].split("_");
-
-                if (Integer.parseInt(split_1[2]) > 0) {//Significa que tiene esta cuota pendiente.
-
-                    monto_temporal = monto_temporal - Integer.parseInt(split_1[2]);//Esta es la cantidad que va quedando del abono.
-
-                    if (monto_temporal < 0) {//Significa que no alcanza para esta cuota. Debe retornar
-                        LocalDate hoy_LD = LocalDate.now();
-                        String fecha_cuadrito = split_1[3];
-                        String[] split_fec = fecha_cuadrito.split("/");
-                        fecha_cuadrito = split_fec[2] + "-" + split_fec[1] + "-" + split_fec[0];
-                        LocalDate fecha_cuadrito_LD = LocalDate.parse(fecha_cuadrito);
-                        String diferencia_fechas = String.valueOf(DAYS.between(fecha_cuadrito_LD, hoy_LD));
-                        if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado.
-                            morosidad = "M";
-                        } else if (Integer.parseInt(diferencia_fechas) <= 0 ) {
-                            morosidad = "D";
-                        } else {
-                            //Do nothing.
-                        }
-                        int saldo_cuadro = Integer.parseInt(split_1[2]);
-                        saldo_cuadro = saldo_cuadro - monto_temporal;
-                        proximo_abono = split_1[3];
-                        interes_mora_total = "0";
-                        cuadratura = cuadratura.replace(split_1[0] + "_" + split_1[1] + "_" + split_1[2] + "_" + split_1[3],
-                                split_1[0] + "_" + split_1[1] + "_" + String.valueOf(saldo_cuadro) + "_" + split_1[3]);
-                        flag = cuadratura;
-                        return flag;
-                    } else if (monto_temporal > 0) {//Alcanza para pagar esta cuota y sobra.
-                        //
-                        cuadratura = cuadratura.replace(split_1[0] + "_" + split_1[1] + "_" + split_1[2] + "_" + split_1[3],
-                                split_1[0] + "_" + split_1[1] + "_0_" + split_1[3]);
-                    } else if (monto_temporal == 0) {//Alcanza para pagar esta cuota pero no sobra nada. Debe retornar!!!
-                        //
-                        cuadratura = cuadratura.replace(split_1[0] + "_" + split_1[1] + "_" + split_1[2] + "_" + split_1[3],
-                                split_1[0] + "_" + split_1[1] + "_0_" + split_1[3]);
-                        LocalDate hoy_LD = LocalDate.now();
-                        String fecha_cuadrito = split_1[3];
-                        String[] split_fec = fecha_cuadrito.split("/");
-                        fecha_cuadrito = split_fec[2] + "-" + split_fec[1] + "-" + split_fec[0];
-                        LocalDate fecha_cuadrito_LD = LocalDate.parse(fecha_cuadrito);
-                        String diferencia_fechas = String.valueOf(DAYS.between(fecha_cuadrito_LD, hoy_LD));
-                        if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado.
-                            morosidad = "M";
-                            proximo_abono = split_1[3];
-                        } else if (Integer.parseInt(diferencia_fechas) <= 0 ) {
-                            morosidad = "D";
-                            LocalDate proximo_abono_LD = fecha_cuadrito_LD.plusWeeks(factor_semanas);
-                            fecha_cuadrito = proximo_abono_LD.toString();
-                            String[] split_fe_cua = fecha_cuadrito.split("-");
-                            fecha_cuadrito = split_fe_cua[2] + "/" + split_fe_cua[1] + "/" + split_fe_cua[0];
-                            proximo_abono = fecha_cuadrito;
-                        } else {
-                            //Do nothing.
-                        }
-
-                        interes_mora_total = "0";
-                        flag = cuadratura;
-                        return flag;
-                    }
-
-                } else if (Integer.parseInt(split_1[2]) < 0) {//Nunca debe ser negativo el monto pendiente
-                    Log.v("Obtener_cuadratura", ".\n\nERROR EN DATO DE ARCHIVO\n\nContenido del archivo: \n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
-                } else if (Integer.parseInt(split_1[2]) == 0) {//Esta cuota ya ha sido pagada, continuar...
-                    //Do nothing. Continue...
-                }
-            }
-            Log.v("Obtener_cuadratura_pF", ".\n\nERROR EN RETORNO\n\nContenido del archivo: \n\n" + imprimir_archivo(archivo_prestamo) + "\n\ncuadratura:\n\n" + cuadratura + "\n\n.");
-            return cuadratura;
         } else {
             //Do nothing. Never come here!!!
             Log.v("Obtener_cuadratura_else", ".\n\nERROR EN DATO DE ARCHIVO\n\nContenido del archivo: \n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
         }
 
+        //flag = cuadratura;
         return flag;
 
     }
@@ -902,11 +789,12 @@ public class AbonarActivity extends AppCompatActivity {
         return flag;
     }*/
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void esperar_un_ratito (int monto_a_pagar) throws InterruptedException {
         try {
             Thread.sleep(1000);
             presentar_monto_a_pagar(monto_a_pagar);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | JSONException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -921,17 +809,19 @@ public class AbonarActivity extends AppCompatActivity {
         }
     }
 
-    private void presentar_monto_a_pagar (int monto_a_pagar) {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void presentar_monto_a_pagar (int monto_a_pagar) throws JSONException, IOException, InterruptedException {
 
         et_ID.setEnabled(true);
-        et_ID.setText(String.valueOf(monto_a_pagar));
+        et_ID.setText(String.valueOf("0"));
         et_ID.setFocusableInTouchMode(true);
         et_ID.setVisibility(View.VISIBLE);
-        bt_consultar.setVisibility(View.VISIBLE);
-        bt_consultar.setText("REALIZAR PAGO");
+        //bt_consultar.setVisibility(View.VISIBLE);
+        //bt_consultar.setText("REALIZAR PAGO");
         tv_esperar.setText("Monto a pagar al dia de hoy: ");
         tv_esperar.setVisibility(View.VISIBLE);
         et_ID.requestFocus();
+        consultar(null);
     }
 
     private Integer obtener_monto_cuota(String s) {
@@ -1013,7 +903,7 @@ public class AbonarActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void presentar_info_credito(String s) {
+    private void presentar_info_credito (String s) {
 
         if (s.equals("UNO")) {
             String archivos[] = fileList();
@@ -1320,7 +1210,7 @@ public class AbonarActivity extends AppCompatActivity {
         text_listener();
     }*/
 
-    private void text_listener() {
+    private void text_listener () {
 
         //Implementacion de un text listener
         et_ID.addTextChangedListener(new TextWatcher() {

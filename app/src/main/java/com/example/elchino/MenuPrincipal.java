@@ -134,6 +134,7 @@ public class MenuPrincipal extends AppCompatActivity {
         Intent abonar = new Intent(this, AbonarActivity.class);
         abonar.putExtra("msg", "");
         abonar.putExtra("cliente_recivido", "");
+        abonar.putExtra("abono_cero", "");
         startActivity(abonar);
         finish();
         System.exit(0);

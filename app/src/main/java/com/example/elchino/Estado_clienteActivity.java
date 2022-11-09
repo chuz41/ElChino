@@ -93,6 +93,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
 
     public void consultar (View view) {
         bt_consultar.setClickable(false);
+        bt_consultar.setEnabled(false);
         String archivos[] = fileList();
         String puntuacion_cliente = "";
         String archivoCompleto = "";
@@ -195,7 +196,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         Intent abonar = new Intent(this, AbonarActivity.class);
         abonar.putExtra("msg", "");
         abonar.putExtra("cliente_recivido", cliente_ID);
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        abonar.putExtra("abono_cero", "");
         startActivity(abonar);
         finish();
         System.exit(0);
