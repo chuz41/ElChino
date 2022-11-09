@@ -466,26 +466,25 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         file_content = file_content + "morosidad_separador_" + morosidad + "\n";
         String cuadratura = "";
         String sema_quince = "";
+        int factor = 0;
         String[] split = plazo_presentar.split("_");
         if (split[1].equals("semanas")) {
             sema_quince = "semana";
+            factor = 1;
         } else if (split[1].equals("quincenas")) {
             sema_quince = "quincena";
+            factor = 2;
         } else {
             //do nothing here!!
         }
+        LocalDate fecha_hoy = LocalDate.now();
+        LocalDate fecha_poner = fecha_hoy;
         for (int i = 0; i < Integer.parseInt(cuotass); i++) {
 
-            /*if () {
-
-            } else if () {
-
-            } else {
-
-            }*///TODO: Hacer aqui el algoritmo que calcula las fechas de la cuadratura.
-
-            String fechita = "00/00/0000";
-            cuadratura = cuadratura + sema_quince + "_" + String.valueOf(i + 1) + "_" + monto_cuota + "_" + fechita + "__";
+            fecha_poner = fecha_poner.plusWeeks(factor);
+            String[] splet = fecha_poner.toString().split("-");
+            String fecha_S_poner = splet[2] + "/" + splet[1] + "/" + splet[0];
+            cuadratura = cuadratura + sema_quince + "_" + String.valueOf(i + 1) + "_" + monto_cuota + "_" + fecha_S_poner + "__";
 
         }
         file_content = file_content + "cuadratura_separador_" + cuadratura + "\n";

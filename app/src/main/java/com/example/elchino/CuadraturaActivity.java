@@ -15,7 +15,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -47,6 +46,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,7 +121,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
         cliente_recibido = getIntent().getStringExtra( "cliente_recivido");
         //tv_esperar = (TextView) findViewById(R.id.tv_esperar);
-        sequi1 = (Button) findViewById(R.id.sequi1);
+        /*sequi1 = (Button) findViewById(R.id.sequi1);
         sequi2 = (Button) findViewById(R.id.sequi2);
         sequi3 = (Button) findViewById(R.id.sequi3);
         sequi4 = (Button) findViewById(R.id.sequi4);
@@ -138,7 +138,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         sequi6.setVisibility(View.INVISIBLE);
         sequi7.setVisibility(View.INVISIBLE);
         sequi8.setVisibility(View.INVISIBLE);
-        sequi9.setVisibility(View.INVISIBLE);
+        sequi9.setVisibility(View.INVISIBLE);*/
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
         tv_saludo.setText("ESTADO DE CUENTA\n\nCliente ID: " + cliente_recibido);
         text_listener();
@@ -627,14 +627,64 @@ public class CuadraturaActivity extends AppCompatActivity {
     }
 
     private void presentar_cuadratura() {
-        //TODO: llamar a la activity estado_de_cuenta
-        Intent CuadraturaAc = new Intent(this, CuadraturaActivity.class);
-        CuadraturaAc.putExtra("cuadratura", cuadratura);
-        //CuadraturaAc.putExtra("cliente_recivido", "");
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
-        startActivity(CuadraturaAc);
-        finish();
-        System.exit(0);
+        //TODO: Presentar la informacion que esta en la cuadratura
+        bt_consultar.setEnabled(false);
+        bt_consultar.setVisibility(View.INVISIBLE);
+        tv_esperar.setText("");
+        tv_esperar.setVisibility(View.INVISIBLE);
+        et_ID.setText("");
+        et_ID.setVisibility(View.INVISIBLE);
+        et_ID.setEnabled(false);
+        sp_plazos.setEnabled(false);
+        sp_plazos.setVisibility(View.INVISIBLE);
+        sequi1 = (Button) findViewById(R.id.sequi1);
+        sequi2 = (Button) findViewById(R.id.sequi2);
+        sequi3 = (Button) findViewById(R.id.sequi3);
+        sequi4 = (Button) findViewById(R.id.sequi4);
+        sequi5 = (Button) findViewById(R.id.sequi5);
+        sequi6 = (Button) findViewById(R.id.sequi6);
+        sequi7 = (Button) findViewById(R.id.sequi7);
+        sequi8 = (Button) findViewById(R.id.sequi8);
+        sequi9 = (Button) findViewById(R.id.sequi9);
+        sequi1.setVisibility(View.INVISIBLE);
+        sequi2.setVisibility(View.INVISIBLE);
+        sequi3.setVisibility(View.INVISIBLE);
+        sequi4.setVisibility(View.INVISIBLE);
+        sequi5.setVisibility(View.INVISIBLE);
+        sequi6.setVisibility(View.INVISIBLE);
+        sequi7.setVisibility(View.INVISIBLE);
+        sequi8.setVisibility(View.INVISIBLE);
+        sequi9.setVisibility(View.INVISIBLE);
+        String[] split_1 = cuadratura.split("__");
+        int largo_split = split_1.length;
+        HashMap<Integer, Button> botones = new HashMap<Integer, Button>();
+        botones.put(0, sequi1);
+        botones.put(1, sequi2);
+        botones.put(2, sequi3);
+        botones.put(3, sequi4);
+        botones.put(4, sequi5);
+        botones.put(5, sequi6);
+        botones.put(6, sequi7);
+        botones.put(7, sequi8);
+        botones.put(8, sequi9);
+        TreeMap<Integer, Button> botones_tree = getTreeMapBotones(botones);
+        //Map<Integer, Button> botones_treeMap = getTreeMap(botones);
+        for (int i = 0; i < largo_split; i++) {
+            String[] split = split_1[i].split("_");
+            String info_boton = split[3] + "\n" + split[0] + " " + split[1] + "\n" + split[2];
+            botones_tree.get(i).setVisibility(View.VISIBLE);
+            botones_tree.get(i).setText(info_boton);
+            botones_tree.get(i).setClickable(false);
+        }
+    }
+
+    private TreeMap<Integer, Button> getTreeMapBotones(HashMap<Integer, Button> botones) {
+        TreeMap<Integer, Button> treeMap = new TreeMap<Integer, Button>();
+        for (int key : botones.keySet()) {
+            treeMap.put(key, botones.get(key));
+        }
+
+        return treeMap;
     }
 
     private void actualizar_archivo_cliente() {
