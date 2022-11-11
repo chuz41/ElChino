@@ -676,6 +676,7 @@ public class AbonarActivity extends AppCompatActivity {
         CuadraturaAc.putExtra("msg", "Abono realizado con exito!!!");
         CuadraturaAc.putExtra("cliente_recivido", cliente_ID);
         CuadraturaAc.putExtra("cambio", String.valueOf(cambio));
+        CuadraturaAc.putExtra("monto_creditito", "0");
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(CuadraturaAc);
         finish();

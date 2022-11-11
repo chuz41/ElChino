@@ -65,8 +65,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private Integer tasa = 0;//Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
     private String ID_credito = "";
     private String plazo = "";//Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%) Se elige con un spinner
-
-
+    private String cuadratura = "";
     private EditText et_ID;
     private TextView tv_esperar;
     private Map<String, Integer> meses = new HashMap<String, Integer>();private String dia;
@@ -464,7 +463,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         file_content = file_content + "ID_credito_separador_" + credit_ID + "\n";
         String morosidad = "D";
         file_content = file_content + "morosidad_separador_" + morosidad + "\n";
-        String cuadratura = "";
         String sema_quince = "";
         int factor = 0;
         String[] split = plazo_presentar.split("_");
@@ -875,6 +873,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             return true;
         }
     }
+
     /*
     private void check_onlines () throws JSONException {
         if (verificar_internet()) {
@@ -1081,6 +1080,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         }
     }
     */
+
     private void subir_archivo (String file) throws JSONException {
         ocultar_todito();
         String sp_creditos = "";
@@ -1229,9 +1229,25 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
             mostrar_todito();
             Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
+            presentar_cuadratura();
             esperar("\"Credito generado y registrado correctamente en el servidor.\"");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private void presentar_cuadratura() {
+        //TODO: llamar a la activity estado_de_cuenta
+        Intent CuadraturaAc = new Intent(this, CuadraturaActivity.class);
+        CuadraturaAc.putExtra("cuadratura", cuadratura);
+        CuadraturaAc.putExtra("msg", "Abono realizado con exito!!!");
+        CuadraturaAc.putExtra("cliente_recivido", cliente_ID);
+        CuadraturaAc.putExtra("cambio", "0");
+        CuadraturaAc.putExtra("monto_creditito", String.valueOf(monto_credito));
+        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        startActivity(CuadraturaAc);
+        finish();
+        System.exit(0);
+    }
+
 }

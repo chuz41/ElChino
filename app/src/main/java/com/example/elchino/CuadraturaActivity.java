@@ -111,6 +111,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     private Button sequi8;
     private Button sequi9;
     private TextView tv_cambio;
+    private String monto_creditito;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -120,6 +121,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         String mensaje_recibido = getIntent().getStringExtra( "msg");
         cuadratura = getIntent().getStringExtra( "cuadratura");
         cambio = getIntent().getStringExtra("cambio");
+        monto_creditito = getIntent().getStringExtra("monto_creditito");
         tv_cambio = (TextView) findViewById(R.id.tv_cambio);
         tv_cambio.setVisibility(View.INVISIBLE);
         Integer cambio_int = Integer.valueOf(cambio);
@@ -127,8 +129,11 @@ public class CuadraturaActivity extends AppCompatActivity {
             tv_cambio.setText("Cambio:\n\n" + cambio);
             tv_cambio.setVisibility(View.VISIBLE);
             Toast.makeText(this, "Devolver " + cambio + " colones sobrantes.", Toast.LENGTH_LONG).show();
-        } else {
-
+        }
+        if (Integer.parseInt(monto_creditito) > 0) {
+            tv_cambio.setText("Prestamo aprobado.\n\nMonto del credito:\n" + monto_creditito + " colones.");
+            tv_cambio.setVisibility(View.VISIBLE);
+            Toast.makeText(this, "Entregar " + monto_creditito + " colones al cliente.", Toast.LENGTH_LONG).show();
         }
         et_ID = (EditText) findViewById(R.id.et_ID);
         sp_plazos = (Spinner) findViewById(R.id.sp_plazos);

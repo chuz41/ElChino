@@ -188,6 +188,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         cuadra_tura.putExtra("cuadratura", "");
         cuadra_tura.putExtra("cliente_recivido", cliente_ID);
         cuadra_tura.putExtra("cambio", "0");
+        cuadra_tura.putExtra("monto_creditito", "0");
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(cuadra_tura);
         finish();
