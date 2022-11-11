@@ -277,7 +277,11 @@ public class AbonarActivity extends AppCompatActivity {
 
                     br.close();
                     archivo.close();
-                    creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
+                    if (Integer.parseInt(saldo_mas_intereses_s) > 100) {
+                        creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
+                    } else {
+                        //Do notring.
+                    }
                     //Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
                 } catch (IOException e) {
                 }
@@ -526,7 +530,7 @@ public class AbonarActivity extends AppCompatActivity {
 
             tv_esperar.setText("");
 
-            procesar_abono();
+            procesar_abono2();
 
         } else if (tv_esperar.getText().toString().equals("Prestamo a consultar:")){
             bt_consultar.setClickable(false);
@@ -549,18 +553,11 @@ public class AbonarActivity extends AppCompatActivity {
                     monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + Integer.parseInt(interes_mora_total);
                 }
             }
-            esperar_un_ratito(monto_a_pagar);
+            presentar_monto_a_pagar(monto_a_pagar);
 
         } else {
             //TODO: no se sabe que hacer aqui!!!
         }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void procesar_abono () throws InterruptedException {
-
-        esperar_otro_ratito();
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -671,7 +668,6 @@ public class AbonarActivity extends AppCompatActivity {
         }
 
     }
-
 
     private void presentar_cuadratura() {
         //TODO: llamar a la activity estado_de_cuenta
@@ -925,29 +921,18 @@ public class AbonarActivity extends AppCompatActivity {
         fecha_mostrar2 = partes[2] + "/" + partes[1] + "/" + partes[0];
         flag = fecha_mostrar2;
         return flag;
-    }*/
+    }
 
 
     private void esperar_un_ratito (int monto_a_pagar) throws InterruptedException {
-        presentar_monto_a_pagar(monto_a_pagar);
-        /*try {
-            Thread.sleep(1000);
-            presentar_monto_a_pagar(monto_a_pagar);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+        //presentar_monto_a_pagar(monto_a_pagar);
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void esperar_otro_ratito () throws InterruptedException {
-        procesar_abono2();
-        /*try {
-            Thread.sleep(1000);
-            procesar_abono2();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-    }
+        //procesar_abono2();
+    }*/
 
 
     private void presentar_monto_a_pagar (int monto_a_pagar) {
@@ -1005,10 +990,6 @@ public class AbonarActivity extends AppCompatActivity {
         }
         return flag;
     }
-
-/*    private void actualizar_saldo_cliente () {
-
-    }*/
 
     private void spinner_listener () {
         sp_plazos.setOnItemSelectedListener(
@@ -1874,7 +1855,7 @@ public class AbonarActivity extends AppCompatActivity {
         Log.v("json_string_debug", ".\n\njson_string: " + "\n\n" + json_string + "\n\n.");
         jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_credito);
         subir_nuevo_credito(jsonObject, file);
-    }
+    }//TODO
 
     private void subir_nuevo_credito (JSONObject jsonObject, String file) {
         if (verificar_internet()) {

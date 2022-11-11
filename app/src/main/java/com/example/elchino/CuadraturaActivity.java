@@ -185,13 +185,6 @@ public class CuadraturaActivity extends AppCompatActivity {
             }
             text_listener();
         }
-
-        //actualizar_cuadratura();
-    }
-
-    private void actualizar_cuadratura() {
-
-        //mostrar_cuadratura();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -258,9 +251,7 @@ public class CuadraturaActivity extends AppCompatActivity {
                     String saldo_mas_intereses_s = "";
                     String plazo = "";
                     String numero_de_credito = "";
-                    String morosidad_s = "";
                     String cuotas_morosas = "";
-                    //String indice_file = "";
                     String file_name = archivos[i];
                     String[] split_indice = file_name.split("_P_");
                     numero_de_credito = split_indice[1];
@@ -282,9 +273,6 @@ public class CuadraturaActivity extends AppCompatActivity {
                         if (split[0].equals("cuotas")) {
                             cuotas_morosas = split[1];
                         }
-                        if (split[0].equals("morosidad")) {
-                            morosidad_s = split[1];
-                        }
                         if (split[0].equals("intereses_moratorios")) {
                             intereses_mora = split[1];
                         }
@@ -296,7 +284,11 @@ public class CuadraturaActivity extends AppCompatActivity {
 
                     br.close();
                     archivo.close();
-                    creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
+                    if (Integer.parseInt(saldo_mas_intereses_s) > 100) {
+                        creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
+                    } else {
+                        //Do notring.
+                    }
                     //Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
                 } catch (IOException e) {
                 }
@@ -545,7 +537,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
             tv_esperar.setText("");
 
-            procesar_abono();
+            procesar_abono2();
 
         } else if (tv_esperar.getText().toString().equals("Prestamo a consultar:")){
             bt_consultar.setClickable(false);
@@ -568,18 +560,11 @@ public class CuadraturaActivity extends AppCompatActivity {
                     monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + Integer.parseInt(interes_mora_total);
                 }
             }*/
-            esperar_un_ratito(monto_a_pagar);
+            presentar_monto_a_pagar(monto_a_pagar);
 
         } else {
             //TODO: no se sabe que hacer aqui!!!
         }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void procesar_abono () throws InterruptedException {
-
-        esperar_otro_ratito();
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -805,25 +790,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         return flag;
     }
 
-    private String obtener_cuotas_nuevas(String cuadratura) {
-
-        String flag = "";
-        String[] split = cuadratura.split("__");
-        int largo_split = split.length;
-        int cuottas = 0;
-        for (int i = 0; i < largo_split; i++) {
-
-            String[] split_1 = split[i].split("_");
-
-            if (Integer.parseInt(split_1[2]) > 0) {//Significa que tiene esta cuota pendiente.
-                cuottas = cuottas + 1;
-            }
-        }
-
-        flag = String.valueOf(cuottas);
-        return flag;
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     private String obtener_cuadratura (String cuadratura, String fecha_next_abono, int factor_semanas, int monto_ingresado) {
 
@@ -906,28 +872,6 @@ public class CuadraturaActivity extends AppCompatActivity {
     }*/
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void esperar_un_ratito (int monto_a_pagar) throws InterruptedException, JSONException, IOException {
-        presentar_monto_a_pagar(monto_a_pagar);
-        /*try {
-            Thread.sleep(1000);
-            presentar_monto_a_pagar(monto_a_pagar);
-        } catch (InterruptedException | JSONException | IOException e) {
-            e.printStackTrace();
-        }*/
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void esperar_otro_ratito () throws InterruptedException {
-        procesar_abono2();
-        /*try {
-            Thread.sleep(1000);
-            procesar_abono2();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private void presentar_monto_a_pagar (int monto_a_pagar) throws JSONException, IOException, InterruptedException {
 
         et_ID.setEnabled(true);
@@ -981,10 +925,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
         return flag;
     }
-
-/*    private void actualizar_saldo_cliente () {
-
-    }*/
 
     private void spinner_listener () {
         sp_plazos.setOnItemSelectedListener(
@@ -1267,27 +1207,9 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
         flag = String.valueOf(cuotas);
         return flag;
-    }*/
-
-    private void actualizar_caja (int monto_ingresado) {
-        try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput(caja));
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            String[] split = linea.split(" ");
-            int monto_nuevo = Integer.parseInt(split[1]) + monto_ingresado;
-            linea = linea.replace(split[1], String.valueOf(monto_nuevo));
-            br.close();
-            archivo.close();
-            borrar_archivo(caja);
-            crear_archivo(caja);
-            guardar(linea, caja);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
-/*    private String obtener_id () {
+      private String obtener_id () {
         String flag = "";
         String cliente_file = cliente_ID + "_C_.txt";
         String lista_archivos = "";
@@ -1596,6 +1518,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             return true;
         }
     }
+
     /*
     private void check_onlines () throws JSONException {
         if (verificar_internet()) {
@@ -1802,6 +1725,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
     }
     */
+
     private void subir_archivo (String file) throws JSONException {
         ocultar_todito();
         String sp_creditos = "";
