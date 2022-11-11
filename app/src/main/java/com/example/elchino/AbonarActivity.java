@@ -949,6 +949,7 @@ public class AbonarActivity extends AppCompatActivity {
         et_ID.setText(String.valueOf(monto_a_pagar));
         et_ID.setFocusableInTouchMode(true);
         et_ID.setVisibility(View.VISIBLE);
+        et_ID.setHint("Digite el monto a abonar...");
         bt_consultar.setEnabled(true);
         bt_consultar.setText("REALIZAR PAGO");
         bt_consultar.setVisibility(View.VISIBLE);

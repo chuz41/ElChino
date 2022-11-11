@@ -1,6 +1,8 @@
 package com.example.elchino;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+
+import androidx.annotation.ColorInt;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
@@ -667,7 +669,8 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     }
 
-    private void presentar_cuadratura() {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void presentar_cuadratura () {
         //TODO: Presentar la informacion que esta en la cuadratura
         bt_consultar.setEnabled(false);
         bt_consultar.setVisibility(View.INVISIBLE);
@@ -678,24 +681,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         et_ID.setEnabled(false);
         sp_plazos.setEnabled(false);
         sp_plazos.setVisibility(View.INVISIBLE);
-        /*sequi1 = (Button) findViewById(R.id.sequi1);
-        sequi2 = (Button) findViewById(R.id.sequi2);
-        sequi3 = (Button) findViewById(R.id.sequi3);
-        sequi4 = (Button) findViewById(R.id.sequi4);
-        sequi5 = (Button) findViewById(R.id.sequi5);
-        sequi6 = (Button) findViewById(R.id.sequi6);
-        sequi7 = (Button) findViewById(R.id.sequi7);
-        sequi8 = (Button) findViewById(R.id.sequi8);
-        sequi9 = (Button) findViewById(R.id.sequi9);
-        sequi1.setVisibility(View.INVISIBLE);
-        sequi2.setVisibility(View.INVISIBLE);
-        sequi3.setVisibility(View.INVISIBLE);
-        sequi4.setVisibility(View.INVISIBLE);
-        sequi5.setVisibility(View.INVISIBLE);
-        sequi6.setVisibility(View.INVISIBLE);
-        sequi7.setVisibility(View.INVISIBLE);
-        sequi8.setVisibility(View.INVISIBLE);
-        sequi9.setVisibility(View.INVISIBLE);*/
         String[] split_1 = cuadratura.split("__");
         int largo_split = split_1.length;
         HashMap<Integer, Button> botones = new HashMap<Integer, Button>();
@@ -710,9 +695,35 @@ public class CuadraturaActivity extends AppCompatActivity {
         botones.put(8, sequi9);
         TreeMap<Integer, Button> botones_tree = getTreeMapBotones(botones);
         //Map<Integer, Button> botones_treeMap = getTreeMap(botones);
+        LocalDate hoy_LD = LocalDate.now();
         for (int i = 0; i < largo_split; i++) {
-            String[] split = split_1[i].split("_");
+            String fecha_cuadrito = split_1[3];
+            String[] split_fec = fecha_cuadrito.split("/");
+            fecha_cuadrito = split_fec[2] + "-" + split_fec[1] + "-" + split_fec[0];
+            LocalDate fecha_cuadrito_LD = LocalDate.parse(fecha_cuadrito);
+            String diferencia_fechas = String.valueOf(DAYS.between(fecha_cuadrito_LD, hoy_LD));
+            String[] split = split_1[i].split("_");//TODO: Si estan en cero o al dia, se debe pintar verde el boton, si es hoy el dia, pintar amarillo, si esta atrazado, pintar verde.
             String info_boton = split[3] + "\n" + split[0] + " " + split[1] + "\n" + split[2];
+            if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado.
+                if (Integer.parseInt(split[2]) == 0) {
+                    botones_tree.get(i).setTextColor(0X0D7302);//VERDE OBSCURO
+                    botones_tree.get(i).setBackgroundColor(0x97FD8C);//VERDE CLARO
+                } else {
+                    botones_tree.get(i).setTextColor(0XDE0037);//ROJO OBSCURO
+                    botones_tree.get(i).setBackgroundColor(0xFDAAC5);//ROJO CLARO
+                }
+            } else if (Integer.parseInt(diferencia_fechas) < 0 ) {//Es una fecha posterior a hoy
+                botones_tree.get(i).setTextColor(0X0D7302);//VERDE OBSCURO
+                botones_tree.get(i).setBackgroundColor(0x97FD8C);//VERDE CLARO
+            } else if (Integer.parseInt(diferencia_fechas) == 0 ) {//Es hoy
+                if (Integer.parseInt(split[2]) == 0) {
+                    botones_tree.get(i).setTextColor(0X0D7302);//VERDE OBSCURO
+                    botones_tree.get(i).setBackgroundColor(0x97FD8C);//VERDE CLARO
+                } else {
+                    botones_tree.get(i).setTextColor(0X949900);//AMARILLO OBSCURO
+                    botones_tree.get(i).setBackgroundColor(0xF9FF61);//AMARILLO CLARO
+                }
+            }
             botones_tree.get(i).setVisibility(View.VISIBLE);
             botones_tree.get(i).setText(info_boton);
             botones_tree.get(i).setClickable(false);//TODO: Aqui se debe hacer un algoritmo que al tener monto pendiente, se pueda cancelar solo esa cuota.
