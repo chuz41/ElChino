@@ -634,6 +634,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void actualizar_archivo_credito() {
         //archivo_prestamo
 
@@ -698,32 +699,35 @@ public class CuadraturaActivity extends AppCompatActivity {
         LocalDate hoy_LD = LocalDate.now();
         for (int i = 0; i < largo_split; i++) {
             String fecha_cuadrito = split_1[3];
+            //String[] split_fec = fecha_cuadrito.split("/");
+            String[] split = split_1[i].split("_");//TODO: Si estan en cero o al dia, se debe pintar verde el boton, si es hoy el dia, pintar amarillo, si esta atrazado, pintar verde.
+            fecha_cuadrito = split[3];
             String[] split_fec = fecha_cuadrito.split("/");
             fecha_cuadrito = split_fec[2] + "-" + split_fec[1] + "-" + split_fec[0];
             LocalDate fecha_cuadrito_LD = LocalDate.parse(fecha_cuadrito);
             String diferencia_fechas = String.valueOf(DAYS.between(fecha_cuadrito_LD, hoy_LD));
-            String[] split = split_1[i].split("_");//TODO: Si estan en cero o al dia, se debe pintar verde el boton, si es hoy el dia, pintar amarillo, si esta atrazado, pintar verde.
             String info_boton = split[3] + "\n" + split[0] + " " + split[1] + "\n" + split[2];
             if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado.
                 if (Integer.parseInt(split[2]) == 0) {
-                    botones_tree.get(i).setTextColor(0X0D7302);//VERDE OBSCURO
-                    botones_tree.get(i).setBackgroundColor(0x97FD8C);//VERDE CLARO
+                    botones_tree.get(i).setTextColor(0XFF0D7302);//VERDE OBSCURO
+                    botones_tree.get(i).setBackgroundColor(0xFF97FD8C);//VERDE CLARO
                 } else {
-                    botones_tree.get(i).setTextColor(0XDE0037);//ROJO OBSCURO
-                    botones_tree.get(i).setBackgroundColor(0xFDAAC5);//ROJO CLARO
+                    botones_tree.get(i).setTextColor(0XFFDE0037);//ROJO OBSCURO
+                    botones_tree.get(i).setBackgroundColor(0xFFFDAAC5);//ROJO CLARO
                 }
             } else if (Integer.parseInt(diferencia_fechas) < 0 ) {//Es una fecha posterior a hoy
-                botones_tree.get(i).setTextColor(0X0D7302);//VERDE OBSCURO
-                botones_tree.get(i).setBackgroundColor(0x97FD8C);//VERDE CLARO
+                botones_tree.get(i).setTextColor(0XFF0D7302);//VERDE OBSCURO
+                botones_tree.get(i).setBackgroundColor(0xFF97FD8C);//VERDE CLARO
             } else if (Integer.parseInt(diferencia_fechas) == 0 ) {//Es hoy
                 if (Integer.parseInt(split[2]) == 0) {
-                    botones_tree.get(i).setTextColor(0X0D7302);//VERDE OBSCURO
-                    botones_tree.get(i).setBackgroundColor(0x97FD8C);//VERDE CLARO
+                    botones_tree.get(i).setTextColor(0XFF0D7302);//VERDE OBSCURO
+                    botones_tree.get(i).setBackgroundColor(0xFF97FD8C);//VERDE CLARO
                 } else {
-                    botones_tree.get(i).setTextColor(0X949900);//AMARILLO OBSCURO
-                    botones_tree.get(i).setBackgroundColor(0xF9FF61);//AMARILLO CLARO
+                    botones_tree.get(i).setTextColor(0XFF949900);//AMARILLO OBSCURO
+                    botones_tree.get(i).setBackgroundColor(0xFFF9FF61);//AMARILLO CLARO
                 }
             }
+
             botones_tree.get(i).setVisibility(View.VISIBLE);
             botones_tree.get(i).setText(info_boton);
             botones_tree.get(i).setClickable(false);//TODO: Aqui se debe hacer un algoritmo que al tener monto pendiente, se pueda cancelar solo esa cuota.
@@ -739,6 +743,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         return treeMap;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void actualizar_archivo_cliente() {
         String[] spliti = archivo_prestamo.split("_");
         String archivo_cliente = spliti[0] + "_C_.txt";
