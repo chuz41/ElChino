@@ -415,8 +415,12 @@ public class CuadraturaActivity extends AppCompatActivity {
             //msg("Cliente no posee creditos activos!");
             cantidad_de_creditos = 0;
             esperar("Cliente no posee creditos activos!");
-        } else if (Integer.parseInt(flag) == 1) {
+        } else if (Integer.parseInt(flag) == 1) {//Solo tiene un credito activo.
             cantidad_de_creditos = 1;
+            String[] split = lista_archivos.split("_sep_");
+            Log.v("revisar_creditos", ".\n\nCuadratura. Archivo correcto: " + split[0] + "\n\n.");
+            archivo_prestamo = split[0];
+            Log.v("revisar_creditos_F", ".\n\nCuadratura. Contenido del archivo " + archivo_prestamo + ":\n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
         } else {
             flasg = true;
             cantidad_de_creditos = 2;//Significa que son 2 o mas creditos. Se debe activar el spinner.
@@ -1029,9 +1033,9 @@ public class CuadraturaActivity extends AppCompatActivity {
             String file_to_consult = "";
 
             if (flag_client_reciv) {
-                file_to_consult = cliente_recibido + "_P_";
+                file_to_consult = archivo_prestamo;
             } else {
-                file_to_consult = et_ID.getText().toString() + "_P_";
+                file_to_consult = archivo_prestamo;
             }
             for (int i = 0; i < archivos.length; i++) {
                 Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
