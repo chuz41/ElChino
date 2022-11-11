@@ -296,7 +296,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
                     br.close();
                     archivo.close();
-                    creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad_s + " " + cuotas_morosas + "___";
+                    creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
                     //Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
                 } catch (IOException e) {
                 }
@@ -329,10 +329,15 @@ public class CuadraturaActivity extends AppCompatActivity {
         int diferencia_en_dias = Integer.parseInt(String.valueOf(DAYS.between(fecha_hoy, proximo_abono_LD)));
         if (diferencia_en_dias <= 0) {
             saldo = String.valueOf(saldo_plus);
+            morosidad = "D";
         } else {
+
             saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)) + Integer.parseInt(intereses_de_mora));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
             double pre_num = (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)) + Integer.parseInt(intereses_de_mora);
             int pre_num_int = (int) pre_num;
+            if (pre_num_int > 0) {
+                morosidad = "M";
+            }
             interes_mora_total = String.valueOf(pre_num_int);
         }
         flag = saldo;

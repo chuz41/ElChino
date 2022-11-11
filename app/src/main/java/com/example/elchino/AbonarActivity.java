@@ -672,6 +672,7 @@ public class AbonarActivity extends AppCompatActivity {
 
     }
 
+
     private void presentar_cuadratura() {
         //TODO: llamar a la activity estado_de_cuenta
         Intent CuadraturaAc = new Intent(this, CuadraturaActivity.class);
@@ -926,6 +927,7 @@ public class AbonarActivity extends AppCompatActivity {
         return flag;
     }*/
 
+
     private void esperar_un_ratito (int monto_a_pagar) throws InterruptedException {
         presentar_monto_a_pagar(monto_a_pagar);
         /*try {
@@ -946,6 +948,7 @@ public class AbonarActivity extends AppCompatActivity {
             e.printStackTrace();
         }*/
     }
+
 
     private void presentar_monto_a_pagar (int monto_a_pagar) {
 
