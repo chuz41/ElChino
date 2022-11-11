@@ -183,11 +183,13 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     }
 
     public void estado_cuenta(View view) {
-        Intent estado_cuenta = new Intent(this, Estado_clienteActivity.class);
-        estado_cuenta.putExtra("msg", "");
-        estado_cuenta.putExtra("cliente_recivido", cliente_ID);
+        Intent cuadra_tura = new Intent(this, CuadraturaActivity.class);
+        cuadra_tura.putExtra("msg", "");
+        cuadra_tura.putExtra("cuadratura", "");
+        cuadra_tura.putExtra("cliente_recivido", cliente_ID);
+        cuadra_tura.putExtra("cambio", "0");
         //abonar.putExtra("sid_vendidas", sid_vendidas);
-        startActivity(estado_cuenta);
+        startActivity(cuadra_tura);
         finish();
         System.exit(0);
     }

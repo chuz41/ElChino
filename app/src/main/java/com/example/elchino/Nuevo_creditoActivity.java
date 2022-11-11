@@ -494,6 +494,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         crear_archivo(file_name);
         guardar(file_content, file_name);
         actualizar_caja();
+        Log.v("antes_de_subir", ".\n\nArchivo a subir: " + file_name + "\n\nContenido de " + file_name + ":\n\n" + imprimir_archivo(file_name) + "\n\n.");
         subir_archivo(file_name);
 
     }
@@ -1125,6 +1126,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Log.v("json_string_debug", ".\n\njson_string: " + "\n\n" + json_string + "\n\n.");
         jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_credito);
         subir_nuevo_credito(jsonObject, file);
     }
@@ -1161,15 +1163,15 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                             String[] split = response.toString().split("\"");
                             int length_split = split.length;
                             Log.v("info_sub_file_resag: ", "\n\n" + response + "\n\n");
-                            if (length_split > 3) {//TODO: Corregir este if. Debe ser mas especifico y detectar si la respuesta no es correcta.
+                            if (length_split > 3) {//
                                 for (int i = 0; i < length_split; i++) {
                                     Log.v("split[" + i + "]", split[i]);
                                 }
-                                if (split[21].equals(credit_ID)) {//TODO: Todo de arriba tiene que ver tambien con este.
+                                if (split[23].equals(credit_ID)) {//
                                     cambiar_bandera1(file);
-                                    esperar("\"Credito generado y registrado correctamente en el servidor.\"");
+
                                 } else {
-                                    esperar("Error al subir informacion del credito al servidor. Conectese a internet!!!");
+                                    esperar("Error al subir informacion del credito al servidor.");
                                 }
                             } else {
                                 //No se subio correctamente!
@@ -1227,6 +1229,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
             mostrar_todito();
             Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
+            esperar("\"Credito generado y registrado correctamente en el servidor.\"");
         } catch (IOException e) {
             e.printStackTrace();
         }

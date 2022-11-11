@@ -54,6 +54,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     private Integer monto_abono = 0;
     private Integer monto_cuota = 0;
+    private String cambio;
     private String fecha_pago = "";//Fecha que debe pagar la proxima cuota.
     private Integer saldo_mas_intereses = 0;
     private Integer tasa = 0;//Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
@@ -107,21 +108,40 @@ public class CuadraturaActivity extends AppCompatActivity {
     private Button sequi7;
     private Button sequi8;
     private Button sequi9;
+    private TextView tv_cambio;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cuadratura);
         String mensaje_recibido = getIntent().getStringExtra( "msg");
         cuadratura = getIntent().getStringExtra( "cuadratura");
+        cambio = getIntent().getStringExtra("cambio");
+        tv_cambio = (TextView) findViewById(R.id.tv_cambio);
+        tv_cambio.setVisibility(View.INVISIBLE);
+        Integer cambio_int = Integer.valueOf(cambio);
+        if (cambio_int > 0) {
+            tv_cambio.setText("Cambio:\n\n" + cambio);
+            tv_cambio.setVisibility(View.VISIBLE);
+            Toast.makeText(this, "Devolver " + cambio + " colones sobrantes.", Toast.LENGTH_LONG).show();
+        } else {
+
+        }
+        et_ID = (EditText) findViewById(R.id.et_ID);
+        sp_plazos = (Spinner) findViewById(R.id.sp_plazos);
+        sp_plazos.setVisibility(View.INVISIBLE);
+        bt_consultar = (Button) findViewById(R.id.bt_consultar_ab);
+        bt_consultar.setClickable(false);
+        bt_consultar.setEnabled(false);
         if (mensaje_recibido.equals("")) {
             //Do nothing.
         } else {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
         }
         cliente_recibido = getIntent().getStringExtra( "cliente_recivido");
-        //tv_esperar = (TextView) findViewById(R.id.tv_esperar);
-        /*sequi1 = (Button) findViewById(R.id.sequi1);
+        tv_esperar = (TextView) findViewById(R.id.tv_esperar);
+        sequi1 = (Button) findViewById(R.id.sequi1);
         sequi2 = (Button) findViewById(R.id.sequi2);
         sequi3 = (Button) findViewById(R.id.sequi3);
         sequi4 = (Button) findViewById(R.id.sequi4);
@@ -138,11 +158,32 @@ public class CuadraturaActivity extends AppCompatActivity {
         sequi6.setVisibility(View.INVISIBLE);
         sequi7.setVisibility(View.INVISIBLE);
         sequi8.setVisibility(View.INVISIBLE);
-        sequi9.setVisibility(View.INVISIBLE);*/
+        sequi9.setVisibility(View.INVISIBLE);
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
         tv_saludo.setText("ESTADO DE CUENTA\n\nCliente ID: " + cliente_recibido);
-        text_listener();
         separar_fechaYhora();
+
+        if (!cuadratura.equals("")) {
+            presentar_cuadratura();
+        } else {
+            if (cliente_recibido.equals("")) {
+                //Do nothing.
+            } else if (cliente_recibido.equals("CERO")) {
+                //Do nothing.
+            } else {
+                flag_client_reciv = true;
+                cliente_ID = cliente_recibido;
+                try {
+                    consultar(null);
+                } catch (JSONException | InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            text_listener();
+        }
+
         //actualizar_cuadratura();
     }
 
@@ -275,7 +316,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private String obtener_saldo_al_dia(String saldo_plus, String next_pay, String intereses_de_mora) {
+    private String obtener_saldo_al_dia (String saldo_plus, String next_pay, String intereses_de_mora) {
         String flag = "";
         String saldo = "";
         String[] split2 = next_pay.split("/");
@@ -567,8 +608,8 @@ public class CuadraturaActivity extends AppCompatActivity {
             }
             br.close();
             archivo.close();
-            Log.v("prosesar_abono2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
-            String[] piezas = plazo.split(" ");
+            Log.v("prosesar_abono2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\nPlazo: " + plazo + "\n\n.");
+            String[] piezas = plazo.split("_");
             if (piezas[1].equals("quincenas")) {
                 factor_semanas = 2;
             } else if (piezas[1].equals("semanas")) {
@@ -578,9 +619,9 @@ public class CuadraturaActivity extends AppCompatActivity {
                 //ERROR
             }
 
-            Log.v("antes_de_cuadra_chang", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
+            Log.v("antes_de_cuadra_chang", ".\n\nCuadratura. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
             cuadratura = obtener_cuadratura(cuadratura, fecha_next_abono, factor_semanas, monto_ingresado);//Aqui se obtiene la verdadera y final morosidad.
-            Log.v("despues_de_cuadra_chang", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
+            Log.v("despues_de_cuadra_chang", ".\n\nCuadratura. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
             //cuotas = obtener_cuotas_nuevas(cuadratura);
             saldo_mas_intereses = Integer.parseInt(obtener_saldo_plus(cuadratura));
 
@@ -615,7 +656,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             }
             br.close();
             archivo.close();
-            Log.v("actualizar_archiv_cred1", ".\n\nArchivo: " + archivo_prestamo + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
+            Log.v("actualizar_archiv_cred1", ".\n\nCuadratura. Archivo: " + archivo_prestamo + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
             borrar_archivo(archivo_prestamo);
             crear_archivo(archivo_prestamo);
             guardar(contenido, archivo_prestamo);
@@ -637,7 +678,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         et_ID.setEnabled(false);
         sp_plazos.setEnabled(false);
         sp_plazos.setVisibility(View.INVISIBLE);
-        sequi1 = (Button) findViewById(R.id.sequi1);
+        /*sequi1 = (Button) findViewById(R.id.sequi1);
         sequi2 = (Button) findViewById(R.id.sequi2);
         sequi3 = (Button) findViewById(R.id.sequi3);
         sequi4 = (Button) findViewById(R.id.sequi4);
@@ -654,7 +695,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         sequi6.setVisibility(View.INVISIBLE);
         sequi7.setVisibility(View.INVISIBLE);
         sequi8.setVisibility(View.INVISIBLE);
-        sequi9.setVisibility(View.INVISIBLE);
+        sequi9.setVisibility(View.INVISIBLE);*/
         String[] split_1 = cuadratura.split("__");
         int largo_split = split_1.length;
         HashMap<Integer, Button> botones = new HashMap<Integer, Button>();
@@ -674,7 +715,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             String info_boton = split[3] + "\n" + split[0] + " " + split[1] + "\n" + split[2];
             botones_tree.get(i).setVisibility(View.VISIBLE);
             botones_tree.get(i).setText(info_boton);
-            botones_tree.get(i).setClickable(false);
+            botones_tree.get(i).setClickable(false);//TODO: Aqui se debe hacer un algoritmo que al tener monto pendiente, se pueda cancelar solo esa cuota.
         }
     }
 
@@ -840,23 +881,25 @@ public class CuadraturaActivity extends AppCompatActivity {
     }*/
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void esperar_un_ratito (int monto_a_pagar) throws InterruptedException {
-        try {
+    private void esperar_un_ratito (int monto_a_pagar) throws InterruptedException, JSONException, IOException {
+        presentar_monto_a_pagar(monto_a_pagar);
+        /*try {
             Thread.sleep(1000);
             presentar_monto_a_pagar(monto_a_pagar);
         } catch (InterruptedException | JSONException | IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void esperar_otro_ratito () throws InterruptedException {
-        try {
+        procesar_abono2();
+        /*try {
             Thread.sleep(1000);
             procesar_abono2();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -943,7 +986,15 @@ public class CuadraturaActivity extends AppCompatActivity {
                             tv_esperar.setText("");
                             tv_esperar.setFocusableInTouchMode(true);
                             tv_esperar.requestFocus();
-                            presentar_info_credito(sp_plazos.getSelectedItem().toString());
+                            try {
+                                presentar_info_credito(sp_plazos.getSelectedItem().toString());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                     @Override
@@ -953,7 +1004,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void presentar_info_credito (String s) {
+    private void presentar_info_credito (String s) throws JSONException, IOException, InterruptedException {
 
         if (s.equals("UNO")) {
             String archivos[] = fileList();
@@ -978,7 +1029,6 @@ public class CuadraturaActivity extends AppCompatActivity {
                         String saldo_mas_intereses_s = "";
                         String plazo = "";
                         String numero_de_credito = "";
-                        String morosidad_s = "";
                         String cuotas_morosas = "";
                         String valor_presentar_s = "";
                         //String indice_file = "";
@@ -1003,9 +1053,6 @@ public class CuadraturaActivity extends AppCompatActivity {
                             if (split[0].equals("cuotas")) {
                                 cuotas_morosas = split[1];
                             }
-                            if (split[0].equals("morosidad")) {
-                                morosidad_s = split[1];
-                            }
                             if (split[0].equals("intereses_moratorios")) {
                                 intereses_mor = split[1];
                             }
@@ -1021,7 +1068,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
                         br.close();
                         archivo.close();
-                        valor_presentar_s = "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad_s + " " + cuotas_morosas;
+                        valor_presentar_s = "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas;
                         presentar_et_esperar = valor_presentar_s;
                         et_ID.setText("");
                         et_ID.setFocusableInTouchMode(false);
@@ -1034,9 +1081,10 @@ public class CuadraturaActivity extends AppCompatActivity {
                         tv_esperar.setText("");
                         tv_esperar.setVisibility(View.VISIBLE);
                         tv_esperar.setText("Prestamo a consultar:");
-                        bt_consultar.setEnabled(true);
-                        bt_consultar.setVisibility(View.VISIBLE);
-                        bt_consultar.setClickable(true);
+                        consultar(null);
+                        //bt_consultar.setEnabled(true);
+                        //bt_consultar.setVisibility(View.VISIBLE);
+                        //bt_consultar.setClickable(true);
                     } catch (IOException e) {
                     }
 
@@ -1059,9 +1107,10 @@ public class CuadraturaActivity extends AppCompatActivity {
             tv_esperar.setText("");
             tv_esperar.setVisibility(View.VISIBLE);
             tv_esperar.setText("Prestamo a consultar:");
-            bt_consultar.setEnabled(true);
-            bt_consultar.setVisibility(View.VISIBLE);
-            bt_consultar.setClickable(true);
+            consultar(null);
+            //bt_consultar.setEnabled(true);
+            //bt_consultar.setVisibility(View.VISIBLE);
+            //bt_consultar.setClickable(true);
         }
 
     }
@@ -1267,6 +1316,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (tv_esperar.getText().toString().equals("Digite el monto del abono")) {
@@ -1772,6 +1822,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Log.v("json_string_debug", ".\n\njson_string: " + "\n\n" + json_string + "\n\n.");
         jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_credito);
         subir_nuevo_credito(jsonObject, file);
     }
