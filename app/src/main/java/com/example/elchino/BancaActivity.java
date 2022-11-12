@@ -76,6 +76,7 @@ public class BancaActivity extends AppCompatActivity {
     private boolean flag_client_reciv = false;
     private String cliente_recibido = "";
     private String caja = "caja.txt";
+    private TextView tv_caja;
     private String credit_ID = "";
 
     @Override
@@ -99,6 +100,9 @@ public class BancaActivity extends AppCompatActivity {
         bt_recibir.setEnabled(false);
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
         tv_saludo.setText("ABONAR/RECIBIR FONDOS DE BANCA");
+        tv_caja = (TextView) findViewById(R.id.tv_caja);
+        tv_caja.setHint("Caja...");
+        mostrar_caja();
         separar_fechaYhora();
         if (cliente_recibido.equals("")) {
             //Do nothing.
@@ -107,6 +111,10 @@ public class BancaActivity extends AppCompatActivity {
             cliente_ID = cliente_recibido;
         }
         text_listener();
+    }
+
+    private void mostrar_caja () {
+        tv_caja.setText(imprimir_archivo(caja));
     }
 
     private void actualizar_disponible (String operador) {

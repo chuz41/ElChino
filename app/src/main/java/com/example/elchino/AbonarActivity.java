@@ -105,6 +105,7 @@ public class AbonarActivity extends AppCompatActivity {
     private String puntuacion_cliente = "";
     private String presentar_et_esperar = "";
     private String cuadratura = "";
+    private TextView tv_caja;
 
     private Spinner sp_plazos;
 
@@ -130,6 +131,9 @@ public class AbonarActivity extends AppCompatActivity {
         tv_saludo.setText("ABONO A CREDITO");
         sp_plazos = (Spinner) findViewById(R.id.sp_plazos);
         sp_plazos.setVisibility(View.INVISIBLE);
+        tv_caja = (TextView) findViewById(R.id.tv_caja);
+        tv_caja.setHint("Caja...");
+        mostrar_caja();
         separar_fechaYhora();
 
         if (cliente_recibido.equals("")) {
@@ -148,6 +152,10 @@ public class AbonarActivity extends AppCompatActivity {
             }
         }
         text_listener();
+    }
+
+    private void mostrar_caja () {
+        tv_caja.setText(imprimir_archivo(caja));
     }
 
 /*    private String obtener_morosidad (String file) {

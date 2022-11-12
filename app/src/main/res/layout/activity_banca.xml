@@ -79,4 +79,13 @@
         app:layout_constraintBottom_toTopOf="@+id/bt_recibir"
         app:layout_constraintStart_toStartOf="@+id/bt_recibir" />
 
+    <TextView
+        android:id="@+id/tv_caja"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

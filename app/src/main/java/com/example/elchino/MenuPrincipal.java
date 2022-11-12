@@ -69,6 +69,8 @@ public class MenuPrincipal extends AppCompatActivity {
     private TextView tv_fecha;
     private boolean flag_salir = false;
     private String mensaje_recibido = "";
+    private TextView tv_caja;
+    private String caja = "caja.txt";
 
     @Override
     protected void onPause() {
@@ -114,6 +116,9 @@ public class MenuPrincipal extends AppCompatActivity {
         bt_nuevo_credito = (Button) findViewById(R.id.bt_nuevo_credito);
         tv_saludo = (TextView) findViewById(R.id.tv_saludoMenu);
         tv_fecha = (TextView) findViewById(R.id.tv_fecha);
+        tv_caja = (TextView) findViewById(R.id.tv_caja);
+        tv_caja.setHint("Caja...");
+        mostrar_caja();
         separar_fechaYhora();
         tv_fecha.setText(fecha + "/" + mes + "/" + anio);
         tv_saludo.setText("El Chino");
@@ -128,6 +133,10 @@ public class MenuPrincipal extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void mostrar_caja() {
+        tv_caja.setText(imprimir_archivo(caja));
     }
 
     public void abonar(View view){
@@ -345,7 +354,7 @@ public class MenuPrincipal extends AppCompatActivity {
 
     }
 
-    private String imprimir_archivo(String file_name){
+    private String imprimir_archivo (String file_name){
 
         String archivos[] = fileList();
         String contenido = "";//Aqui se lee el contenido del archivo guardado.

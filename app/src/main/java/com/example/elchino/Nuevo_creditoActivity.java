@@ -90,6 +90,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private boolean flag_client_reciv = false;
     private String cliente_recibido = "";
     private String caja = "caja.txt";
+    private TextView tv_caja;
     private String credit_ID = "";
     private String interes_mora = "";
     private String puntuacion_cliente = "";
@@ -115,7 +116,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         sp_plazos = (Spinner) findViewById(R.id.sp_plazos);
         sp_plazos.setVisibility(View.INVISIBLE);
         tv_saludo.setText("NUEVO CREDITO");
-        //et_ID.setVisibility(View.INVISIBLE);
+        tv_caja = (TextView) findViewById(R.id.tv_caja);
+        tv_caja.setHint("Caja...");
+        mostrar_caja();
         separar_fechaYhora();
         if (cliente_recibido.equals("")) {
             //Do nothing.
@@ -1234,6 +1237,10 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void mostrar_caja () {
+        tv_caja.setText(imprimir_archivo(caja));
     }
 
     private void presentar_cuadratura() {

@@ -659,7 +659,7 @@ public class MainActivity extends AppCompatActivity {
         text_listener();
     }
 
-    public void submit(View view) throws IOException {
+    public void submit (View view) throws IOException {
 
         et_ID.setFocusableInTouchMode(false);
         et_ID.setEnabled(false);

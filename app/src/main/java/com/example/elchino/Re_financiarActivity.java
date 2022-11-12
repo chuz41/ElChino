@@ -97,6 +97,7 @@ public class Re_financiarActivity extends AppCompatActivity {
     private String cliente_recibido = "";
     private String abono_cero = "0";
     private String caja = "caja.txt";
+    private TextView tv_caja;
     private String credit_ID = "";
     private int cantidad_de_creditos = 0;
     private String interes_mora = "";
@@ -131,6 +132,9 @@ public class Re_financiarActivity extends AppCompatActivity {
         tv_saludo.setText("RE-FINANCIAR CREDITO");
         sp_plazos = (Spinner) findViewById(R.id.sp_plazos);
         sp_plazos.setVisibility(View.INVISIBLE);
+        tv_caja = (TextView) findViewById(R.id.tv_caja);
+        tv_caja.setHint("Caja...");
+        mostrar_caja();
         separar_fechaYhora();
 
         if (cliente_recibido.equals("")) {
@@ -149,6 +153,10 @@ public class Re_financiarActivity extends AppCompatActivity {
             }
         }
         text_listener();
+    }
+
+    private void mostrar_caja () {
+        tv_caja.setText(imprimir_archivo(caja));
     }
 
 /*    private String obtener_morosidad (String file) {

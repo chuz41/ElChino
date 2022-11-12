@@ -95,4 +95,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.894"
         tools:text="@string/banca_reciv_entreg" />
+
+    <TextView
+        android:id="@+id/tv_caja"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/bt_nuevo_cliente"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_saludoMenu" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -31,6 +31,8 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     private String cliente_ID = "";
     private Button bt_estado_cuenta;
     private boolean flag_consultar = false;
+    private TextView tv_caja;
+    private String caja = "caja.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,44 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         bt_abonar.setVisibility(View.INVISIBLE);
         bt_estado_cuenta = (Button) findViewById(R.id.bt_estado_cuenta);
         bt_estado_cuenta.setVisibility(View.INVISIBLE);
+        tv_caja = (TextView) findViewById(R.id.tv_caja);
+        tv_caja.setHint("Caja...");
+        mostrar_caja();
         text_listener();
+    }
+
+    private void mostrar_caja () {
+        tv_caja.setText(imprimir_archivo(caja));
+    }
+
+    private String imprimir_archivo (String file_name){
+
+        String archivos[] = fileList();
+        String contenido = "";//Aqui se lee el contenido del archivo guardado.
+        if (archivo_existe(archivos, file_name)) {//Archivo nombre_archivo es el archivo que vamos a imprimir
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));//Se abre archivo
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();//Se lee archivo
+                while (linea != null) {
+                    contenido = contenido + linea + "\n";
+                    linea = br.readLine();
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+            }
+        }
+        return contenido;
+    }
+
+    private boolean archivo_existe (String[] archivos, String file_name){
+        for (int i = 0; i < archivos.length; i++) {
+            if (file_name.equals(archivos[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void text_listener() {
