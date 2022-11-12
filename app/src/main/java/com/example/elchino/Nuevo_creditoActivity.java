@@ -1171,7 +1171,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                                     cambiar_bandera1(file);
 
                                 } else {
-                                    esperar("Error al subir informacion del credito al servidor.");
+                                    Log.v("onResponse_nuev_cred", "Error al subir informacion del credito al servidor.");
                                 }
                             } else {
                                 //No se subio correctamente!
@@ -1194,7 +1194,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             agregar_linea_archivo("abajo " + file, onlines);
             //msg("Para registrar al vendedor en el servidor, debe estar conectado a internet.");
             mostrar_todito();
-            esperar("\"Para registrar al vendedor en el servidor, debe estar conectado a internet.\"");
+            presentar_cuadratura();
 
         }
 
@@ -1230,7 +1230,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             mostrar_todito();
             Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
             presentar_cuadratura();
-            esperar("\"Credito generado y registrado correctamente en el servidor.\"");
+            Log.v("camb_band_nuev_cred", "\"Credito generado y registrado correctamente en el servidor.\"");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1240,7 +1240,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         //TODO: llamar a la activity estado_de_cuenta
         Intent CuadraturaAc = new Intent(this, CuadraturaActivity.class);
         CuadraturaAc.putExtra("cuadratura", cuadratura);
-        CuadraturaAc.putExtra("msg", "Abono realizado con exito!!!");
+        CuadraturaAc.putExtra("msg", "Operacion realizada con exito!!!");
         CuadraturaAc.putExtra("cliente_recivido", cliente_ID);
         CuadraturaAc.putExtra("cambio", "0");
         CuadraturaAc.putExtra("monto_creditito", String.valueOf(monto_credito));

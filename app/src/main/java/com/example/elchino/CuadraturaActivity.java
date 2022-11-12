@@ -600,8 +600,8 @@ public class CuadraturaActivity extends AppCompatActivity {
                     cuotas = split[1];
                 } else if (split[0].equals("morosidad")) {
                     morosidad = split[1];
-                } else if (split[0].equals("intereses_moratorios")) {
-                    interes_mora_total = split[1];
+                //} else if (split[0].equals("intereses_moratorios")) {
+                //    interes_mora_total = split[1];
                 } else {
                 }
                 contenido = contenido + linea + "\n";
@@ -764,7 +764,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             }
             br.close();
             archivo.close();
-            Log.v("actualiz_archiv_client1", ".\n\nArchivo: " + archivo_cliente + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_cliente) + "\n\n.");
+            Log.v("actualiz_archiv_client1", ".\n\nCuadratura. Archivo: " + archivo_cliente + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_cliente) + "\n\n.");
             borrar_archivo(archivo_cliente);
             crear_archivo(archivo_cliente);
             guardar(contenido, archivo_cliente);

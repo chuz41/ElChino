@@ -588,8 +588,8 @@ public class AbonarActivity extends AppCompatActivity {
                     cuotas = split[1];
                 } else if (split[0].equals("morosidad")) {
                     morosidad = split[1];
-                } else if (split[0].equals("intereses_moratorios")) {
-                    interes_mora_total = split[1];
+                //} else if (split[0].equals("intereses_moratorios")) {
+                //    interes_mora_total = split[1];
                 } else {
                 }
                 contenido = contenido + linea + "\n";
@@ -707,7 +707,7 @@ public class AbonarActivity extends AppCompatActivity {
             }
             br.close();
             archivo.close();
-            Log.v("actualiz_archiv_client1", ".\n\nArchivo: " + archivo_cliente + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_cliente) + "\n\n.");
+            Log.v("actualiz_archiv_client1", ".\n\nAbonar. Archivo: " + archivo_cliente + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_cliente) + "\n\n.");
             borrar_archivo(archivo_cliente);
             crear_archivo(archivo_cliente);
             guardar(contenido, archivo_cliente);
@@ -1377,7 +1377,7 @@ public class AbonarActivity extends AppCompatActivity {
                     for (int i = 0; i < archivos.length; i++) {
                         Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
                         Matcher matcher = pattern.matcher(archivos[i]);
-                        Log.v("text_listener_identifi", ".\n\narchivos[" + i + "]: " + archivos[i] + "\n\n.");
+                        //Log.v("text_listener_identifi", ".\n\narchivos[" + i + "]: " + archivos[i] + "\n\n.");
                         boolean matchFound = matcher.find();
                         if (matchFound) {
                             if (s.length() >= 9) {
