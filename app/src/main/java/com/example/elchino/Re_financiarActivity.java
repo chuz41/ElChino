@@ -246,7 +246,7 @@ public class Re_financiarActivity extends AppCompatActivity {
                     String fecha_next_abono = "";
                     String intereses_mora = "";
                     String saldo_mas_intereses_s = "";
-                    String plazo = "";
+                    //String plazo = "";
                     String numero_de_credito = "";
                     String morosidad_s = "";
                     String cuotas_morosas = "";
@@ -417,9 +417,9 @@ public class Re_financiarActivity extends AppCompatActivity {
         } else if (Integer.parseInt(flag) == 1) {
             cantidad_de_creditos = 1;
             String[] split = lista_archivos.split("_sep_");
-            Log.v("revisar_creditos", ".\n\nAbonar. Archivo correcto: " + split[0] + "\n\n.");
+            Log.v("revisar_creditos", ".\n\nRe-financiar. Archivo correcto: " + split[0] + "\n\n.");
             archivo_prestamo = split[0];
-            Log.v("revisar_creditos_F", ".\n\nAbonar. Contenido del archivo " + archivo_prestamo + ":\n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
+            Log.v("revisar_creditos_F", ".\n\nRe-financiar. Contenido del archivo " + archivo_prestamo + ":\n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
         } else {
             flasg = true;
             cantidad_de_creditos = 2;//Significa que son 2 o mas creditos. Se debe activar el spinner.
@@ -619,12 +619,14 @@ public class Re_financiarActivity extends AppCompatActivity {
 
             saldo_mas_intereses = Integer.parseInt(obtener_saldo_plus(cuadratura)) + Integer.parseInt(interes_mora_total);
             monto_abono = saldo_mas_intereses;
+            Log.v("procesar_abono_refin", ".\n\nRe-financiar. Antes de cuadra changes. Saldo mas intereses: " + saldo_mas_intereses + "\n\ninteres mora total: " + interes_mora_total + "\n\nCuadratura:\n\n" + cuadratura + "\n\n.");
             actualizar_caja(saldo_mas_intereses);
             monto_ingresado = saldo_mas_intereses;
-            Log.v("antes_de_cuadra_chang", ".\n\nAbonar. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
+            Log.v("antes_de_cuadra_chang", ".\n\nRe-financiar. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
             cuadratura = obtener_cuadratura(cuadratura, fecha_next_abono, factor_semanas, monto_ingresado);//Aqui se obtiene la verdadera y final morosidad.
             interes_mora_total = "0";
-            Log.v("despues_de_cuadra_chang", ".\n\nAbonar. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
+            Log.v("despues_de_cuadra_chang", ".\n\nRe-financiar. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
+            Log.v("procesar_abono_refin", ".\n\nRe-financiar. Despues de cuadra changes. Saldo mas intereses: " + saldo_mas_intereses + "\n\ninteres mora total: " + interes_mora_total + "\n\nCuadratura:\n\n" + cuadratura + "\n\n.");
             cuotas = obtener_cuotas_nuevas(cuadratura);
             //saldo_mas_intereses = Integer.parseInt(obtener_saldo_plus(cuadratura));
             actualizar_archivo_credito();
@@ -684,7 +686,7 @@ public class Re_financiarActivity extends AppCompatActivity {
             }
             br.close();
             archivo.close();
-            Log.v("actualizar_archiv_cred1", ".\n\nAbonar. Archivo: " + archivo_prestamo + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
+            Log.v("actualizar_archiv_cred1", ".\n\nRe-financiar. Archivo: " + archivo_prestamo + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
             borrar_archivo(archivo_prestamo);
             crear_archivo(archivo_prestamo);
             guardar(contenido, archivo_prestamo);
@@ -784,7 +786,7 @@ public class Re_financiarActivity extends AppCompatActivity {
         borrar_archivo(file);
         crear_archivo(file_name);
         guardar(file_content, file_name);
-        actualizar_caja(monto_credito);
+        actualizar_caja((0-monto_credito));
         monto_credito = monto_credito - monto_abono;
         Log.v("antes_de_subir", ".\n\nRe_financiar. Archivo a subir: " + file_name + "\n\nContenido de " + file_name + ":\n\n" + imprimir_archivo(file_name) + "\n\n.");
         subir_archivo(file_name);
@@ -799,7 +801,7 @@ public class Re_financiarActivity extends AppCompatActivity {
         CuadraturaAc.putExtra("cliente_recivido", cliente_ID);
         CuadraturaAc.putExtra("cambio", "0");
         CuadraturaAc.putExtra("monto_creditito", String.valueOf(monto_credito));
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        CuadraturaAc.putExtra("activity_devolver", "MenuPrincipal");
         startActivity(CuadraturaAc);
         finish();
         System.exit(0);
@@ -916,7 +918,7 @@ public class Re_financiarActivity extends AppCompatActivity {
         return flag;
     }
 
-    private String obtener_saldo_plus(String cuadratura) {
+    private String obtener_saldo_plus (String cuadratura) {
         String flag = "";
 
         String[] split = cuadratura.split("__");

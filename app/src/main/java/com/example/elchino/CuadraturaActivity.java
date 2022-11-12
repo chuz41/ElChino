@@ -69,6 +69,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     private String cuotas = "";
     private EditText et_ID;
     private TextView tv_esperar;
+    private String activity_devolver;
     private Map<String, Integer> meses = new HashMap<String, Integer>();private String dia;
     private String mes;
     private String anio;
@@ -112,6 +113,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     private Button sequi9;
     private TextView tv_cambio;
     private String monto_creditito;
+    private String cliente_Id_volver;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -121,6 +123,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         String mensaje_recibido = getIntent().getStringExtra( "msg");
         cuadratura = getIntent().getStringExtra( "cuadratura");
         cambio = getIntent().getStringExtra("cambio");
+        activity_devolver = getIntent().getStringExtra("activity_devolver");
         monto_creditito = getIntent().getStringExtra("monto_creditito");
         tv_cambio = (TextView) findViewById(R.id.tv_cambio);
         tv_cambio.setVisibility(View.INVISIBLE);
@@ -147,6 +150,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
         }
         cliente_recibido = getIntent().getStringExtra( "cliente_recivido");
+        cliente_Id_volver = cliente_recibido;
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
         sequi1 = (Button) findViewById(R.id.sequi1);
         sequi2 = (Button) findViewById(R.id.sequi2);
@@ -697,10 +701,10 @@ public class CuadraturaActivity extends AppCompatActivity {
         //Map<Integer, Button> botones_treeMap = getTreeMap(botones);
         LocalDate hoy_LD = LocalDate.now();
         for (int i = 0; i < largo_split; i++) {
-            String fecha_cuadrito = split_1[3];
+            //String fecha_cuadrito = split_1[3];
             //String[] split_fec = fecha_cuadrito.split("/");
             String[] split = split_1[i].split("_");//TODO: Si estan en cero o al dia, se debe pintar verde el boton, si es hoy el dia, pintar amarillo, si esta atrazado, pintar verde.
-            fecha_cuadrito = split[3];
+            String fecha_cuadrito = split[3];
             String[] split_fec = fecha_cuadrito.split("/");
             fecha_cuadrito = split_fec[2] + "-" + split_fec[1] + "-" + split_fec[0];
             LocalDate fecha_cuadrito_LD = LocalDate.parse(fecha_cuadrito);
@@ -743,7 +747,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void actualizar_archivo_cliente() {
+    private void actualizar_archivo_cliente () {
         String[] spliti = archivo_prestamo.split("_");
         String archivo_cliente = spliti[0] + "_C_.txt";
         String contenido = "";
@@ -757,6 +761,8 @@ public class CuadraturaActivity extends AppCompatActivity {
                 if (split[0].equals("puntuacion")) {
                     linea = linea.replace(split[1], String.valueOf(puntuacion_cliente));
                     contenido = contenido + linea + "\n";
+                //} else if (split[0].equals("")) {
+
                 } else {
                     contenido = contenido + linea + "\n";
                 }
@@ -1457,11 +1463,25 @@ public class CuadraturaActivity extends AppCompatActivity {
     }
 
     private void boton_atras() {
-        Intent menu_principal = new Intent(this, MenuPrincipal.class);
-        menu_principal.putExtra("mensaje", "");
-        startActivity(menu_principal);
-        finish();
-        System.exit(0);
+
+        if (activity_devolver.equals("MenuPrincipal")) {
+            Intent activity_volver = new Intent(this, MenuPrincipal.class);
+            activity_volver.putExtra("mensaje", "");
+            startActivity(activity_volver);
+            finish();
+            System.exit(0);
+        } else if (activity_devolver.equals("Estado_cliente")) {
+            Intent activity_volver = new Intent(this, Estado_clienteActivity.class);
+            activity_volver.putExtra("mensaje", "");
+            activity_volver.putExtra("cliente_ID", cliente_Id_volver);
+            startActivity(activity_volver);
+            finish();
+            System.exit(0);
+        } else {
+
+        }
+
+
     }
 
     private void mostrar_todito() {

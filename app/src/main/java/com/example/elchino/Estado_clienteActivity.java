@@ -39,6 +39,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_estado_cliente);
         saludo_estado = (TextView) findViewById(R.id.tv_saludoEstado);
+        cliente_ID = getIntent().getStringExtra("cliente_ID");
         saludo_estado.setText(" Estado del cliente");
         et_ID = (EditText) findViewById(R.id.et_ID);
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
@@ -56,7 +57,11 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         tv_caja = (TextView) findViewById(R.id.tv_caja);
         tv_caja.setHint("Caja...");
         mostrar_caja();
-        text_listener();
+        if (cliente_ID.equals("")) {
+            text_listener();
+        } else {
+            consultar(null);
+        }
     }
 
     private void mostrar_caja () {
@@ -136,7 +141,12 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         String archivos[] = fileList();
         String puntuacion_cliente = "";
         String archivoCompleto = "";
-        String consultador = et_ID.getText().toString() + "_C_";
+        String consultador;
+        if (cliente_ID.equals("")) {
+            consultador = et_ID.getText().toString() + "_C_";
+        } else {
+            consultador = cliente_ID + "_C_";
+        }
         for (int i = 0; i < archivos.length; i++) {
             Pattern pattern = Pattern.compile(consultador, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(archivos[i]);
@@ -228,7 +238,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         cuadra_tura.putExtra("cliente_recivido", cliente_ID);
         cuadra_tura.putExtra("cambio", "0");
         cuadra_tura.putExtra("monto_creditito", "0");
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        cuadra_tura.putExtra("activity_devolver", "Estado_cliente");
         startActivity(cuadra_tura);
         finish();
         System.exit(0);

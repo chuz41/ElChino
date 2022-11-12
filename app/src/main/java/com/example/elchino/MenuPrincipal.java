@@ -161,7 +161,7 @@ public class MenuPrincipal extends AppCompatActivity {
 
     public void estado_cliente(View view){
         Intent estado_cliente = new Intent(this, Estado_clienteActivity.class);
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
+        estado_cliente.putExtra("cliente_ID", "");
         startActivity(estado_cliente);
         finish();
         System.exit(0);

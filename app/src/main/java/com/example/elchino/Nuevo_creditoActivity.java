@@ -16,6 +16,7 @@ import android.text.TextWatcher;
 import android.text.method.NumberKeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -1244,13 +1245,13 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     }
 
     private void presentar_cuadratura() {
-        //TODO: llamar a la activity estado_de_cuenta
         Intent CuadraturaAc = new Intent(this, CuadraturaActivity.class);
         CuadraturaAc.putExtra("cuadratura", cuadratura);
         CuadraturaAc.putExtra("msg", "Operacion realizada con exito!!!");
         CuadraturaAc.putExtra("cliente_recivido", cliente_ID);
         CuadraturaAc.putExtra("cambio", "0");
         CuadraturaAc.putExtra("monto_creditito", String.valueOf(monto_credito));
+        CuadraturaAc.putExtra("activity_devolver", "MenuPrincipal");
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(CuadraturaAc);
         finish();
