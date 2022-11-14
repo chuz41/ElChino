@@ -61,6 +61,7 @@ public class AbonarActivity extends AppCompatActivity {
 
     private Integer monto_abono = 0;
     private Integer cambio = 0;
+    private String interes_mora_parcial;
     private Integer monto_cuota = 0;
     private String fecha_pago = "";//Fecha que debe pagar la proxima cuota.
     private Integer saldo_mas_intereses = 0;
@@ -245,7 +246,7 @@ public class AbonarActivity extends AppCompatActivity {
                     String fecha_next_abono = "";
                     String intereses_mora = "";
                     String saldo_mas_intereses_s = "";
-                    String plazo = "";
+                    String plazo_s = "";
                     String numero_de_credito = "";
                     String morosidad_s = "";
                     String cuotas_morosas = "";
@@ -263,7 +264,7 @@ public class AbonarActivity extends AppCompatActivity {
                             fecha_next_abono = split[1];
                         }
                         if (split[0].equals("plazo")) {
-                            plazo = split[1];
+                            plazo_s = split[1];
                         }
                         if (split[0].equals("saldo_mas_intereses")) {
                             saldo_mas_intereses_s = split[1];
@@ -279,12 +280,27 @@ public class AbonarActivity extends AppCompatActivity {
                         }
                         linea = br.readLine();
                     }
-
-                    saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mora);
-                    cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazo, fecha_next_abono);
-
                     br.close();
                     archivo.close();
+
+                    String[] piezas = plazoz.split("_");
+                    if (piezas[1].equals("quincenas")) {
+                        factor_semanas = 2;
+                    } else if (piezas[1].equals("semanas")) {
+                        factor_semanas = 1;
+                    } else {
+                        factor_semanas = -1;
+                        //ERROR
+                    }
+
+                    String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
+                    String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
+                    interes_mora_total = intereses_moritas;
+                    cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
+                    saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mora);
+                    cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
+
+
                     if (Integer.parseInt(saldo_mas_intereses_s) > 100) {
                         creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
                     } else {
@@ -319,11 +335,12 @@ public class AbonarActivity extends AppCompatActivity {
         //SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         LocalDate proximo_abono_LD = LocalDate.parse(proximo_abono_formato);
         LocalDate fecha_hoy = LocalDate.now();
-        int diferencia_en_dias = Integer.parseInt(String.valueOf(DAYS.between(fecha_hoy, proximo_abono_LD)));
-        if (diferencia_en_dias <= 0) {
+        int diferencia_en_dias = Integer.parseInt(String.valueOf(DAYS.between(proximo_abono_LD, fecha_hoy)));
+        Log.v("obt_sald_al_dia", ".\n\nDiferencia en dias: " + diferencia_en_dias + "\n\n.");
+        if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
             saldo = saldo_plus;
             morosidad = "D";
-        } else {
+        } else {//Significa que esta atrazado!!!
 
             saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)) + Integer.parseInt(intereses_de_mora));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
             double pre_num = (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)) + Integer.parseInt(intereses_de_mora);
@@ -594,6 +611,8 @@ public class AbonarActivity extends AppCompatActivity {
                     saldo_mas_intereses = Integer.parseInt(split[1]);
                 } else if (split[0].equals("cuotas")) {
                     cuotas = split[1];
+                } else if (split[0].equals("tasa")) {
+                    tasa = Integer.parseInt(split[1]);
                 } else if (split[0].equals("morosidad")) {
                     morosidad = split[1];
                 //} else if (split[0].equals("intereses_moratorios")) {
@@ -692,7 +711,7 @@ public class AbonarActivity extends AppCompatActivity {
         System.exit(0);
     }
 
-    private void actualizar_archivo_cliente() {
+    private void actualizar_archivo_cliente () {
         String[] spliti = archivo_prestamo.split("_");
         String archivo_cliente = spliti[0] + "_C_.txt";
         String contenido = "";
@@ -727,10 +746,10 @@ public class AbonarActivity extends AppCompatActivity {
         }
     }
 
-    private String obtener_saldo_plus(String cuadratura) {
+    private String obtener_saldo_plus (String cuadratura_s) {
         String flag = "";
 
-        String[] split = cuadratura.split("__");
+        String[] split = cuadratura_s.split("__");
         int largo_split = split.length;
         int saldo_plus_plus = 0;
         for (int i = 0; i < largo_split; i++) {
@@ -809,7 +828,8 @@ public class AbonarActivity extends AppCompatActivity {
         } else if (monto_temporal > 0) {//Aqui paga el monto de los intereses y ademas, paga tambien parte o to-do lo de las cuotas pendientes y/o futuras.
 
             String[] split = cuadratura.split("__");
-            monto_disponible = String.valueOf(Integer.parseInt(monto_disponible) + monto_temporal);
+            int restar_disponible = monto_temporal * (tasa/100);
+            monto_disponible = String.valueOf(Integer.parseInt(monto_disponible) + monto_temporal - restar_disponible);
             int largo_split = split.length;
             for (int i = 0; i < largo_split; i++) {
 
@@ -961,13 +981,14 @@ public class AbonarActivity extends AppCompatActivity {
         et_ID.requestFocus();
     }
 
-    private Integer obtener_monto_cuota(String s) {
+    private Integer obtener_monto_cuota (String s) {
         int flag = 0;
         String[] split = s.split("#");
         Log.v("obt_monto_cuota", ".\n\nString: "+ s + "\n\nSplit[0]: " + split[0] + "\n\nSplit[1]: " + split[1] + "\n\n.");
         String archivos[] = fileList();
+        s = split[1];
         for (int i = 0; i < archivos.length; i++) {
-            Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
+            Pattern pattern = Pattern.compile(cliente_ID + "_P_" + s + "_P_", Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(archivos[i]);
             boolean matchFound = matcher.find();
             if (matchFound) {
@@ -1067,11 +1088,12 @@ public class AbonarActivity extends AppCompatActivity {
                         String fecha_next_abono = "";
                         String intereses_mor = "";
                         String saldo_mas_intereses_s = "";
-                        String plazo = "";
+                        String plazoz = "";
                         String numero_de_credito = "";
                         String cuotas_morosas = "";
                         String valor_presentar_s = "";
-                        //String indice_file = "";
+                        String cuadratura_pre = "";
+                        int factor_semanas = 0;
                         String file_name = archivos[i];
                         String[] split_indice = file_name.split("_P_");
                         numero_de_credito = split_indice[1];
@@ -1085,7 +1107,10 @@ public class AbonarActivity extends AppCompatActivity {
                                 fecha_next_abono = split[1];
                             }
                             if (split[0].equals("plazo")) {
-                                plazo = split[1];
+                                plazoz = split[1];
+                            }
+                            if (split[0].equals("cuadratura")) {
+                                cuadratura_pre = split[1];
                             }
                             if (split[0].equals("saldo_mas_intereses")) {
                                 saldo_mas_intereses_s = split[1];
@@ -1102,12 +1127,30 @@ public class AbonarActivity extends AppCompatActivity {
                             //archivoCompleto = archivoCompleto + linea + "\n";
                             linea = br.readLine();
                         }
-
-                        saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
-                        cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazo, fecha_next_abono);
-
                         br.close();
                         archivo.close();
+
+
+                        //TODO: calcular intereses moratorios aqui!!!
+
+                        String[] piezas = plazoz.split("_");
+                        if (piezas[1].equals("quincenas")) {
+                            factor_semanas = 2;
+                        } else if (piezas[1].equals("semanas")) {
+                            factor_semanas = 1;
+                        } else {
+                            factor_semanas = -1;
+                            //ERROR
+                        }
+
+                        String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
+                        String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
+                        interes_mora_total = intereses_moritas;
+                        cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
+                        saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
+                        cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
+
+
                         valor_presentar_s = "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas;
                         presentar_et_esperar = valor_presentar_s;
                         et_ID.setText("");
@@ -1135,25 +1178,145 @@ public class AbonarActivity extends AppCompatActivity {
             }
         } else {
             String valor_presentar_s = s;
-            presentar_et_esperar = valor_presentar_s;
-            et_ID.setText("");
-            et_ID.setFocusableInTouchMode(false);
-            et_ID.setClickable(false);
-            et_ID.setEnabled(true);
-            et_ID.setVisibility(View.VISIBLE);
-            et_ID.setText(valor_presentar_s);
-            et_ID.setEnabled(false);
-            tv_esperar.setEnabled(true);
-            tv_esperar.setText("");
-            tv_esperar.setVisibility(View.VISIBLE);
-            tv_esperar.setText("Prestamo a consultar:");
-            consultar(null);
-            //bt_consultar.setEnabled(true);
-            //bt_consultar.setVisibility(View.VISIBLE);
-            //bt_consultar.setClickable(true);
+            String[] splitte = valor_presentar_s.split(" ");
+            String num_credit = splitte[0];
+            num_credit = num_credit.replace("#", "");
+            String archivos[] = fileList();
+            //String puntuacion_cliente = "";
+            //String archivoCompleto = "";
+            String file_to_consult = "";
+            Log.v("valor_a_presentar", ".\n\nnum_credit: " + num_credit + "\n\n.");
+            if (flag_client_reciv) {
+                file_to_consult = cliente_ID + "_P_" + num_credit + "_P_";
+            } else {
+                file_to_consult = cliente_ID + "_P_" + num_credit + "_P_";
+            }
+            for (int i = 0; i < archivos.length; i++) {
+                Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(archivos[i]);
+                boolean matchFound = matcher.find();
+                if (matchFound) {
+                    //TODO: Abrir archivo y leerlo.
+                    try {
+                        String fecha_next_abono = "";
+                        String intereses_mor = "";
+                        String saldo_mas_intereses_s = "";
+                        String plazoz = "";
+                        String numero_de_credito = "";
+                        String cuotas_morosas = "";
+                        String cuadratura_pre = "";
+                        int factor_semanas = 0;
+                        //String indice_file = "";
+                        String file_name = archivos[i];
+                        String[] split_indice = file_name.split("_P_");
+                        numero_de_credito = split_indice[1];
+                        InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                        BufferedReader br = new BufferedReader(archivo);
+                        String linea = br.readLine();
+                        while (linea != null) {
+                            Log.v("Presentar_info_cli_MORE", ".\n\nlinea:\n\n" + linea + "\n\n.");
+                            String[] split = linea.split("_separador_");
+                            if (split[0].equals("proximo_abono")) {
+                                fecha_next_abono = split[1];
+                            }
+                            if (split[0].equals("plazo")) {
+                                plazoz = split[1];
+                            }
+                            if (split[0].equals("saldo_mas_intereses")) {
+                                saldo_mas_intereses_s = split[1];
+                            }
+                            if (split[0].equals("cuotas")) {
+                                cuotas_morosas = split[1];
+                            }
+                            if (split[0].equals("cuadratura")) {
+                                cuadratura_pre = split[1];
+                            }
+                            if (split[0].equals("intereses_moratorios")) {
+                                intereses_mor = split[1];
+                            }
+                            //linea = linea.replace("_separador_", ": ");
+                            //linea = linea.replace("_cliente", "");
+                            //linea = linea.replace("_", " ");
+                            //archivoCompleto = archivoCompleto + linea + "\n";
+                            linea = br.readLine();
+                        }
+                        br.close();
+                        archivo.close();
 
+                        //TODO: calcular intereses moratorios aqui!!!
+
+                        String[] piezas = plazoz.split("_");
+                        if (piezas[1].equals("quincenas")) {
+                            factor_semanas = 2;
+                        } else if (piezas[1].equals("semanas")) {
+                            factor_semanas = 1;
+                        } else {
+                            factor_semanas = -1;
+                            //ERROR
+                        }
+
+                        String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
+                        String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
+                        interes_mora_total = intereses_moritas;
+                        cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
+                        saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_moritas);
+                        cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
+
+
+                        valor_presentar_s = "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas;
+                        presentar_et_esperar = valor_presentar_s;
+                        et_ID.setText("");
+                        et_ID.setFocusableInTouchMode(false);
+                        et_ID.setClickable(false);
+                        et_ID.setEnabled(true);
+                        et_ID.setVisibility(View.VISIBLE);
+                        et_ID.setText(valor_presentar_s);
+                        et_ID.setEnabled(false);
+                        tv_esperar.setEnabled(true);
+                        tv_esperar.setText("");
+                        tv_esperar.setVisibility(View.VISIBLE);
+                        tv_esperar.setText("Prestamo a consultar:");
+                        consultar(null);
+                        //bt_consultar.setEnabled(true);
+                        //bt_consultar.setVisibility(View.VISIBLE);
+                        //bt_consultar.setClickable(true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private String obtener_intereses_moratorios (String saldo_plus, String next_pay) {
+        String flag = "";
+        String saldo = "";
+        String[] split2 = next_pay.split("/");
+        String proximo_abono_formato = split2[2] + "-" + split2[1] + "-" + split2[0];
+        //SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        LocalDate proximo_abono_LD = LocalDate.parse(proximo_abono_formato);
+        LocalDate fecha_hoy = LocalDate.now();
+        int diferencia_en_dias = Integer.parseInt(String.valueOf(DAYS.between(proximo_abono_LD, fecha_hoy)));
+        if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
+            saldo = saldo_plus;
+            morosidad = "D";
+        } else {//Significa que esta atrazado!!!
+
+            saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
+            double pre_num = (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus));
+            int pre_num_int = (int) pre_num;
+            if (pre_num_int > 0) {
+                morosidad = "M";
+            }
+            interes_mora_parcial = String.valueOf(pre_num_int);
+        }
+        flag = saldo;
+        return flag;
     }
 
 /*    private String calcular_cuota () {
@@ -1530,7 +1693,7 @@ public class AbonarActivity extends AppCompatActivity {
         return false;
     }
 
-    private void crear_archivo(String nombre_archivo) {
+    private void crear_archivo (String nombre_archivo) {
         try{
             OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(nombre_archivo, Activity.MODE_PRIVATE));
             archivo.flush();
@@ -1540,11 +1703,11 @@ public class AbonarActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed (){
         boton_atras();
     }
 
-    private void boton_atras() {
+    private void boton_atras () {
         Intent menu_principal = new Intent(this, MenuPrincipal.class);
         menu_principal.putExtra("mensaje", "");
         startActivity(menu_principal);
@@ -1552,20 +1715,20 @@ public class AbonarActivity extends AppCompatActivity {
         System.exit(0);
     }
 
-    private void mostrar_todito() {
+    private void mostrar_todito () {
         tv_esperar.setText("");
         tv_esperar.setVisibility(View.INVISIBLE);
         bt_consultar.setVisibility(View.VISIBLE);
     }
 
-    private void ocultar_todito() {
+    private void ocultar_todito () {
         Log.v("ocultar_todito", "Se hace todo invisible");
         tv_esperar.setVisibility(View.VISIBLE);
         tv_esperar.setText("conectando, por favor espere...");
         bt_consultar.setVisibility(View.INVISIBLE);
     }
 
-    private String imprimir_archivo(String file_name){
+    private String imprimir_archivo (String file_name){
 
         String archivos[] = fileList();
         String contenido = "";//Aqui se lee el contenido del archivo guardado.
@@ -1598,7 +1761,7 @@ public class AbonarActivity extends AppCompatActivity {
 
     //Metodos comunes online//
 
-    private boolean verificar_internet() {
+    private boolean verificar_internet () {
         ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();

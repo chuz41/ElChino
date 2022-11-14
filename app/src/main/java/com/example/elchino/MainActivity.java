@@ -118,11 +118,22 @@ public class MainActivity extends AppCompatActivity {
         checkedTextView.setText("Mostrar password");
         checkedTextView.setVisibility(View.INVISIBLE);
         separar_fechaYhora();
+        abonar();
         try {
             check_activation();
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void abonar(){
+        Intent abonar = new Intent(this, AbonarActivity.class);
+        abonar.putExtra("msg", "");
+        abonar.putExtra("cliente_recivido", "");
+        abonar.putExtra("abono_cero", "");
+        startActivity(abonar);
+        finish();
+        System.exit(0);
     }
 
     private void menu_principal (String messag) {
