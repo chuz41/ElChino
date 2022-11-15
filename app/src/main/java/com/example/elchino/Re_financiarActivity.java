@@ -245,7 +245,7 @@ public class Re_financiarActivity extends AppCompatActivity {
             if (matchFound) {
                 try {
                     String fecha_next_abono = "";
-                    String intereses_mora = "";
+                    String intereses_mor = "";
                     String saldo_mas_intereses_s = "";
                     String plazoz = "";
                     String numero_de_credito = "";
@@ -277,7 +277,7 @@ public class Re_financiarActivity extends AppCompatActivity {
                             cuotas_morosas = split[1];
                         }
                         if (split[0].equals("intereses_moratorios")) {
-                            intereses_mora = split[1];
+                            intereses_mor = split[1];
                         }
                         linea = br.readLine();
                     }
@@ -298,7 +298,7 @@ public class Re_financiarActivity extends AppCompatActivity {
                     String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                     interes_mora_total = intereses_moritas;
                     cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
-                    saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mora);
+                    saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
                     cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
 
 
@@ -1478,7 +1478,7 @@ public class Re_financiarActivity extends AppCompatActivity {
                         String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                         interes_mora_total = intereses_moritas;
                         cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
-                        saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_moritas);
+                        saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
                         cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
 
 
