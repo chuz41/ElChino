@@ -6,36 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".Estado_clienteActivity">
 
-    <EditText
-        android:id="@+id/et_ID"
-        android:layout_width="305dp"
-        android:layout_height="48dp"
-        android:hint="@string/identificacion"
-        android:inputType="textPersonName|text|textCapWords"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.49" />
-
-    <TextView
-        android:id="@+id/tv_esperar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/identificacion_tv"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/et_ID"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.433" />
-
     <TextView
         android:id="@+id/tv_saludoEstado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="4dp"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,7 +28,41 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_ID"
-        app:layout_constraintVertical_bias="0.213" />
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/tv_esperar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/identificacion_tv"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/et_ID"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.365" />
+
+    <Button
+        android:id="@+id/bt_estado_cuenta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="estado_cuenta"
+        android:text="@string/estado_cuenta"
+        app:layout_constraintBottom_toTopOf="@+id/bt_prestar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_esperar"
+        app:layout_constraintVertical_bias="0.559" />
+
+    <EditText
+        android:id="@+id/et_ID"
+        android:layout_width="305dp"
+        android:layout_height="48dp"
+        android:hint="@string/identificacion"
+        android:inputType="textPersonName|text|textCapWords"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.42" />
 
     <Button
         android:id="@+id/bt_prestar"
@@ -86,23 +98,11 @@
         app:layout_constraintStart_toEndOf="@+id/tv_saludoEstado"
         app:layout_constraintTop_toBottomOf="@+id/tv_saludoEstado" />
 
-    <Button
-        android:id="@+id/bt_estado_cuenta"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="estado_cuenta"
-        android:text="@string/estado_cuenta"
-        app:layout_constraintBottom_toTopOf="@+id/bt_prestar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_esperar" />
-
     <TextView
         android:id="@+id/tv_caja"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

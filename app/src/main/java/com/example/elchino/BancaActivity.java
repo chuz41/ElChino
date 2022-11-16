@@ -292,7 +292,7 @@ public class BancaActivity extends AppCompatActivity {
         meses.put("Sep",9);
         meses.put("Oct",10);
         meses.put("Nov",11);
-        meses.put("Dic",12);
+        meses.put("Dec",12);
         meses.put("1",1);
         meses.put("2",2);
         meses.put("3",3);

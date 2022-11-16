@@ -38,6 +38,7 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.TranslateUtil;
 
 import org.json.JSONException;
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         checkedTextView.setVisibility(View.INVISIBLE);
         separar_fechaYhora();
         abonar();
+        //nuevo_credito();
         try {
             check_activation();
         } catch (JSONException e) {
@@ -129,9 +131,18 @@ public class MainActivity extends AppCompatActivity {
     public void abonar(){
         Intent abonar = new Intent(this, AbonarActivity.class);
         abonar.putExtra("msg", "");
-        abonar.putExtra("cliente_recivido", "");
+        abonar.putExtra("cliente_recivido", "205570207");
         abonar.putExtra("abono_cero", "");
         startActivity(abonar);
+        finish();
+        System.exit(0);
+    }
+
+    public void nuevo_credito(){
+        Intent Nuevo_credito = new Intent(this, Nuevo_creditoActivity.class);
+        Nuevo_credito.putExtra("msg", "");
+        Nuevo_credito.putExtra("cliente_recivido", "205570207");
+        startActivity(Nuevo_credito);
         finish();
         System.exit(0);
     }
@@ -770,7 +781,7 @@ public class MainActivity extends AppCompatActivity {
         meses.put("Sep",9);
         meses.put("Oct",10);
         meses.put("Nov",11);
-        meses.put("Dic",12);
+        meses.put("Dec",12);
         meses.put("1",1);
         meses.put("2",2);
         meses.put("3",3);

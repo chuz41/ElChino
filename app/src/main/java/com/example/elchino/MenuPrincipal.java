@@ -121,7 +121,7 @@ public class MenuPrincipal extends AppCompatActivity {
         mostrar_caja();
         separar_fechaYhora();
         tv_fecha.setText(fecha + "/" + mes + "/" + anio);
-        tv_saludo.setText("El Chino");
+        tv_saludo.setText("Menu principal");
         mensaje_recibido = getIntent().getStringExtra( "mensaje");
         if (mensaje_recibido.equals("") | (mensaje_recibido == null)) {
             //Do nothing.
@@ -266,7 +266,7 @@ public class MenuPrincipal extends AppCompatActivity {
         meses.put("Sep",9);
         meses.put("Oct",10);
         meses.put("Nov",11);
-        meses.put("Dic",12);
+        meses.put("Dec",12);
         meses.put("1",1);
         meses.put("2",2);
         meses.put("3",3);

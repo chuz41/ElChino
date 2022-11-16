@@ -38,6 +38,7 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.TranslateUtil;
 
 import org.json.JSONException;
@@ -49,7 +50,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.NumberFormat;
-import java.time.LocalDate;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -130,6 +131,8 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                 consultar(null);
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
         text_listener();
@@ -164,7 +167,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void consultar (View view) throws JSONException, IOException {
+    public void consultar (View view) throws JSONException, IOException, ParseException {
         bt_consultar.setClickable(false);
         bt_consultar.setEnabled(false);
 
@@ -424,7 +427,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private String obtener_proximo_abono () {
+    private String obtener_proximo_abono () throws ParseException {
         String flag = "";
         int factor_semanas = 0;
         String[] piezas = plazo.split(" ");
@@ -437,7 +440,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             //flag = "ERROR";
         }
 
-        String fecha_mostrar2 = LocalDate.now().plusWeeks(factor_semanas).toString();
+        Date fecha_hoy = Calendar.getInstance().getTime();
+        Date fecha_mostrar_D = DateUtilities.addWeeks(fecha_hoy, factor_semanas);
+        String fecha_mostrar2 = DateUtilities.dateToString(fecha_mostrar_D);
         String[] partes = fecha_mostrar2.split("-");
         fecha_mostrar2 = partes[2] + "/" + partes[1] + "/" + partes[0];
         flag = fecha_mostrar2;
@@ -446,7 +451,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void generar_credito () throws IOException, JSONException {
+    private void generar_credito () throws IOException, JSONException, ParseException {
         String file_content = "";
         file_content = file_content + "monto_credito_separador_" + monto_credito + "\n";
         String plazo_presentar = plazo.replace(" ", "_");
@@ -479,15 +484,15 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } else {
             //do nothing here!!
         }
-        LocalDate fecha_hoy = LocalDate.now();
-        LocalDate fecha_poner = fecha_hoy;
+        Date fecha_hoy = Calendar.getInstance().getTime();
+        Date fecha_poner = fecha_hoy;
         for (int i = 0; i < Integer.parseInt(cuotass); i++) {
-
-            fecha_poner = fecha_poner.plusWeeks(factor);
-            String[] splet = fecha_poner.toString().split("-");
+            fecha_poner = DateUtilities.addWeeks(fecha_poner, factor);
+            String fecha_poner_S = DateUtilities.dateToString(fecha_poner);
+            String[] splet = fecha_poner_S.split("-");
+            Log.v("generar_credito", ".\n\nFecha_poner: " + String.valueOf(fecha_poner) + "\n\n.");
             String fecha_S_poner = splet[2] + "/" + splet[1] + "/" + splet[0];
             cuadratura = cuadratura + sema_quince + "_" + String.valueOf(i + 1) + "_" + monto_cuota + "_" + fecha_S_poner + "__";
-
         }
         file_content = file_content + "cuadratura_separador_" + cuadratura + "\n";
         file_content = file_content + "intereses_moratorios_separador_0";
@@ -740,7 +745,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         meses.put("Sep",9);
         meses.put("Oct",10);
         meses.put("Nov",11);
-        meses.put("Dic",12);
+        meses.put("Dec",12);
         meses.put("1",1);
         meses.put("2",2);
         meses.put("3",3);

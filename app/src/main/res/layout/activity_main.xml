@@ -25,7 +25,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.49" />
+        app:layout_constraintVertical_bias="0.247" />
 
     <Button
         android:id="@+id/boton_submit"
@@ -43,7 +43,7 @@
     <CheckBox
         android:id="@+id/checkedTextView"
         android:layout_width="182dp"
-        android:layout_height="29dp"
+        android:layout_height="48dp"
         android:checked="false"
         android:onClick="check_box_listener"
         android:text="@string/mostrar_password"

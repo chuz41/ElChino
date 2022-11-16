@@ -35,6 +35,7 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.TranslateUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,7 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.time.LocalDate;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -116,7 +117,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     private String monto_creditito;
     private String cliente_Id_volver;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,7 +177,11 @@ public class CuadraturaActivity extends AppCompatActivity {
         separar_fechaYhora();
 
         if (!cuadratura.equals("")) {
-            presentar_cuadratura();
+            try {
+                presentar_cuadratura();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         } else {
             if (cliente_recibido.equals("")) {
                 //Do nothing.
@@ -197,8 +202,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private String obtener_cuotas_morosas (String cuotas_pendientes, String plazo, String fecha_proximo_abono) {
+    private String obtener_cuotas_morosas (String cuotas_pendientes, String plazo, String fecha_proximo_abono) throws ParseException {
         String flag = "";
         int factor = 0;
         int dias_atrasados = 0;
@@ -214,9 +218,9 @@ public class CuadraturaActivity extends AppCompatActivity {
 
         String[] split_fecha_next = fecha_proximo_abono.split("/");
         fecha_proximo_abono = split_fecha_next[2] + "-" + split_fecha_next[1] + "-" + split_fecha_next[0];
-        LocalDate fehca_next_abono = LocalDate.parse(fecha_proximo_abono);
-        LocalDate fecha_de_hoy = LocalDate.now();
-        dias_atrasados = Integer.parseInt(String.valueOf(DAYS.between(fehca_next_abono, fecha_de_hoy)));//Cantidad positiva indica morosidad.
+        Date fehca_next_abono = DateUtilities.stringToDate(fecha_proximo_abono);
+        Date fecha_de_hoy = Calendar.getInstance().getTime();
+        dias_atrasados = DateUtilities.daysBetween(fecha_de_hoy, fehca_next_abono);//Cantidad positiva indica morosidad.
 
         if (dias_atrasados < 0) {
             flag = "0";
@@ -245,7 +249,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         return flag;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     private void llenar_spinner () {
         //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
         String creditos = "Escoja el credito...___";
@@ -318,6 +322,8 @@ public class CuadraturaActivity extends AppCompatActivity {
                     }
                     //Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
                 } catch (IOException e) {
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -336,43 +342,45 @@ public class CuadraturaActivity extends AppCompatActivity {
         spinner_listener();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private String obtener_intereses_moratorios (String saldo_plus, String next_pay) {
+
+    private String obtener_intereses_moratorios (String saldo_plus, String next_pay) throws ParseException {
         String flag = "";
-        String saldo = "";
+        //String saldo = "";
         String[] split2 = next_pay.split("/");
         String proximo_abono_formato = split2[2] + "-" + split2[1] + "-" + split2[0];
         //SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
-        LocalDate proximo_abono_LD = LocalDate.parse(proximo_abono_formato);
-        LocalDate fecha_hoy = LocalDate.now();
-        int diferencia_en_dias = Integer.parseInt(String.valueOf(DAYS.between(proximo_abono_LD, fecha_hoy)));
+        Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
+        Date fecha_hoy = Calendar.getInstance().getTime();
+        int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
         if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
-            saldo = saldo_plus;
+            //saldo = saldo_plus;
             morosidad = "D";
+            interes_mora_parcial = "0";
         } else {//Significa que esta atrazado!!!
 
-            saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
+            //saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
             double pre_num = (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus));
             int pre_num_int = (int) pre_num;
             if (pre_num_int > 0) {
                 morosidad = "M";
+                interes_mora_parcial = String.valueOf(pre_num_int);
+            } else {
+                interes_mora_parcial = "0";
             }
-            interes_mora_parcial = String.valueOf(pre_num_int);
+
         }
-        flag = saldo;
+        flag = interes_mora_parcial;
         return flag;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private String obtener_saldo_al_dia (String saldo_plus, String next_pay, String intereses_de_mora) {
+    private String obtener_saldo_al_dia (String saldo_plus, String next_pay, String intereses_de_mora) throws ParseException {
         String flag = "";
         String saldo = "";
         String[] split2 = next_pay.split("/");
         String proximo_abono_formato = split2[2] + "-" + split2[1] + "-" + split2[0];
-        //SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
-        LocalDate proximo_abono_LD = LocalDate.parse(proximo_abono_formato);
-        LocalDate fecha_hoy = LocalDate.now();
-        int diferencia_en_dias = Integer.parseInt(String.valueOf(DAYS.between(fecha_hoy, proximo_abono_LD)));
+        Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
+        Date fecha_hoy = Calendar.getInstance().getTime();
+        int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
         if (diferencia_en_dias <= 0) {
             saldo = String.valueOf(saldo_plus);
             morosidad = "D";
@@ -507,7 +515,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
     }*/
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     public void consultar (View view) throws JSONException, IOException, InterruptedException {
         bt_consultar.setClickable(false);
         bt_consultar.setEnabled(false);
@@ -621,7 +629,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     private void procesar_abono2 () {
 
         String file_name = archivo_prestamo;
@@ -682,7 +690,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     private void actualizar_archivo_credito() {
         //archivo_prestamo
 
@@ -718,8 +726,8 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void presentar_cuadratura () {
+    
+    private void presentar_cuadratura () throws ParseException {
         //TODO: Presentar la informacion que esta en la cuadratura
         bt_consultar.setEnabled(false);
         bt_consultar.setVisibility(View.INVISIBLE);
@@ -744,16 +752,14 @@ public class CuadraturaActivity extends AppCompatActivity {
         botones.put(8, sequi9);
         TreeMap<Integer, Button> botones_tree = getTreeMapBotones(botones);
         //Map<Integer, Button> botones_treeMap = getTreeMap(botones);
-        LocalDate hoy_LD = LocalDate.now();
+        Date hoy_LD = Calendar.getInstance().getTime();
         for (int i = 0; i < largo_split; i++) {
-            //String fecha_cuadrito = split_1[3];
-            //String[] split_fec = fecha_cuadrito.split("/");
             String[] split = split_1[i].split("_");//TODO: Si estan en cero o al dia, se debe pintar verde el boton, si es hoy el dia, pintar amarillo, si esta atrazado, pintar verde.
             String fecha_cuadrito = split[3];
             String[] split_fec = fecha_cuadrito.split("/");
             fecha_cuadrito = split_fec[2] + "-" + split_fec[1] + "-" + split_fec[0];
-            LocalDate fecha_cuadrito_LD = LocalDate.parse(fecha_cuadrito);
-            String diferencia_fechas = String.valueOf(DAYS.between(fecha_cuadrito_LD, hoy_LD));
+            Date fecha_cuadrito_LD = DateUtilities.stringToDate(fecha_cuadrito);
+            String diferencia_fechas = String.valueOf(DateUtilities.daysBetween(hoy_LD, fecha_cuadrito_LD));
             String info_boton = split[3] + "\n" + split[0] + " " + split[1] + "\n" + split[2];
             if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado.
                 if (Integer.parseInt(split[2]) == 0) {
@@ -791,7 +797,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         return treeMap;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     private void actualizar_archivo_cliente () {
         String[] spliti = archivo_prestamo.split("_");
         String archivo_cliente = spliti[0] + "_C_.txt";
@@ -823,6 +829,8 @@ public class CuadraturaActivity extends AppCompatActivity {
             presentar_cuadratura();
 
         } catch (IOException e) {
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 
@@ -846,7 +854,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         return flag;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     private String obtener_cuadratura (String cuadratura, String fecha_next_abono, int factor_semanas, int monto_ingresado) {
 
         String flag = "";
@@ -897,7 +905,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     }
 
-/*    @RequiresApi(api = Build.VERSION_CODES.O)
+/*    
     private String obtener_proximo_abono (String fecha_next_abono) {
         String flag = "";
         int factor_semanas = 0;
@@ -927,7 +935,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         return flag;
     }*/
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     private void presentar_monto_a_pagar (int monto_a_pagar) throws JSONException, IOException, InterruptedException {
 
         et_ID.setEnabled(true);
@@ -985,7 +993,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     private void spinner_listener () {
         sp_plazos.setOnItemSelectedListener(
                 new AdapterView.OnItemSelectedListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         //Crear diccionario con la informacion de la loteria seleccionada
@@ -1024,7 +1032,7 @@ public class CuadraturaActivity extends AppCompatActivity {
                 });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     private void presentar_info_credito (String s) throws JSONException, IOException, InterruptedException {
 
         if (s.equals("UNO")) {
@@ -1082,10 +1090,6 @@ public class CuadraturaActivity extends AppCompatActivity {
                             if (split[0].equals("intereses_moratorios")) {
                                 intereses_mor = split[1];
                             }
-                            //linea = linea.replace("_separador_", ": ");
-                            //linea = linea.replace("_cliente", "");
-                            //linea = linea.replace("_", " ");
-                            //archivoCompleto = archivoCompleto + linea + "\n";
                             linea = br.readLine();
                         }
 
@@ -1123,10 +1127,9 @@ public class CuadraturaActivity extends AppCompatActivity {
                         tv_esperar.setVisibility(View.VISIBLE);
                         tv_esperar.setText("Prestamo a consultar:");
                         consultar(null);
-                        //bt_consultar.setEnabled(true);
-                        //bt_consultar.setVisibility(View.VISIBLE);
-                        //bt_consultar.setClickable(true);
                     } catch (IOException e) {
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
 
                     break;
@@ -1140,8 +1143,6 @@ public class CuadraturaActivity extends AppCompatActivity {
             String num_credit = splitte[0];
             num_credit = num_credit.replace("#", "");
             String archivos[] = fileList();
-            //String puntuacion_cliente = "";
-            //String archivoCompleto = "";
             String file_to_consult = "";
             Log.v("valor_a_presentar", ".\n\nnum_credit: " + num_credit + "\n\n.");
             if (flag_client_reciv) {
@@ -1164,7 +1165,6 @@ public class CuadraturaActivity extends AppCompatActivity {
                         String cuotas_morosas = "";
                         String cuadratura_pre = "";
                         int factor_semanas = 0;
-                        //String indice_file = "";
                         String file_name = archivos[i];
                         String[] split_indice = file_name.split("_P_");
                         numero_de_credito = split_indice[1];
@@ -1192,10 +1192,6 @@ public class CuadraturaActivity extends AppCompatActivity {
                             if (split[0].equals("intereses_moratorios")) {
                                 intereses_mor = split[1];
                             }
-                            //linea = linea.replace("_separador_", ": ");
-                            //linea = linea.replace("_cliente", "");
-                            //linea = linea.replace("_", " ");
-                            //archivoCompleto = archivoCompleto + linea + "\n";
                             linea = br.readLine();
                         }
                         br.close();
@@ -1243,6 +1239,8 @@ public class CuadraturaActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ParseException e) {
                         e.printStackTrace();
                     }
                 }
@@ -1433,7 +1431,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-            @RequiresApi(api = Build.VERSION_CODES.O)
+            
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (tv_esperar.getText().toString().equals("Digite el monto del abono")) {
@@ -1455,10 +1453,7 @@ public class CuadraturaActivity extends AppCompatActivity {
                 } else if (tv_esperar.getText().toString().equals("Digite la identificacion del cliente")) {
                     et_ID.setEnabled(true);
                     et_ID.setFocusableInTouchMode(true);
-                    //et_ID.setText("");
                     et_ID.requestFocus();
-                    //bt_consultar.setClickable(false);
-                    //bt_consultar.setEnabled(false);
                     String archivos[] = fileList();
                     for (int i = 0; i < archivos.length; i++) {
                         Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
@@ -1553,7 +1548,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         meses.put("Sep",9);
         meses.put("Oct",10);
         meses.put("Nov",11);
-        meses.put("Dic",12);
+        meses.put("Dec",12);
         meses.put("1",1);
         meses.put("2",2);
         meses.put("3",3);
