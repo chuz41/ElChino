@@ -62,6 +62,7 @@ public class AbonarActivity extends AppCompatActivity {
 
     private Integer monto_abono = 0;
     private String mensaje_imprimir = "";
+    private Integer intereses_monroe = 0;
     private Integer cambio = 0;
     private String interes_mora_parcial;
     private Integer monto_cuota = 0;
@@ -352,7 +353,7 @@ public class AbonarActivity extends AppCompatActivity {
         int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
         Log.v("obt_sald_al_dia0", "Abonar.\n\nDiferencia en dias: " + diferencia_en_dias + "\n\nnext_pay: " + next_pay + "\n\nIntereses de mora: " + intereses_de_mora + "\n\nSaldo_plus: " + saldo_plus + "\n\n.");
         if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
-            saldo = saldo_plus;
+            saldo = String.valueOf(Integer.parseInt(saldo_plus) + Integer.parseInt(intereses_de_mora));
             morosidad = "D";
         } else {//Significa que esta atrazado!!!
             double pre_saldo = diferencia_en_dias * (Integer.parseInt(interes_mora)) * Integer.parseInt(saldo_plus);
@@ -579,14 +580,14 @@ public class AbonarActivity extends AppCompatActivity {
             Log.v("Prestamo_a_consultar2", ".\n\nCoutas pendientes: " + cantidad_cuotas_pendientes + "\n\nInteres mora total: " + interes_mora_parcial + "\n\nMorosidad: " + morosidad + "\n\nMonto cuota: " + monto_cuota + "\n\n.");
             //archivo_prestamo = file_name; Checked!!!
             if (Integer.parseInt(parts_prestamo[3]) == 0) {
-                monto_a_pagar = monto_cuota;
+                monto_a_pagar = monto_cuota + intereses_monroe;
             } else {
                 //morosidad
                 if (morosidad.equals("D")) {
-                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota;
+                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + intereses_monroe;
                 } else {
                     //monto a pagar
-                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + Integer.parseInt(interes_mora_parcial);
+                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + Integer.parseInt(interes_mora_parcial) + monto_cuota;
                 }
             }
             presentar_monto_a_pagar(monto_a_pagar);
@@ -651,11 +652,10 @@ public class AbonarActivity extends AppCompatActivity {
             interes_mora_total = intereses_moritas;
             interes_mora_parcial = interes_mora_total;
             Log.v("antes_de_cuadra_chang", ".\n\nAbonar. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
-            cuadratura = obtener_cuadratura(cuadratura, proximo_abono, factor_semanas, monto_ingresado);//Aqui se obtiene la verdadera y final morosidad.
+            cuadratura = obtener_cuadratura(cuadratura, fecha_next_abono, factor_semanas, monto_ingresado);//Aqui se obtiene la verdadera y final morosidad.
             Log.v("despues_de_cuadra_chang", ".\n\nAbonar. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
             cuotas = obtener_cuotas_nuevas(cuadratura);
             saldo_mas_intereses = Integer.parseInt(obtener_saldo_plus(cuadratura));
-
             actualizar_archivo_credito();
 
 
@@ -704,11 +704,11 @@ public class AbonarActivity extends AppCompatActivity {
             borrar_archivo(archivo_prestamo);
             crear_archivo(archivo_prestamo);
             guardar(contenido, archivo_prestamo);
-            actualizar_archivo_cliente();
+            Log.v("actualizar_archiv_cred2", ".\n\nAbonar. Archivo: " + archivo_prestamo + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
+            actualizar_archivo_cliente(archivo_prestamo);
 
         } catch (IOException e) {
         }
-
     }
 
     private void presentar_cuadratura() {
@@ -727,7 +727,7 @@ public class AbonarActivity extends AppCompatActivity {
         System.exit(0);
     }
 
-    private void actualizar_archivo_cliente () {
+    private void actualizar_archivo_cliente (String archivo_P) {
         String[] spliti = archivo_prestamo.split("_");
         String archivo_cliente = spliti[0] + "_C_.txt";
         String contenido = "";
@@ -757,9 +757,10 @@ public class AbonarActivity extends AppCompatActivity {
             crear_archivo(archivo_cliente);
             guardar(contenido, archivo_cliente);
             Log.v("actualiz_archiv_client2", ".\n\nAbonar. Archivo: " + archivo_cliente + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_cliente) + "\n\n.");
-            presentar_cuadratura();
+            subir_archivo(archivo_P);
 
-        } catch (IOException e) {
+
+        } catch (IOException | JSONException e) {
         }
     }
 
@@ -810,6 +811,14 @@ public class AbonarActivity extends AppCompatActivity {
         int monto_temporal = monto_ingresado - Integer.parseInt(interes_mora_total);
         int monto_temporal_fix = monto_temporal;
 
+        if (monto_ingresado > 0) {
+            if (Integer.parseInt(interes_mora_total) > 0) {
+                mensaje_imprimir = mensaje_imprimir + "Monto abonado:        " + monto_ingresado + "\n";
+                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
+                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + "0" + "\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
+            }
+        }
+
         Log.v("Debug_cuadra0", "Abonar.\n\nCuadratura: " + cuadratura + "\n\ninteres mora total: " + interes_mora_total + "\n\nfecha next abono: " + fecha_next_abono + "\n\nMonto ingresado: " + monto_ingresado + "\n\nMonto temporal: " + monto_temporal + "\n\n.");
         if (monto_temporal < 0) {//No alcanzo siquiera para pagar los intereses. Debe retornar
 
@@ -830,11 +839,7 @@ public class AbonarActivity extends AppCompatActivity {
             morosidad = "M";
             flag = cuadratura;//TODO: No se le ha hecho nada a cuadratura :-( (Porque no hay que hacerle nada!!!)
 
-            if (monto_ingresado > 0) {
-                mensaje_imprimir = mensaje_imprimir + "Monto abonado:        " + monto_ingresado + "\n";
-                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
-                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + "0" + "\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
-            }
+
 
             Log.v("obt_cuadra_no_paga_int", "Abonar.\n\nCuadratura:\n\n" + cuadratura + "\n\nInteres mora total: " + interes_mora_total + "\n\nProximo abono: " + proximo_abono + "\n\n.");
             return flag;
@@ -1041,12 +1046,6 @@ public class AbonarActivity extends AppCompatActivity {
         return flag;
     }
 
-
-    private void esperar_un_ratito (int monto_a_pagar) throws InterruptedException {
-        //presentar_monto_a_pagar(monto_a_pagar);
-
-    }
-
     
     private void esperar_otro_ratito () throws InterruptedException {
         //procesar_abono2();
@@ -1240,6 +1239,7 @@ public class AbonarActivity extends AppCompatActivity {
                         interes_mora_total = intereses_moritas;
                         interes_mora_parcial = interes_mora_total;
                         cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
+                        intereses_monroe = Integer.parseInt(intereses_mor);
                         saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
                         cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
 
@@ -1258,9 +1258,6 @@ public class AbonarActivity extends AppCompatActivity {
                         tv_esperar.setVisibility(View.VISIBLE);
                         tv_esperar.setText("Prestamo a consultar:");
                         consultar(null);
-                        //bt_consultar.setEnabled(true);
-                        //bt_consultar.setVisibility(View.VISIBLE);
-                        //bt_consultar.setClickable(true);
                     } catch (IOException e) {
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -1277,8 +1274,6 @@ public class AbonarActivity extends AppCompatActivity {
             String num_credit = splitte[0];
             num_credit = num_credit.replace("#", "");
             String archivos[] = fileList();
-            //String puntuacion_cliente = "";
-            //String archivoCompleto = "";
             String file_to_consult = "";
             Log.v("valor_a_presentar", ".\n\nnum_credit: " + num_credit + "\n\n.");
             if (flag_client_reciv) {
@@ -1301,7 +1296,6 @@ public class AbonarActivity extends AppCompatActivity {
                         String cuotas_morosas = "";
                         String cuadratura_pre = "";
                         int factor_semanas = 0;
-                        //String indice_file = "";
                         String file_name = archivos[i];
                         String[] split_indice = file_name.split("_P_");
                         numero_de_credito = split_indice[1];
@@ -1329,10 +1323,6 @@ public class AbonarActivity extends AppCompatActivity {
                             if (split[0].equals("intereses_moratorios")) {
                                 intereses_mor = split[1];
                             }
-                            //linea = linea.replace("_separador_", ": ");
-                            //linea = linea.replace("_cliente", "");
-                            //linea = linea.replace("_", " ");
-                            //archivoCompleto = archivoCompleto + linea + "\n";
                             linea = br.readLine();
                         }
                         br.close();
@@ -1358,6 +1348,7 @@ public class AbonarActivity extends AppCompatActivity {
                         interes_mora_parcial = interes_mora_total;
                         Log.v("MORE3", ".\n\ninteres_mora_total: " + interes_mora_total + "\n\n.");
                         cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
+                        intereses_monroe = Integer.parseInt(intereses_mor);
                         Log.v("MORE4", ".\n\ncuadratura_pre: " + cuadratura_pre + "\n\n.");
                         saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
                         Log.v("MORE5", ".\n\nsaldo_mas_intereses_s: " + saldo_mas_intereses_s + "\n\n.");
@@ -1888,212 +1879,7 @@ public class AbonarActivity extends AppCompatActivity {
             return true;
         }
     }
-    /*
-    private void check_onlines () throws JSONException {
-        if (verificar_internet()) {
-            boolean flag = true;
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
-                //imprimir_archivo("facturas_online.txt");
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                //String contenido = "";
-                abajos.clear();
-                Integer countercito = 0;
-                while (linea != null) {
-                    countercito++;
-                    String count = String.valueOf(countercito);
-                    String[] split = linea.split(" ");
-                    if (split[0].equals("abajo")) {
-                        Log.v("OJOF_abajo: ", "\n\nLinea: " + linea + " Fin de linea!!!");
-                        abajos.put(count, split[1]);
-                        flag = false;
-                    } else if (split[0].equals("arriba")) {
-                        Log.v("OJOF_arriba: ", "\n\nLinea: " + linea + " Fin de linea!!!");
-                        //TODO: Pensar que hacer!!!
-                    } else {
-                        Log.v("OJOF_(error): ", "\n\n(No deberia llegar aqui!!!\n\nLinea: " + linea + " Fin de linea!!!");
-                        //Do nothing.
-                    }
-                    linea = br.readLine();
-                }
-                archivo.close();
-                br.close();
 
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            if (flag) {
-                return;
-            } else {
-                //Do nothing. Continue with the work
-            }
-
-            abajiar();
-            //return objeto_json;
-        } else {
-
-        }
-    }
-
-    private void abajiar() throws JSONException {
-        String sp_clientes = "";
-        String sp_creditos = "";
-        try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
-            //imprimir_archivo("facturas_online.txt");
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            int cont = 0;
-            while (linea != null) {
-                String[] split = linea.split(" ");
-                if (split[0].equals("Screditos")) {
-                    sp_creditos = split[1];
-                }
-                if (split[0].equals("Sclientes")) {
-                    sp_clientes = split[1];
-                }
-                linea = br.readLine();
-                cont++;
-            }
-            br.close();
-            archivo.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String spid = "";
-        String sheet = "";
-        for (String key : abajos.keySet()) {
-            String json_string = "";
-            JSONObject jsonObject = new JSONObject();
-            String[] split_pre = abajos.get(key).split("_");
-            if (split_pre[1].equals("C")) {
-                spid = sp_clientes;
-                sheet = "clientes";
-            } else {
-                spid = sp_creditos;
-                sheet = "creditos";
-            }
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput(abajos.get(key)));
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                while (linea != null && !linea.isEmpty()) {
-                    String[] split = linea.split("_separador_");
-                    json_string = json_string + split[1] + "_n_";
-                    linea = br.readLine();
-                }
-                br.close();
-                archivo.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, split_pre[0]);
-            subir_archivo_resagado(jsonObject, abajos.get(key), key);
-            break;
-        }
-    }
-
-    private void subir_archivo_resagado (JSONObject jsonObject, String file, String key) {
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(this);
-        //Llamada POST usando Volley:
-        RequestQueue requestQueue;
-
-        // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
-
-        // Set up the network to use HttpURLConnection as the HTTP client.
-        Network network = new BasicNetwork(new HurlStack());
-
-        // Instantiate the RequestQueue with the cache and network.
-        requestQueue = new RequestQueue(cache, network);
-
-        // Start the queue
-        requestQueue.start();
-
-        //Toast.makeText(this, "Debug:\nConsecutivo: " + Consecutivo + "\nconsecutivo: " + consecutivo + "\nDeben ser iguales.", Toast.LENGTH_LONG).show();
-
-        String url = addRowURL;
-
-        //ocultar_todo();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        String[] split = response.toString().split("\"");
-                        int length_split = split.length;
-                        Log.v("info_sub_file_resag: ", "\n\n" + response + "\n\n");
-                        if (length_split > 3) {//TODO: Corregir este if. Debe ser mas especifico y detectar si la respuesta no es correcta.
-                            for (int i = 0; i < length_split; i++) {
-                                Log.v("split[" + i + "]", split[i]);
-                            }
-                            if (split[2].equals(":")) {//TODO: Todo de arriba tiene que ver tambien con este.
-                                cambiar_bandera (file, key);
-                                try {
-                                    abajiar();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                String factura_num = split[15];
-                            }
-                        } else {
-                            //No se subio correctamente!
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                    }
-                });
-
-        // Add the request to the RequestQueue.
-        requestQueue.add(jsonObjectRequest);
-
-    }
-
-    private void cambiar_bandera (String file, String key) {
-        try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            String contenido = "";
-            while (linea != null) {
-                Log.v("cambiar_bandera_file", "  Linea: " + linea + "\n\n");
-                String[] split = linea.split(" ");
-                if (split[0].equals("arriba")) {
-                    //Dejar perder la linea
-                } else if (split[0].equals("abajo")) {
-                    if (split[1].equals(file)) {
-                        linea = linea.replace(split[0], "arriba");
-                        abajos.remove(key);
-                        contenido = contenido + linea + "\n";
-                    } else {
-                        contenido = contenido + linea + "\n";
-                    }
-                } else {
-                    //Do nothing. Nunca llega aqui.
-                }
-                linea = br.readLine();
-            }
-            br.close();
-            archivo.close();
-            borrar_archivo(onlines);
-            guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
-            Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    */
     private void subir_archivo (String file) throws JSONException {
         ocultar_todito();
         String sp_creditos = "";
@@ -2142,7 +1928,7 @@ public class AbonarActivity extends AppCompatActivity {
         Log.v("json_string_debug", ".\n\njson_string: " + "\n\n" + json_string + "\n\n.");
         jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_credito);
         subir_nuevo_credito(jsonObject, file);
-    }//TODO
+    }
 
     private void subir_nuevo_credito (JSONObject jsonObject, String file) {
         if (verificar_internet()) {
@@ -2176,15 +1962,15 @@ public class AbonarActivity extends AppCompatActivity {
                             String[] split = response.toString().split("\"");
                             int length_split = split.length;
                             Log.v("info_sub_file_resag: ", "\n\n" + response + "\n\n");
-                            if (length_split > 3) {//TODO: Corregir este if. Debe ser mas especifico y detectar si la respuesta no es correcta.
+                            if (length_split > 3) {//
                                 for (int i = 0; i < length_split; i++) {
                                     Log.v("split[" + i + "]", split[i]);
                                 }
-                                if (split[21].equals(credit_ID)) {//TODO: Todo de arriba tiene que ver tambien con este.
+                                if (split[23].equals(credit_ID)) {//
                                     cambiar_bandera1(file);
-                                    esperar("\"Credito generado y registrado correctamente en el servidor.\"");
+
                                 } else {
-                                    esperar("Error al subir informacion del credito al servidor. Conectese a internet!!!");
+                                    Log.v("onResponse_nuev_cred", "Error al subir informacion del credito al servidor.");
                                 }
                             } else {
                                 //No se subio correctamente!
@@ -2207,7 +1993,7 @@ public class AbonarActivity extends AppCompatActivity {
             agregar_linea_archivo("abajo " + file, onlines);
             //msg("Para registrar al vendedor en el servidor, debe estar conectado a internet.");
             mostrar_todito();
-            esperar("\"Para registrar al vendedor en el servidor, debe estar conectado a internet.\"");
+            presentar_cuadratura();
 
         }
 
@@ -2242,6 +2028,8 @@ public class AbonarActivity extends AppCompatActivity {
             guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
             mostrar_todito();
             Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
+            presentar_cuadratura();
+            Log.v("camb_band_nuev_cred", "\"Credito generado y registrado correctamente en el servidor.\"");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -212,13 +212,13 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     }
 
     public void refinanciar(View view){
-        Intent refinanciar = new Intent(this, Re_financiarActivity.class);
-        refinanciar.putExtra("msg", "");
-        refinanciar.putExtra("cliente_recivido", cliente_ID);
+        //Intent refinanciar = new Intent(this, Re_financiarActivity.class);
+        //refinanciar.putExtra("msg", "");
+        //refinanciar.putExtra("cliente_recivido", cliente_ID);
         //abonar.putExtra("sid_vendidas", sid_vendidas);
-        startActivity(refinanciar);
-        finish();
-        System.exit(0);
+        //startActivity(refinanciar);
+        //finish();
+        //System.exit(0);
     }
 
     public void nuevo_credito(View view){

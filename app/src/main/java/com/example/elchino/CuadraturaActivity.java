@@ -328,6 +328,7 @@ public class CuadraturaActivity extends AppCompatActivity {
                     String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
                     String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                     interes_mora_total = intereses_moritas;
+                    interes_mora_parcial = interes_mora_total;
                     cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
                     saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
                     cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
@@ -620,18 +621,6 @@ public class CuadraturaActivity extends AppCompatActivity {
                 } else {
                     presentar_info_credito("UNO");
                 }
-                /*
-                Toast.makeText(this, "Cliente encontrado", Toast.LENGTH_SHORT).show();
-                et_ID.setText("");
-                et_ID.setFocusableInTouchMode(false);
-                et_ID.setEnabled(false);
-                et_ID.setVisibility(View.INVISIBLE);
-                bt_consultar.setVisibility(View.INVISIBLE);
-                tv_esperar.setText("");
-                tv_esperar.setVisibility(View.INVISIBLE);
-                //Aqui se llama al metodo principal.
-                recibir_fondos_cliente();
-                 */
             }
         } else if (tv_esperar.getText().toString().equals("Monto a pagar al dia de hoy: ")) {
             bt_consultar.setClickable(false);
@@ -650,6 +639,19 @@ public class CuadraturaActivity extends AppCompatActivity {
             cantidad_cuotas_pendientes = Integer.parseInt(parts_prestamo[3]);
             morosidad = parts_prestamo[2];
             monto_cuota = obtener_monto_cuota(parts_prestamo[0]);
+            Log.v("Prestamo_a_consultar2", ".\n\nCoutas pendientes: " + cantidad_cuotas_pendientes + "\n\nInteres mora total: " + interes_mora_parcial + "\n\nMorosidad: " + morosidad + "\n\nMonto cuota: " + monto_cuota + "\n\n.");
+            //archivo_prestamo = file_name; Checked!!!
+            if (Integer.parseInt(parts_prestamo[3]) == 0) {
+                monto_a_pagar = monto_cuota;
+            } else {
+                //morosidad
+                if (morosidad.equals("D")) {
+                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota;
+                } else {
+                    //monto a pagar
+                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + Integer.parseInt(interes_mora_parcial);
+                }
+            }
             presentar_monto_a_pagar(monto_a_pagar);
 
         } else {
@@ -677,6 +679,7 @@ public class CuadraturaActivity extends AppCompatActivity {
                     cuadratura = split[1];
                 } else if (split[0].equals("proximo_abono")) {
                     proximo_abono = split[1];
+                    fecha_next_abono = proximo_abono;
                 } else if (split[0].equals("plazo")) {
                     plazo = split[1];
                 } else if (split[0].equals("saldo_mas_intereses")) {
@@ -705,9 +708,12 @@ public class CuadraturaActivity extends AppCompatActivity {
                 //ERROR
             }
 
+            String saldo_plus_s = obtener_saldo_plus(cuadratura);
+            String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
+            interes_mora_total = intereses_moritas;
+            interes_mora_parcial = interes_mora_total;
             Log.v("antes_de_cuadra_chang", ".\n\nCuadratura. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
             cuadratura = obtener_cuadratura(cuadratura, proximo_abono, factor_semanas, monto_ingresado);//Aqui se obtiene la verdadera y final morosidad.
-
             Log.v("despues_de_cuadra_chang", ".\n\nCuadratura. Archivo: " + file_name + "\n\nMorosidad: " + morosidad + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
             //cuotas = obtener_cuotas_nuevas(cuadratura);
             saldo_mas_intereses = Integer.parseInt(obtener_saldo_plus(cuadratura));
@@ -716,15 +722,20 @@ public class CuadraturaActivity extends AppCompatActivity {
                 String fecha_next_abono_S = DateUtilities.dateToString(fecha_next_abono_D);
                 String[] splittte = fecha_next_abono_S.split("-");
                 fecha_next_abono_S = splittte[2] + "/" + splittte[1] + "/" + splittte[0];
-                fecha_next_abono = fecha_next_abono_S;
+                fecha_next_abono = fecha_next_abono_S;//Es la fecha de hoy.
+                Log.v("proc_ab_2", "Cuadratura.\n\nfecha_next_abono (Debe ser hoy): " + fecha_next_abono);
             } else {
                 fecha_next_abono = proximo_abono;
+                Log.v("proc_ab_2", "Cuadratura.\n\nfecha_next_abono (Debe ser hoy): " + fecha_next_abono);
             }
             proximo_abono = fecha_next_abono;
             Log.v("procesar_abono", ".\n\nProximo abono: " + proximo_abono + "\n\n.");
-            actualizar_archivo_credito();
+            //actualizar_archivo_credito();
+            presentar_cuadratura();
 
         } catch (IOException e) {
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
     }
@@ -745,9 +756,11 @@ public class CuadraturaActivity extends AppCompatActivity {
                     linea = linea.replace(split[1], morosidad);
                     contenido = contenido + linea + "\n";
                 } else if (split[0].equals("intereses_moratorios")) {
+                    Log.v("act_file_credit1", "Cuadratura.\n\nIntereses moratorios: " + interes_mora_total + "\n\n.");
                     linea = linea.replace(split[1], interes_mora_total);
                     contenido = contenido + linea + "\n";
                 } else if (split[0].equals("proximo_abono")) {
+                    Log.v("act_file_credit2", "Cuadratura.\n\nProximo abono: " + proximo_abono + "\n\n.");
                     linea = linea.replace(split[1], proximo_abono);
                     contenido = contenido + linea + "\n";
                 } else {
@@ -761,7 +774,8 @@ public class CuadraturaActivity extends AppCompatActivity {
             borrar_archivo(archivo_prestamo);
             crear_archivo(archivo_prestamo);
             guardar(contenido, archivo_prestamo);
-            actualizar_archivo_cliente();
+            Log.v("actualizar_archiv_cred2", ".\n\nCuadratura. Archivo: " + archivo_prestamo + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
+            //actualizar_archivo_cliente();
 
         } catch (IOException e) {
         }
@@ -1163,9 +1177,11 @@ public class CuadraturaActivity extends AppCompatActivity {
                         String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
                         String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                         interes_mora_total = intereses_moritas;
+                        interes_mora_parcial = interes_mora_total;
                         cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
                         saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
                         cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
+
 
                         valor_presentar_s = "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas;
                         presentar_et_esperar = valor_presentar_s;
