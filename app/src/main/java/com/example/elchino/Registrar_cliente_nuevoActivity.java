@@ -32,6 +32,7 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.TranslateUtil;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -77,10 +78,10 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     private String edad_clienteS = "";
     private String sexo_clienteS = "";
     private String direccion_clienteS = "";
-    private String puntuacion_clienteS = "";
-    private String tasa_clienteS = "";
+    private String puntuacion_clienteS = "9";
+    private String tasa_clienteS = "25";
     private String monto_disponibleS = "";
-    private String interes_moraS = "";
+    private String interes_moraS = "1";
     private String ID_clienteS = "";
     private String fecha_registroS = "";
     private String file_content = "";
@@ -121,11 +122,11 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         edad_cliente = (TextInputLayout) findViewById(R.id.edad_cliente);
         sexo_cliente = (TextInputLayout) findViewById(R.id.sexo_cliente);
         direccion_cliente = (TextInputLayout) findViewById(R.id.direccion_cliente);
-        puntuacion_cliente = (TextInputLayout) findViewById(R.id.puntuacion_cliente);
-        tasa_cliente = (TextInputLayout) findViewById(R.id.tasa_cliente);
+        //puntuacion_cliente = (TextInputLayout) findViewById(R.id.puntuacion_cliente);
+        //tasa_cliente = (TextInputLayout) findViewById(R.id.tasa_cliente);
         monto_disponible = (TextInputLayout) findViewById(R.id.monto_disponible);
-        interes_mora = (TextInputLayout) findViewById(R.id.interes_mora);
-        fecha_registro = (TextInputLayout) findViewById(R.id.fecha_registro);
+        //interes_mora = (TextInputLayout) findViewById(R.id.interes_mora);
+        //fecha_registro = (TextInputLayout) findViewById(R.id.fecha_registro);
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
         confirmar = (Button) findViewById(R.id.bt_confirmar);
         et_ID = (EditText) findViewById(R.id.et_ID);
@@ -585,9 +586,13 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     }
 
     public boolean fecha_registro () {//Se llena con un onClick listener!!!
-        if (fecha_registro.getEditText()!=null){
-            u14 = fecha_registro.getEditText().getText().toString().trim();
-        }
+
+        Date fecha_hoy = Calendar.getInstance().getTime();
+        String fecha_hoy_S = DateUtilities.dateToString(fecha_hoy);
+        String[] split = fecha_hoy_S.split("-");
+        fecha_hoy_S = split[2] + "/" + split[1] + "/" + split[0];
+
+        u14 = fecha_hoy_S;
 
         if (u14.isEmpty()) {
 
@@ -714,9 +719,8 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     }
 
     public boolean tasa_cliente () {//Se debe llenar automaticamente
-        if (tasa_cliente.getEditText()!=null){
-            u5 = tasa_cliente.getEditText().getText().toString().trim();
-        }
+
+        u5 = "25";
 
         if (u5.isEmpty()) {
 
@@ -815,9 +819,8 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     }
 
     public boolean interes_mora () {//Se debe llenar automaticamente
-        if (interes_mora.getEditText()!=null){
-            u7 = interes_mora.getEditText().getText().toString().trim();
-        }
+
+        u7 = "1";
 
         if (u7.isEmpty()) {
 
@@ -868,9 +871,9 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     }
 
     public boolean puntuacion_cliente () {//Se llena automaticamente!!!
-        if (puntuacion_cliente.getEditText()!=null){
-            u11 = puntuacion_cliente.getEditText().getText().toString().trim();
-        }
+
+
+        u11 = "9";
 
         if (u11.isEmpty()) {
 

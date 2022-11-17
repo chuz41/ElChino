@@ -6,6 +6,9 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -37,6 +40,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.TranslateUtil;
+import com.example.elchino.Util.BluetoothUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -56,6 +60,7 @@ import java.util.regex.Pattern;
 public class CuadraturaActivity extends AppCompatActivity {
 
     private Integer monto_abono = 0;
+    private Button bt_imprimir;
     private Integer monto_cuota = 0;
     private String cambio;
     private String fecha_pago = "";//Fecha que debe pagar la proxima cuota.
@@ -116,6 +121,10 @@ public class CuadraturaActivity extends AppCompatActivity {
     private TextView tv_cambio;
     private String monto_creditito;
     private String cliente_Id_volver;
+    private String mensaje_imprimir = "";
+    private String mensaje_imprimir_pre = "";
+    private String nombre_cliente = "";
+    private String apellido_cliente = "";
 
     
     @Override
@@ -127,7 +136,10 @@ public class CuadraturaActivity extends AppCompatActivity {
         cambio = getIntent().getStringExtra("cambio");
         activity_devolver = getIntent().getStringExtra("activity_devolver");
         monto_creditito = getIntent().getStringExtra("monto_creditito");
+        mensaje_imprimir_pre = getIntent().getStringExtra("mensaje_imprimir_pre");
         tv_cambio = (TextView) findViewById(R.id.tv_cambio);
+        bt_imprimir = (Button) findViewById(R.id.bt_imprimir);
+        bt_imprimir.setVisibility(View.INVISIBLE);
         tv_cambio.setVisibility(View.INVISIBLE);
         Integer cambio_int = Integer.valueOf(cambio);
         if (cambio_int > 0) {
@@ -574,6 +586,12 @@ public class CuadraturaActivity extends AppCompatActivity {
                             if (split[0].equals("interes_mora")) {
                                 interes_mora = split[1];
                             }
+                            if (split[0].equals("nombre_cliente")) {
+                                nombre_cliente = split[1];
+                            }
+                            if (split[0].equals("apellido1_cliente")) {
+                                apellido_cliente = split[1];
+                            }
                             linea = linea.replace("_separador_", ": ");
                             linea = linea.replace("_cliente", "");
                             linea = linea.replace("_", " ");
@@ -630,18 +648,6 @@ public class CuadraturaActivity extends AppCompatActivity {
             cantidad_cuotas_pendientes = Integer.parseInt(parts_prestamo[3]);
             morosidad = parts_prestamo[2];
             monto_cuota = obtener_monto_cuota(parts_prestamo[0]);
-            //archivo_prestamo = file_name; Checked!!!
-            /*if (Integer.parseInt(parts_prestamo[3]) == 0) {
-                monto_a_pagar = monto_cuota;
-            } else {
-                //morosidad
-                if (morosidad.equals("D")) {
-                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota;
-                } else {
-                    //monto a pagar
-                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + Integer.parseInt(interes_mora_total);
-                }
-            }*/
             presentar_monto_a_pagar(monto_a_pagar);
 
         } else {
@@ -748,7 +754,12 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     
     private void presentar_cuadratura () throws ParseException {
-        //TODO: Presentar la informacion que esta en la cuadratura
+        //TODO: Imprimir la informacion que esta en la cuadratura
+
+        mensaje_imprimir = "\n\nFecha: " + dia + "/" + mes + "/" + anio + "\n\n\n******** Prestamos El Chino ********\n\nCliente: " +
+                nombre_cliente + " " + apellido_cliente +"\n\n\n******************************\n\n" + mensaje_imprimir_pre + "\n******************************\n\n" +
+                "Estimado cliente, no olvide\nrevisar su tiquete antes de\nque se retire el cobrador.\n\n\n";
+
         bt_consultar.setEnabled(false);
         bt_consultar.setVisibility(View.INVISIBLE);
         tv_esperar.setText("");
@@ -805,6 +816,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             botones_tree.get(i).setVisibility(View.VISIBLE);
             botones_tree.get(i).setText(info_boton);
             botones_tree.get(i).setClickable(false);//TODO: Aqui se debe hacer un algoritmo que al tener monto pendiente, se pueda cancelar solo esa cuota.
+            bt_imprimir.setVisibility(View.VISIBLE);
         }
     }
 
@@ -948,13 +960,14 @@ public class CuadraturaActivity extends AppCompatActivity {
         consultar(null);
     }
 
-    private Integer obtener_monto_cuota(String s) {
+    private Integer obtener_monto_cuota (String s) {
         int flag = 0;
         String[] split = s.split("#");
         Log.v("obt_monto_cuota", ".\n\nString: "+ s + "\n\nSplit[0]: " + split[0] + "\n\nSplit[1]: " + split[1] + "\n\n.");
         String archivos[] = fileList();
+        s = split[1];
         for (int i = 0; i < archivos.length; i++) {
-            Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
+            Pattern pattern = Pattern.compile(cliente_ID + "_P_" + s + "_P_", Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(archivos[i]);
             boolean matchFound = matcher.find();
             if (matchFound) {
@@ -1611,6 +1624,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
+        bt_imprimir.setVisibility(View.INVISIBLE);
         boton_atras();
     }
 
@@ -1642,7 +1656,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         bt_consultar.setVisibility(View.VISIBLE);
     }
 
-    private void ocultar_todito() {
+    private void ocultar_todito () {
         Log.v("ocultar_todito", "Se hace todo invisible");
         tv_esperar.setVisibility(View.VISIBLE);
         tv_esperar.setText("conectando, por favor espere...");
@@ -2054,5 +2068,42 @@ public class CuadraturaActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void printIt (View view) {
+
+            BluetoothSocket socket;
+            socket = null;
+            byte[] data = mensaje_imprimir.getBytes();
+
+            //Get BluetoothAdapter
+            BluetoothAdapter btAdapter = BluetoothUtil.getBTAdapter();
+            if (btAdapter == null) {
+                Toast.makeText(getBaseContext(), "BlueTooth abierto!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Get sunmi InnerPrinter BluetoothDevice
+            String impresora = get_impresora();
+            BluetoothDevice device = BluetoothUtil.getDevice(btAdapter, impresora);
+            if (device == null) {
+                Toast.makeText(getBaseContext(), "Asegurese de tener conectada una impresora!!!", Toast.LENGTH_LONG).show();
+                return;
+            }
+            try {
+                socket = BluetoothUtil.getSocket(device);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                assert socket != null;
+                BluetoothUtil.sendData(data, socket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+
+    private String get_impresora() {
+        String impresora = "00:11:22:33:44:55";
+        return impresora;
     }
 }

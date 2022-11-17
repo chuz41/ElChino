@@ -226,27 +226,6 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tasa_cliente"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:counterEnabled="true"
-            app:counterMaxLength="3"
-            app:counterOverflowTextColor="@color/red"
-            app:counterTextColor="@color/green"
-            app:errorEnabled="true"
-            app:errorIconDrawable="@android:drawable/ic_dialog_alert"
-            app:errorTextColor="@color/red">
-
-            <com.google.android.material.textfield.TextInputEditText
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/tasa_cliente"
-                android:inputType="number" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/monto_disponible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -263,69 +242,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/monto_cliente"
-                android:inputType="number" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/interes_mora"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:counterEnabled="true"
-            app:counterMaxLength="3"
-            app:counterOverflowTextColor="@color/red"
-            app:counterTextColor="@color/green"
-            app:errorEnabled="true"
-            app:errorIconDrawable="@android:drawable/ic_dialog_alert"
-            app:errorTextColor="@color/red">
-
-            <com.google.android.material.textfield.TextInputEditText
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/tasa_mora"
-                android:inputType="number" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/fecha_registro"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:counterEnabled="true"
-            app:counterMaxLength="10"
-            app:counterOverflowTextColor="@color/red"
-            app:counterTextColor="@color/green"
-            app:errorEnabled="true"
-            app:errorIconDrawable="@android:drawable/ic_dialog_alert"
-            app:errorTextColor="@color/red">
-
-            <com.google.android.material.textfield.TextInputEditText
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/fecha_registro"
-                android:inputType="date" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/puntuacion_cliente"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:counterEnabled="true"
-            app:counterMaxLength="1"
-            app:counterOverflowTextColor="@color/red"
-            app:counterTextColor="@color/green"
-            app:errorEnabled="true"
-            app:errorIconDrawable="@android:drawable/ic_dialog_alert"
-            app:errorTextColor="@color/red">
-
-            <com.google.android.material.textfield.TextInputEditText
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/puntuacion_cliente"
                 android:inputType="number" />
 
         </com.google.android.material.textfield.TextInputLayout>
