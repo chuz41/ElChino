@@ -60,6 +60,7 @@ import java.util.regex.Pattern;
 public class CuadraturaActivity extends AppCompatActivity {
 
     private Integer monto_abono = 0;
+    private String imprimir_intermedio = "";
     private Button bt_imprimir;
     private Integer monto_cuota = 0;
     private String cambio;
@@ -148,7 +149,8 @@ public class CuadraturaActivity extends AppCompatActivity {
             Toast.makeText(this, "Devolver " + cambio + " colones sobrantes.", Toast.LENGTH_LONG).show();
         }
         if (Integer.parseInt(monto_creditito) > 0) {
-            tv_cambio.setText("Prestamo aprobado.\n\nMonto del credito:\n" + monto_creditito + " colones.");
+            tv_cambio.setText("***** Prestamo  aprobado *****.\n\nMonto del credito:\n" + monto_creditito + " colones.");
+            imprimir_intermedio = "***** Prestamo  aprobado *****.\n\nMonto del credito:\n" + monto_creditito + " colones.";
             tv_cambio.setVisibility(View.VISIBLE);
             Toast.makeText(this, "Entregar " + monto_creditito + " colones al cliente.", Toast.LENGTH_LONG).show();
         }
@@ -681,8 +683,8 @@ public class CuadraturaActivity extends AppCompatActivity {
                     saldo_mas_intereses = Integer.parseInt(split[1]);
                 } else if (split[0].equals("cuotas")) {
                     cuotas = split[1];
-                } else if (split[0].equals("morosidad")) {
-                    morosidad = split[1];
+                //} else if (split[0].equals("morosidad")) {
+                //    morosidad = split[1];
                 //} else if (split[0].equals("intereses_moratorios")) {
                 //    interes_mora_total = split[1];
                 } else {
@@ -704,11 +706,22 @@ public class CuadraturaActivity extends AppCompatActivity {
             }
 
             Log.v("antes_de_cuadra_chang", ".\n\nCuadratura. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
-            cuadratura = obtener_cuadratura(cuadratura, fecha_next_abono, factor_semanas, monto_ingresado);//Aqui se obtiene la verdadera y final morosidad.
-            Log.v("despues_de_cuadra_chang", ".\n\nCuadratura. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
+            cuadratura = obtener_cuadratura(cuadratura, proximo_abono, factor_semanas, monto_ingresado);//Aqui se obtiene la verdadera y final morosidad.
+
+            Log.v("despues_de_cuadra_chang", ".\n\nCuadratura. Archivo: " + file_name + "\n\nMorosidad: " + morosidad + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
             //cuotas = obtener_cuotas_nuevas(cuadratura);
             saldo_mas_intereses = Integer.parseInt(obtener_saldo_plus(cuadratura));
-
+            if (morosidad.equals("M")) {
+                Date fecha_next_abono_D = Calendar.getInstance().getTime();
+                String fecha_next_abono_S = DateUtilities.dateToString(fecha_next_abono_D);
+                String[] splittte = fecha_next_abono_S.split("-");
+                fecha_next_abono_S = splittte[2] + "/" + splittte[1] + "/" + splittte[0];
+                fecha_next_abono = fecha_next_abono_S;
+            } else {
+                fecha_next_abono = proximo_abono;
+            }
+            proximo_abono = fecha_next_abono;
+            Log.v("procesar_abono", ".\n\nProximo abono: " + proximo_abono + "\n\n.");
             actualizar_archivo_credito();
 
         } catch (IOException e) {
@@ -717,7 +730,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     }
 
     
-    private void actualizar_archivo_credito() {
+    private void actualizar_archivo_credito () {
         //archivo_prestamo
 
         String contenido = "";
@@ -733,6 +746,9 @@ public class CuadraturaActivity extends AppCompatActivity {
                     contenido = contenido + linea + "\n";
                 } else if (split[0].equals("intereses_moratorios")) {
                     linea = linea.replace(split[1], interes_mora_total);
+                    contenido = contenido + linea + "\n";
+                } else if (split[0].equals("proximo_abono")) {
+                    linea = linea.replace(split[1], proximo_abono);
                     contenido = contenido + linea + "\n";
                 } else {
                     contenido = contenido + linea + "\n";
@@ -756,9 +772,13 @@ public class CuadraturaActivity extends AppCompatActivity {
     private void presentar_cuadratura () throws ParseException {
         //TODO: Imprimir la informacion que esta en la cuadratura
 
-        mensaje_imprimir = "\n\nFecha: " + dia + "/" + mes + "/" + anio + "\n\n\n******** Prestamos El Chino ********\n\nCliente: " +
+        nombre_cliente = cliente_ID;
+
+        String cuadratura_print = generar_cuadra_print();
+
+        mensaje_imprimir = "\n\nFecha: " + dia + "/" + mes + "/" + anio + "\n\n\n***** Prestamos El Chino *****\n\nCliente: " +
                 nombre_cliente + " " + apellido_cliente +"\n\n\n******************************\n\n" + mensaje_imprimir_pre + "\n******************************\n\n" +
-                "Estimado cliente, no olvide\nrevisar su tiquete antes de\nque se retire el cobrador.\n\n\n";
+                cuadratura_print + "Estimado cliente, no olvide\nrevisar su tiquete antes de\nque se retire el cobrador.\n\n\n\n\n";
 
         bt_consultar.setEnabled(false);
         bt_consultar.setVisibility(View.INVISIBLE);
@@ -818,6 +838,29 @@ public class CuadraturaActivity extends AppCompatActivity {
             botones_tree.get(i).setClickable(false);//TODO: Aqui se debe hacer un algoritmo que al tener monto pendiente, se pueda cancelar solo esa cuota.
             bt_imprimir.setVisibility(View.VISIBLE);
         }
+    }
+
+    private String generar_cuadra_print() {//******************************
+
+
+        String flag = "\n******************************\n********* CUADRATURA *********\n******************************\n";
+        String[] split = cuadratura.split("__");
+        int largo_split = split.length;
+        int cuottas = 0;
+        for (int i = 0; i < largo_split; i++) {
+
+            String[] split_1 = split[i].split("_");
+
+            flag = flag + "\nCuota " + split_1[0] + " " + split_1[1] + ":\n" + split_1[2] + " colones.\nFecha de pago: " + split_1[3] + "\n";
+
+            if (Integer.parseInt(split_1[2]) > 0) {//Significa que tiene esta cuota pendiente.
+                cuottas = cuottas + 1;
+            }
+        }
+
+        flag = flag + "\n******************************\n" + imprimir_intermedio + "\n******************************\n\n";
+
+        return flag;
     }
 
     private TreeMap<Integer, Button> getTreeMapBotones(HashMap<Integer, Button> botones) {

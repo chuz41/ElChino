@@ -52,7 +52,7 @@ import java.util.Map;
 
 public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
-    TextInputLayout nombre_cliente,fecha_registro,telefono2_cliente,telefono1_cliente,apellido1_cliente,apellido2_cliente,apodo_cliente,edad_cliente,sexo_cliente,direccion_cliente,puntuacion_cliente,tasa_cliente,monto_disponible,interes_mora,ID_cliente;
+    TextInputLayout nombre_cliente,telefono2_cliente,telefono1_cliente,apellido1_cliente,apellido2_cliente,apodo_cliente,edad_cliente,sexo_cliente,direccion_cliente,monto_disponible,ID_cliente;
     private String u0,u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13,u14;
     private boolean flag_u0 = false;
     private boolean flag_u1 = false;
@@ -596,25 +596,25 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
         if (u14.isEmpty()) {
 
-            fecha_registro.setError(getText(R.string.cantempty_edad));
+            //fecha_registro.setError(getText(R.string.cantempty_edad));
             return false;
 
         }
 
         else if (u14.length() > 10) {
 
-            fecha_registro.setError(getText(R.string.toolong_edad));
+            //fecha_registro.setError(getText(R.string.toolong_edad));
             return false;
         }
 
         else if (u14.length() < 10) {
 
-            fecha_registro.setError(getText(R.string.toolow_edad));
+            //fecha_registro.setError(getText(R.string.toolow_edad));
             return false;
         }
 
         else {
-            fecha_registro.setError(null);
+            //fecha_registro.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u14) {
                 if (u14.equals(fecha_registroS)) {
@@ -724,29 +724,29 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
         if (u5.isEmpty()) {
 
-            tasa_cliente.setError(getText(R.string.cantempty_tasa));
+            //tasa_cliente.setError(getText(R.string.cantempty_tasa));
             return false;
 
         }
 
         else if (u5.length() > 3) {
 
-            tasa_cliente.setError(getText(R.string.toolong_tasa));
+            //tasa_cliente.setError(getText(R.string.toolong_tasa));
             return false;
         }
 
         else if (Integer.parseInt(u5) > 100) {
-            tasa_cliente.setError(getText(R.string.toolong_tasa));
+            //tasa_cliente.setError(getText(R.string.toolong_tasa));
             return false;
         }
 
         else if (Integer.parseInt(u5) < 0) {
-            tasa_cliente.setError(getText(R.string.toolow_tasa));
+            //tasa_cliente.setError(getText(R.string.toolow_tasa));
             return false;
         }
 
         else {
-            tasa_cliente.setError(null);
+            //tasa_cliente.setError(null);
 
             //Aqui se programa las acciones que se van a ejecutar con este parametro.
             //Se crea una linea de texto que se va a agregar al archivo nuevo que se va a crear.
@@ -824,29 +824,29 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
         if (u7.isEmpty()) {
 
-            interes_mora.setError(getText(R.string.cantempty_tasa));
+            //interes_mora.setError(getText(R.string.cantempty_tasa));
             return false;
 
         }
 
         else if (u7.length() > 3) {
 
-            interes_mora.setError(getText(R.string.toolong_tasa));
+            //interes_mora.setError(getText(R.string.toolong_tasa));
             return false;
         }
 
         else if (Integer.parseInt(u7) > 100) {
-            interes_mora.setError(getText(R.string.toolong_tasa));
+            //interes_mora.setError(getText(R.string.toolong_tasa));
             return false;
         }
 
         else if (Integer.parseInt(u7) < 0) {
-            interes_mora.setError(getText(R.string.toolow_tasa));
+            //interes_mora.setError(getText(R.string.toolow_tasa));
             return false;
         }
 
         else {
-            interes_mora.setError(null);
+            //interes_mora.setError(null);
 
             //Aqui se programa las acciones que se van a ejecutar con este parametro.
             //Se crea una linea de texto que se va a agregar al archivo nuevo que se va a crear.
@@ -877,25 +877,25 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
         if (u11.isEmpty()) {
 
-            puntuacion_cliente.setError(getText(R.string.cantempty_puntuacion));
+            //puntuacion_cliente.setError(getText(R.string.cantempty_puntuacion));
             return false;
 
         }
 
         else if (u11.length() > 1) {
 
-            puntuacion_cliente.setError(getText(R.string.toolong_puntuacion));
+            //puntuacion_cliente.setError(getText(R.string.toolong_puntuacion));
             return false;
         }
 
         else if (u11.length() < 1) {
 
-            puntuacion_cliente.setError(getText(R.string.toolow_puntuacion));
+            //puntuacion_cliente.setError(getText(R.string.toolow_puntuacion));
             return false;
         }
 
         else {
-            puntuacion_cliente.setError(null);
+            //puntuacion_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u11) {
                 if (u11.equals(puntuacion_clienteS)) {
@@ -1073,14 +1073,14 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         edad_cliente.setVisibility(View.VISIBLE);
         sexo_cliente.setVisibility(View.VISIBLE);
         direccion_cliente.setVisibility(View.VISIBLE);
-        puntuacion_cliente.setVisibility(View.VISIBLE);
-        tasa_cliente.setVisibility(View.VISIBLE);
+        //puntuacion_cliente.setVisibility(View.VISIBLE);
+        //tasa_cliente.setVisibility(View.VISIBLE);
         monto_disponible.setVisibility(View.VISIBLE);
-        interes_mora.setVisibility(View.VISIBLE);
+        //interes_mora.setVisibility(View.VISIBLE);
         confirmar.setVisibility(View.VISIBLE);
         telefono1_cliente.setVisibility(View.VISIBLE);
         telefono2_cliente.setVisibility(View.VISIBLE);
-        fecha_registro.setVisibility(View.VISIBLE);
+        //fecha_registro.setVisibility(View.VISIBLE);
     }
 
     private void ocultar_todito() {
@@ -1096,14 +1096,14 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         edad_cliente.setVisibility(View.INVISIBLE);
         sexo_cliente.setVisibility(View.INVISIBLE);
         direccion_cliente.setVisibility(View.INVISIBLE);
-        puntuacion_cliente.setVisibility(View.INVISIBLE);
-        tasa_cliente.setVisibility(View.INVISIBLE);
+        //puntuacion_cliente.setVisibility(View.INVISIBLE);
+        //tasa_cliente.setVisibility(View.INVISIBLE);
         monto_disponible.setVisibility(View.INVISIBLE);
-        interes_mora.setVisibility(View.INVISIBLE);
+        //interes_mora.setVisibility(View.INVISIBLE);
         confirmar.setVisibility(View.INVISIBLE);
         telefono1_cliente.setVisibility(View.INVISIBLE);
         telefono2_cliente.setVisibility(View.INVISIBLE);
-        fecha_registro.setVisibility(View.INVISIBLE);
+        //fecha_registro.setVisibility(View.INVISIBLE);
     }
 
     private String imprimir_archivo(String file_name){

@@ -216,11 +216,14 @@ public class AbonarActivity extends AppCompatActivity {
             double cantidad_de_cuotas_pendientes = (dias_atrasados / (7 * factor));
             if (cantidad_de_cuotas_pendientes <= 1) {
                 puntuacion_cliente = String.valueOf(Integer.parseInt(puntuacion_cliente) - 1);
+                Log.v("Obteniend_cuotas_moro0", "Abonar.\n\nCantidad de cuotas pendientes: " + cantidad_de_cuotas_pendientes + "\n\n.");
                 flag = "1";
             } else {
                 int c_d_c_p = (int) cantidad_de_cuotas_pendientes;
                 puntuacion_cliente = String.valueOf(Integer.parseInt(puntuacion_cliente) - c_d_c_p);
+                Log.v("Obteniend_cuotas_moro0", "Abonar.\n\nCantidad de cuotas pendientes: " + c_d_c_p + "\n\nCantidad de abonos: " + cantidad_abonos + "\n\n.");
                 if (cantidad_abonos < cantidad_de_cuotas_pendientes) {
+                    Log.v("ERROR_ERROR", ".\n\nERROR_ERROR\n\n");
                     cantidad_de_cuotas_pendientes = cantidad_abonos;
                     flag = String.valueOf(cantidad_de_cuotas_pendientes);
                 } else {
@@ -228,7 +231,7 @@ public class AbonarActivity extends AppCompatActivity {
                 }
             }
         }
-        Log.v("Obteniend_cuotas_moros", ".\n\nflag: " + flag + "\n\n.");
+        Log.v("Obteniend_cuotas_moro1", ".\n\nflag: " + flag + "\n\n.");
         cantidad_cuotas_pendientes = Integer.parseInt(flag);
         return flag;
     }
@@ -303,11 +306,12 @@ public class AbonarActivity extends AppCompatActivity {
                     String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
                     String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                     interes_mora_total = intereses_moritas;
+                    interes_mora_parcial = interes_mora_total;
                     cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
                     saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mora);
                     cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
 
-                    Log.v("llenando_spinner2", "Abonar.\n\nMorosidad: " + morosidad + "\n\n.");
+                    Log.v("llenando_spinner2", "Abonar.\n\nMorosidad_s: " + morosidad_s + "\n\nMorosidad: " + morosidad + "\n\n.");
                     double saldo_mas_intereses_D = Double.parseDouble(saldo_mas_intereses_s);
                     int saldo_mas_intereses_I = (int) saldo_mas_intereses_D;
                     saldo_mas_intereses_s = String.valueOf(saldo_mas_intereses_I);
@@ -610,8 +614,8 @@ public class AbonarActivity extends AppCompatActivity {
 
                 if (split[0].equals("cuadratura")) {
                     cuadratura = split[1];
-                //} else if (split[0].equals("proximo_abono")) {
-                //    proximo_abono = split[1];
+                } else if (split[0].equals("proximo_abono")) {
+                    fecha_next_abono = split[1];
                 } else if (split[0].equals("plazo")) {
                     plazo = split[1];
                 } else if (split[0].equals("saldo_mas_intereses")) {
@@ -642,6 +646,10 @@ public class AbonarActivity extends AppCompatActivity {
                 //ERROR
             }
 
+            String saldo_plus_s = obtener_saldo_plus(cuadratura);
+            String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
+            interes_mora_total = intereses_moritas;
+            interes_mora_parcial = interes_mora_total;
             Log.v("antes_de_cuadra_chang", ".\n\nAbonar. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
             cuadratura = obtener_cuadratura(cuadratura, proximo_abono, factor_semanas, monto_ingresado);//Aqui se obtiene la verdadera y final morosidad.
             Log.v("despues_de_cuadra_chang", ".\n\nAbonar. Archivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
@@ -798,13 +806,12 @@ public class AbonarActivity extends AppCompatActivity {
     private String obtener_cuadratura (String cuadratura, String fecha_next_abono, int factor_semanas, int monto_ingresado) throws ParseException {
 
         String flag = "";
-        mensaje_imprimir = "\n******************************\n";
+        //mensaje_imprimir = "\n******************************\n";
         int monto_temporal = monto_ingresado - Integer.parseInt(interes_mora_total);
         int monto_temporal_fix = monto_temporal;
 
         Log.v("Debug_cuadra0", "Abonar.\n\nCuadratura: " + cuadratura + "\n\ninteres mora total: " + interes_mora_total + "\n\nfecha next abono: " + fecha_next_abono + "\n\nMonto ingresado: " + monto_ingresado + "\n\nMonto temporal: " + monto_temporal + "\n\n.");
         if (monto_temporal < 0) {//No alcanzo siquiera para pagar los intereses. Debe retornar
-
 
             Date hoy_LD = Calendar.getInstance().getTime();
             String[] split2 = fecha_next_abono.split("/");
@@ -826,7 +833,7 @@ public class AbonarActivity extends AppCompatActivity {
             if (monto_ingresado > 0) {
                 mensaje_imprimir = mensaje_imprimir + "Monto abonado:        " + monto_ingresado + "\n";
                 mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
-                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + "0" + "\n******************************\n";
+                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + "0" + "\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
             }
 
             Log.v("obt_cuadra_no_paga_int", "Abonar.\n\nCuadratura:\n\n" + cuadratura + "\n\nInteres mora total: " + interes_mora_total + "\n\nProximo abono: " + proximo_abono + "\n\n.");
@@ -844,7 +851,7 @@ public class AbonarActivity extends AppCompatActivity {
             if (monto_ingresado > 0) {
                 mensaje_imprimir = mensaje_imprimir + "Monto abonado:        " + monto_ingresado + "\n";
                 mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
-                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + "0" + "\n******************************\n";
+                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + "0" + "\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
             }
             return flag;
 
@@ -888,12 +895,14 @@ public class AbonarActivity extends AppCompatActivity {
                         String diferencia_fechas = String.valueOf(DateUtilities.daysBetween(hoy_LD, fecha_cuadrito_LD));
                         Log.v("paga_cuotas", ".\n\nfecha_cuadrito: " + fecha_cuadrito + "\n\nDiferencia entre fechas: " + diferencia_fechas + "\n\n.");
                         if (monto_ingresado > 0) {
-                            mensaje_imprimir = mensaje_imprimir + "\n\nPaga la cuota # " + numero_cuota + " de manera parcial.\nSaldo abonado a la cuota #" + split_1[1] + ": " + monto_temporal + " colones.\n";
+                            int monto_abonado_I = Integer.parseInt(split_1[2]) + monto_temporal;
+                            mensaje_imprimir = mensaje_imprimir + "\n\nPaga la cuota # " + numero_cuota + "\nde manera parcial.\nMonto abonado\ncuota #" + split_1[1] + ": " +
+                                    monto_abonado_I + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": " + String.valueOf(0 - monto_temporal) + " colones.\n";
                         }
                         if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado.
                             morosidad = "M";
                             if (monto_ingresado > 0) {
-                                mensaje_imprimir = mensaje_imprimir + "\n** *** ** *** ** *** ** *** **\nCuota # " + numero_cuota + " se encuentra atrasada!!!.\n** *** ** *** ** *** ** *** **\n";
+                                mensaje_imprimir = mensaje_imprimir + "\n** *** ** *** ** *** ** *** **\nCuota # " + numero_cuota + " se encuentra atrasada!\n** *** ** *** ** *** ** *** **\n";
                             }
                         } else if (Integer.parseInt(diferencia_fechas) <= 0 ) {
                             morosidad = "D";
@@ -903,9 +912,14 @@ public class AbonarActivity extends AppCompatActivity {
                         int saldo_cuadro = Integer.parseInt(split_1[2]);
                         saldo_cuadro = 0 - monto_temporal;//TODO:Que pasa si el monto ingresado es mayor al monto de una cuota o de todas juntas?
 
+                        int monto_abono_c = Integer.parseInt(split_1[2]) - saldo_cuadro;
+
                         proximo_abono = split_1[3];
                         if (monto_ingresado > 0) {
-                            mensaje_imprimir = mensaje_imprimir + "\nSaldo abonado a la cuota #" + split_1[1] + ": " + saldo_cuadro + "\n";
+                            //mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + ": " + monto_abono_c + "\n";
+                            mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado:        " + monto_ingresado + "\n";
+                            mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
+                            mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + monto_temporal_fix + "\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
                         }
                         interes_mora_total = "0";
                         cuadratura = cuadratura.replace(split_1[0] + "_" + split_1[1] + "_" + split_1[2] + "_" + split_1[3],
@@ -924,15 +938,21 @@ public class AbonarActivity extends AppCompatActivity {
                             flag = cuadratura;
                             if (monto_ingresado > 0) {
                                 if (cambio > 0) {
-                                    mensaje_imprimir = mensaje_imprimir + "\nSaldo abonado a la cuota #" + split_1[1] + ": " + split_1[2] + " colones.\nSaldo pendiente de la cuota #" + split_1[1] + ": 0\n\nCambio: " + cambio + "\n";
+                                    mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + ": " + split_1[2] + " colones.\nSaldo pendiente\ncuota #" + split_1[1] +
+                                            ": 0 colones.\nCambio: " + cambio + " colones.\n";
                                 } else {
-                                    mensaje_imprimir = mensaje_imprimir + "\nSaldo abonado a la cuota #" + split_1[1] + ": " + split_1[2] + " colones.\nSaldo abonado a la cuota #" + split_1[1] + ": " + split_1[2] + " colones.\nSaldo pendiente de la cuota #" + split_1[1] + ": 0\n";
+                                    mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + ": " +
+                                            split_1[2] + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0 colones.\n";
                                 }
+                                mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado:        " + String.valueOf(monto_ingresado - cambio) + "\n";
+                                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
+                                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + String.valueOf(monto_temporal_fix - cambio) + "\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
                             }
                             return flag;
                         } else {
                             if (monto_ingresado > 0) {
-                                mensaje_imprimir = mensaje_imprimir + "\nSaldo pendiente de la cuota #" + split_1[1] + ": 0\n";
+                                mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + ": " +
+                                        split_1[2] + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0 colones.\n";
                             }
                         }
                     } else if (monto_temporal == 0) {//Alcanza para pagar esta cuota pero no sobra nada. Debe retornar!!!
@@ -962,7 +982,11 @@ public class AbonarActivity extends AppCompatActivity {
                             //Do nothing.
                         }
                         if (monto_ingresado > 0) {
-                            mensaje_imprimir = mensaje_imprimir + "\nMonto abonado a la cuota #" + split_1[1] + ": " + split_1[2] + "\nSaldo pendiente de la cuota #" + split_1[1] + ": 0\n";
+                            mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + ": " + split_1[2] +
+                                    " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0 colones\n";
+                            mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado:        " + monto_ingresado + "\n";
+                            mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
+                            mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + monto_temporal_fix + "\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
                         }
                         interes_mora_total = "0";
                         flag = cuadratura;
@@ -974,12 +998,6 @@ public class AbonarActivity extends AppCompatActivity {
                 } else if (Integer.parseInt(split_1[2]) == 0) {//Esta cuota ya ha sido pagada, continuar...
                     //Do nothing. Continue...
                 }
-            }
-
-            if (monto_ingresado > 0) {
-                mensaje_imprimir = mensaje_imprimir + "\n\nMonto abonado:        " + monto_ingresado + "\n";
-                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
-                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + monto_temporal_fix + "\n******************************\n";
             }
 
             Log.v("Obtener_cuadratura_pF", ".\n\nERROR EN RETORNO\n\nContenido del archivo: \n\n" + imprimir_archivo(archivo_prestamo) + "\n\ncuadratura:\n\n" + cuadratura + "\n\n.");
@@ -1220,6 +1238,7 @@ public class AbonarActivity extends AppCompatActivity {
                         String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
                         String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                         interes_mora_total = intereses_moritas;
+                        interes_mora_parcial = interes_mora_total;
                         cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
                         saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
                         cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
@@ -1336,6 +1355,7 @@ public class AbonarActivity extends AppCompatActivity {
                         String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                         Log.v("MORE2", ".\n\nintereses_moritas: " + intereses_moritas + "\n\n.");
                         interes_mora_total = intereses_moritas;
+                        interes_mora_parcial = interes_mora_total;
                         Log.v("MORE3", ".\n\ninteres_mora_total: " + interes_mora_total + "\n\n.");
                         cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
                         Log.v("MORE4", ".\n\ncuadratura_pre: " + cuadratura_pre + "\n\n.");

@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         checkedTextView.setText("Mostrar password");
         checkedTextView.setVisibility(View.INVISIBLE);
         separar_fechaYhora();
-        //abonar();
+        abonar();
         //nuevo_credito();
         //estado_cliente();
         try {
