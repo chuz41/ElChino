@@ -24,6 +24,7 @@ public class DateUtilities {
         TimeUnit unidad = TimeUnit.DAYS;
         long dias = unidad.convert(tiempo_transcurrido, TimeUnit.MILLISECONDS);
         diferencia = (int) dias;
+        diferencia = diferencia;
         return diferencia;
     }
 

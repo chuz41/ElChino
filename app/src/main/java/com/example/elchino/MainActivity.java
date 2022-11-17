@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         separar_fechaYhora();
         abonar();
         //nuevo_credito();
+        //estado_cliente();
         try {
             check_activation();
         } catch (JSONException e) {
@@ -143,6 +144,14 @@ public class MainActivity extends AppCompatActivity {
         Nuevo_credito.putExtra("msg", "");
         Nuevo_credito.putExtra("cliente_recivido", "205570207");
         startActivity(Nuevo_credito);
+        finish();
+        System.exit(0);
+    }
+
+    public void estado_cliente(){
+        Intent estado_cliente = new Intent(this, Estado_clienteActivity.class);
+        estado_cliente.putExtra("cliente_ID", "205570207");
+        startActivity(estado_cliente);
         finish();
         System.exit(0);
     }

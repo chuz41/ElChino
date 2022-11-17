@@ -328,7 +328,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } else {
             //Do nothing. Never come here!!!
         }
-        double monto_total = monto_credito + ((monto_credito * interes) / 100);
+        double monto_parcial = (monto_credito * interes);
+        monto_parcial = monto_parcial / 100;
+        double monto_total = monto_credito + monto_parcial;
         double cuota = monto_total / cuotas;
         int flag_int = (int) cuota;
         Log.v("monto_total", ".\n\nMonto total: " + monto_total + "\n\nMonto del credito: " + monto_credito + "\n\n.");
@@ -362,7 +364,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } else {
             //Do nothing. Never come here!!!
         }
-        double monto_total = monto_credito + ((monto_credito * interes) / 100);
+        double monto_parcial = (monto_credito * interes);
+        monto_parcial = monto_parcial / 100;
+        double monto_total = monto_credito + monto_parcial;
         int flag_int = (int) monto_total;
         flag = String.valueOf(flag_int);
         return flag;

@@ -95,7 +95,7 @@ public class Re_financiarActivity extends AppCompatActivity {
     private Button bt_consultar;
     private String cliente_ID = "";
     private TextView tv_saludo;
-    private String monto_disponible = "";
+    private String monto_disponible = "0";
     private boolean flag_client_reciv = false;
     private String cliente_recibido = "";
     private String abono_cero = "0";
@@ -302,6 +302,10 @@ public class Re_financiarActivity extends AppCompatActivity {
                     saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
                     cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
 
+                    Log.v("llenando_spinner2", "Re-financiar.\n\nMorosidad: " + morosidad + "\n\n.");
+                    double saldo_mas_intereses_D = Double.parseDouble(saldo_mas_intereses_s);
+                    int saldo_mas_intereses_I = (int) saldo_mas_intereses_D;
+                    saldo_mas_intereses_s = String.valueOf(saldo_mas_intereses_I);
 
                     if (Integer.parseInt(saldo_mas_intereses_s) > 100) {
                         creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
@@ -338,18 +342,24 @@ public class Re_financiarActivity extends AppCompatActivity {
         Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
         Date fecha_hoy = Calendar.getInstance().getTime();
         int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
+        Log.v("obt_sald_al_dia0", ".\n\nDiferencia en dias: " + diferencia_en_dias + "\n\nnext_pay: " + next_pay + "\n\nIntereses de mora: " + intereses_de_mora + "\n\nSaldo_plus: " + saldo_plus + "\n\n.");
         if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
             saldo = saldo_plus;
             morosidad = "D";
         } else {//Significa que esta atrazado!!!
-
-            saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)) + Integer.parseInt(intereses_de_mora));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
-            double pre_num = (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)) + Integer.parseInt(intereses_de_mora);
+            double pre_saldo = diferencia_en_dias * (Integer.parseInt(interes_mora)) * Integer.parseInt(saldo_plus);
+            pre_saldo = pre_saldo / 100;
+            saldo = String.valueOf(Integer.parseInt(saldo_plus) + (pre_saldo) + Integer.parseInt(intereses_de_mora));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
+            Log.v("obt_saldo_al_dia1", "Abonar.\n\nSaldo: " + saldo + "\n\n.");
+            double pre_num_pre = Integer.parseInt(interes_mora) * Integer.parseInt(saldo_plus) * diferencia_en_dias;
+            pre_num_pre = pre_num_pre / 100;
+            double pre_num = (pre_num_pre) + Integer.parseInt(intereses_de_mora);
             int pre_num_int = (int) pre_num;
             if (pre_num_int > 0) {
                 morosidad = "M";
             }
             interes_mora_total = String.valueOf(pre_num_int);
+            interes_mora_parcial = interes_mora_total;
         }
         flag = saldo;
         return flag;
@@ -361,24 +371,34 @@ public class Re_financiarActivity extends AppCompatActivity {
         String saldo = "";
         String[] split2 = next_pay.split("/");
         String proximo_abono_formato = split2[2] + "-" + split2[1] + "-" + split2[0];
-        //SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        Log.v("obt_int_morat0", ".\n\nRe-financiar. Proximo abono: " + proximo_abono_formato + "\n\n.");
         Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
         Date fecha_hoy = Calendar.getInstance().getTime();
         int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
+        Log.v("obt_int_morat1", ".\n\nRe-financiar. Diferencia en dias: " + diferencia_en_dias + "\n\nfecha_hoy: " + fecha_hoy.toString() + "\n\nProximo abono: " + proximo_abono_LD + "\n\n.");
         if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
             saldo = saldo_plus;
             morosidad = "D";
+            interes_mora_parcial = "0";
         } else {//Significa que esta atrazado!!!
 
-            saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
-            double pre_num = (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus));
+            //saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
+            Log.v("obt_int_morat_late1", ".\n\nRe-financiar. Diferencia en dias: " + diferencia_en_dias + "\n\ninteres_mora: " + interes_mora + "\n\nSaldo_plus: " + saldo_plus + "\n\n.");
+            double pre_num0 = diferencia_en_dias * (Integer.parseInt(interes_mora)) * (Integer.parseInt(saldo_plus));
+            double pre_num = pre_num0 / 100;
             int pre_num_int = (int) pre_num;
+            Log.v("obt_int_morat_late2", ".\n\nRe-financiar. pre_num_int: " + pre_num_int + "\n\n.");
             if (pre_num_int > 0) {
                 morosidad = "M";
+                interes_mora_parcial = String.valueOf(pre_num_int);
+            } else {
+                interes_mora_parcial = "0";
             }
-            interes_mora_parcial = String.valueOf(pre_num_int);
+
         }
-        flag = saldo;
+        flag = interes_mora_parcial;
+        interes_mora_total = interes_mora_parcial;
+        Log.v("obt_int_morat2", ".\n\nRe-financiar. intereses moratorios: " + interes_mora_parcial + "\n\n.");
         return flag;
     }
 
@@ -603,7 +623,7 @@ public class Re_financiarActivity extends AppCompatActivity {
                     monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota;
                 } else {
                     //monto a pagar
-                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + Integer.parseInt(interes_mora_total);
+                    monto_a_pagar = cantidad_cuotas_pendientes * monto_cuota + Integer.parseInt(interes_mora_parcial);
                 }
             }
             presentar_monto_a_pagar();
@@ -940,7 +960,9 @@ public class Re_financiarActivity extends AppCompatActivity {
         } else {
             //Do nothing. Never come here!!!
         }
-        double monto_total = monto_credito + ((monto_credito * interes) / 100);
+        double monto_parcial = (monto_credito * interes);
+        monto_parcial = monto_parcial / 100;
+        double monto_total = monto_credito + monto_parcial;
         int flag_int = (int) monto_total;
         flag = String.valueOf(flag_int);
         return flag;
@@ -1052,8 +1074,21 @@ public class Re_financiarActivity extends AppCompatActivity {
         } else if (monto_temporal > 0) {//Aqui paga el monto de los intereses y ademas, paga tambien parte o to-do lo de las cuotas pendientes y/o futuras.
 
             String[] split = cuadratura.split("__");
-            int restar_disponible = monto_temporal * (tasa/100);
-            monto_disponible = String.valueOf(Integer.parseInt(monto_disponible) + monto_temporal - restar_disponible);
+
+            double factor = tasa + 100;
+            double x = monto_temporal * 100;
+            x = x / factor;
+            double debuge = factor;
+            double restar_disponibleL =  monto_temporal - x;
+            restar_disponibleL = restar_disponibleL / 100;
+            Log.v("debug_cuadra1_pre_pre", ".\n\nRe-financiar. \n\nRestar disponible: " + restar_disponibleL + "\n\nDebuge: " + debuge + "\n\n.");
+            int restar_disponible = (int) restar_disponibleL;
+            int xx = (int) x;
+            float monto_disponible_F = Float.parseFloat(monto_disponible);
+            int monto_disponible_I = (int) monto_disponible_F;
+            monto_disponible = String.valueOf(monto_disponible_I);
+            monto_disponible = String.valueOf((Integer.parseInt(monto_disponible) + xx));
+            Log.v("debug_cadra1", ".\n\nMonto temporal: " + monto_temporal + "\n\nTasa: " + tasa + "\n\nRestar disponible: " + restar_disponible + "\n\nMonto disponible: " + monto_disponible + "\n\n.");
             int largo_split = split.length;
             for (int i = 0; i < largo_split; i++) {
 
@@ -1110,7 +1145,7 @@ public class Re_financiarActivity extends AppCompatActivity {
                         String diferencia_fechas = String.valueOf(DateUtilities.daysBetween(hoy_LD, fecha_cuadrito_LD));
                         if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado. Pago todos los intereses, pero sigue atrasado. proximo_abono = hoy.
                             morosidad = "M";
-                            String fecha_de_hoy = hoy_LD.toString();
+                            String fecha_de_hoy = DateUtilities.dateToString(hoy_LD);
                             String[] split_hoy = fecha_de_hoy.split("-");
                             fecha_de_hoy = split_hoy[2] + "/" + split_hoy[1] + "/" + split_hoy[0];
                             proximo_abono = fecha_de_hoy;
@@ -1219,7 +1254,7 @@ public class Re_financiarActivity extends AppCompatActivity {
                         String linea = br.readLine();
                         while (linea != null) {
                             String[] splitre = linea.split("_separador_");
-                            if (split[0].equals("monto_cuota")) {
+                            if (splitre[0].equals("monto_cuota")) {
                                 monto_cuota = Integer.parseInt(splitre[1]);
                                 flag = monto_cuota;
                                 Log.v("obt_mont_cuota2", ".\n\nLinea:\n\n" + linea + "\n\n.");

@@ -281,7 +281,10 @@ public class CuadraturaActivity extends AppCompatActivity {
                             fecha_next_abono = split[1];
                         }
                         if (split[0].equals("plazo")) {
-                            plazo = split[1];
+                            plazoz = split[1];
+                        }
+                        if (split[0].equals("cuadratura")) {
+                            cuadratura_pre = split[1];
                         }
                         if (split[0].equals("saldo_mas_intereses")) {
                             saldo_mas_intereses_s = split[1];
@@ -297,8 +300,8 @@ public class CuadraturaActivity extends AppCompatActivity {
 
                     br.close();
                     archivo.close();
-
                     String[] piezas = plazoz.split("_");
+                    Log.v("llenando_spinner2", ".\n\nPlazoz: " + plazoz + "\n\npiezas[0]: " + piezas[0] + "\n\n.");
                     if (piezas[1].equals("quincenas")) {
                         factor_semanas = 2;
                     } else if (piezas[1].equals("semanas")) {
@@ -314,6 +317,11 @@ public class CuadraturaActivity extends AppCompatActivity {
                     cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
                     saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
                     cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
+
+                    Log.v("llenando_spinner2", "Cuadratura.\n\nMorosidad: " + morosidad + "\n\n.");
+                    double saldo_mas_intereses_D = Double.parseDouble(saldo_mas_intereses_s);
+                    int saldo_mas_intereses_I = (int) saldo_mas_intereses_D;
+                    saldo_mas_intereses_s = String.valueOf(saldo_mas_intereses_I);
 
                     if (Integer.parseInt(saldo_mas_intereses_s) > 100) {
                         creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
@@ -345,22 +353,26 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     private String obtener_intereses_moratorios (String saldo_plus, String next_pay) throws ParseException {
         String flag = "";
-        //String saldo = "";
+        String saldo = "";
         String[] split2 = next_pay.split("/");
         String proximo_abono_formato = split2[2] + "-" + split2[1] + "-" + split2[0];
-        //SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        Log.v("obt_int_morat0", ".\n\nCuadratura. Proximo abono: " + proximo_abono_formato + "\n\n.");
         Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
         Date fecha_hoy = Calendar.getInstance().getTime();
         int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
+        Log.v("obt_int_morat1", ".\n\nCuadratura. Diferencia en dias: " + diferencia_en_dias + "\n\nfecha_hoy: " + fecha_hoy.toString() + "\n\nProximo abono: " + proximo_abono_LD + "\n\n.");
         if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
-            //saldo = saldo_plus;
+            saldo = saldo_plus;
             morosidad = "D";
             interes_mora_parcial = "0";
         } else {//Significa que esta atrazado!!!
 
             //saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
-            double pre_num = (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus));
+            Log.v("obt_int_morat_late1", ".\n\nCuadratura. Diferencia en dias: " + diferencia_en_dias + "\n\ninteres_mora: " + interes_mora + "\n\nSaldo_plus: " + saldo_plus + "\n\n.");
+            double pre_num0 = diferencia_en_dias * (Integer.parseInt(interes_mora)) * (Integer.parseInt(saldo_plus));
+            double pre_num = pre_num0 / 100;
             int pre_num_int = (int) pre_num;
+            Log.v("obt_int_morat_late2", ".\n\nCuadratura. pre_num_int: " + pre_num_int + "\n\n.");
             if (pre_num_int > 0) {
                 morosidad = "M";
                 interes_mora_parcial = String.valueOf(pre_num_int);
@@ -370,6 +382,8 @@ public class CuadraturaActivity extends AppCompatActivity {
 
         }
         flag = interes_mora_parcial;
+        interes_mora_total = interes_mora_parcial;
+        Log.v("obt_int_morat2", ".\n\nCuadratura. intereses moratorios: " + interes_mora_parcial + "\n\n.");
         return flag;
     }
 
@@ -381,18 +395,24 @@ public class CuadraturaActivity extends AppCompatActivity {
         Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
         Date fecha_hoy = Calendar.getInstance().getTime();
         int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
-        if (diferencia_en_dias <= 0) {
-            saldo = String.valueOf(saldo_plus);
+        Log.v("obt_sald_al_dia0", "Cuadratura.\n\nDiferencia en dias: " + diferencia_en_dias + "\n\nnext_pay: " + next_pay + "\n\nIntereses de mora: " + intereses_de_mora + "\n\nSaldo_plus: " + saldo_plus + "\n\n.");
+        if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
+            saldo = saldo_plus;
             morosidad = "D";
-        } else {
-
-            saldo = String.valueOf(Integer.parseInt(saldo_plus) + (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)) + Integer.parseInt(intereses_de_mora));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
-            double pre_num = (diferencia_en_dias * ((Integer.parseInt(interes_mora))/100) * Integer.parseInt(saldo_plus)) + Integer.parseInt(intereses_de_mora);
+        } else {//Significa que esta atrazado!!!
+            double pre_saldo = diferencia_en_dias * (Integer.parseInt(interes_mora)) * Integer.parseInt(saldo_plus);
+            pre_saldo = pre_saldo / 100;
+            saldo = String.valueOf(Integer.parseInt(saldo_plus) + (pre_saldo) + Integer.parseInt(intereses_de_mora));//No se suman intereses sobre los intereses moratorios, pero si sobre el interes acordado del credito!!!
+            Log.v("obt_saldo_al_dia1", "Cuadratura.\n\nSaldo: " + saldo + "\n\n.");
+            double pre_num_pre = Integer.parseInt(interes_mora) * Integer.parseInt(saldo_plus) * diferencia_en_dias;
+            pre_num_pre = pre_num_pre / 100;
+            double pre_num = (pre_num_pre) + Integer.parseInt(intereses_de_mora);
             int pre_num_int = (int) pre_num;
             if (pre_num_int > 0) {
                 morosidad = "M";
             }
             interes_mora_total = String.valueOf(pre_num_int);
+            interes_mora_parcial = interes_mora_total;
         }
         flag = saldo;
         return flag;
@@ -834,7 +854,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
     }
 
-    private String obtener_saldo_plus(String cuadratura) {
+    private String obtener_saldo_plus (String cuadratura) {
         String flag = "";
 
         String[] split = cuadratura.split("__");
@@ -843,7 +863,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         for (int i = 0; i < largo_split; i++) {
 
             String[] split_1 = split[i].split("_");
-
+            Log.v("Obtener_saldo_plus", ".\n\nCuadratura: " + cuadratura + "\n\n.");
             if (Integer.parseInt(split_1[2]) > 0) {//Significa que tiene esta cuota pendiente.
                 saldo_plus_plus = saldo_plus_plus + Integer.parseInt(split_1[2]);
             }
@@ -859,26 +879,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
         String flag = "";
         int monto_temporal = monto_ingresado - Integer.parseInt(interes_mora_total);
-
         if (monto_temporal < 0) {//No alcanzo siquiera para pagar los intereses. Debe retornar TODO: Revisar
-
-
-
-            //LocalDate hoy_LD = LocalDate.now();
-            //String[] split2 = fecha_next_abono.split("/");
-            //String fecha_nx_abo = split2[2] + "-" + split2[1] + "-" + split2[0];
-            //LocalDate fecha_nx_abo_LD = LocalDate.parse(fecha_nx_abo);
-            //String diferencia_fechas = String.valueOf(DAYS.between(fecha_nx_abo_LD, hoy_LD));
-            //int interes_mora_diario = Integer.parseInt(interes_mora_total) / Integer.parseInt(diferencia_fechas);
-            //int dias_pagados = monto_ingresado / interes_mora_diario;
-            //LocalDate fecha_nextr = fecha_nx_abo_LD.plusDays(dias_pagados);
-
-
-            //interes_mora_total = String.valueOf(Integer.parseInt(interes_mora_total) - monto_ingresado);
-            //proximo_abono = fecha_nextr.toString();
-            //String[] split = proximo_abono.split("-");
-            //proximo_abono = split[2] + "/" + split[1] + "/" + split[0];
-            //monto_disponible = "0";
             morosidad = "M";
             flag = cuadratura;
             return flag;
@@ -887,9 +888,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         } else if (monto_temporal == 0) {//Aqui paga el monto completo, solo de los intereses moratorios, no abona nada a los abonos ordinarios. Debe retornar
 
             flag = cuadratura;
-            //proximo_abono = LocalDate.now().toString();
-            //String[] split = proximo_abono.split("-");
-            //proximo_abono = split[2] + "/" + split[1] + "/" + split[0];
             morosidad = "D";
             //monto_disponible = "0";
             interes_mora_total = "0";
