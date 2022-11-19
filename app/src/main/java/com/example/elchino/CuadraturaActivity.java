@@ -134,6 +134,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cuadratura);
         String mensaje_recibido = getIntent().getStringExtra( "msg");
         cuadratura = getIntent().getStringExtra( "cuadratura");
+        nombre_cliente = getIntent().getStringExtra("nombre_cliente");
         cambio = getIntent().getStringExtra("cambio");
         activity_devolver = getIntent().getStringExtra("activity_devolver");
         monto_creditito = getIntent().getStringExtra("monto_creditito");
@@ -166,6 +167,8 @@ public class CuadraturaActivity extends AppCompatActivity {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
         }
         cliente_recibido = getIntent().getStringExtra( "cliente_recivido");
+        Log.v("onCreate0", "Cuadratura.\n\nCliente recibido: " + cliente_recibido + "\n\n.");
+        cliente_ID = cliente_recibido;
         cliente_Id_volver = cliente_recibido;
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
         sequi1 = (Button) findViewById(R.id.sequi1);
@@ -204,6 +207,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             } else {
                 flag_client_reciv = true;
                 cliente_ID = cliente_recibido;
+                Log.v("onCreate1", "Cuadratura.\n\nCliente ID: " + cliente_ID + "\n\n.");
                 try {
                     consultar(null);
                 } catch (JSONException | InterruptedException e) {
@@ -561,6 +565,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             String file_to_consult = "";
             if (flag_client_reciv) {
                 file_to_consult = cliente_recibido + "_C_";
+                cliente_ID = cliente_recibido;
             } else {
                 file_to_consult = et_ID.getText().toString() + "_C_";
             }
@@ -786,12 +791,20 @@ public class CuadraturaActivity extends AppCompatActivity {
     private void presentar_cuadratura () throws ParseException {
         //TODO: Imprimir la informacion que esta en la cuadratura
 
-        nombre_cliente = cliente_ID;
+        //nombre_cliente = cliente_ID;
 
         String cuadratura_print = generar_cuadra_print();
 
+        if (mensaje_imprimir_pre == null) {
+            mensaje_imprimir_pre = "*****  ESTADO DE CUENTA  *****\n";
+        } else if (mensaje_imprimir_pre.equals("")) {
+            mensaje_imprimir_pre = "*****  CREDITO APROBADO  *****\n";
+        } else {
+
+        }
+
         mensaje_imprimir = "\n\nFecha: " + dia + "/" + mes + "/" + anio + "\n\n\n***** Prestamos El Chino *****\n\nCliente: " +
-                nombre_cliente + " " + apellido_cliente +"\n\n\n******************************\n\n" + mensaje_imprimir_pre + "\n******************************\n\n" +
+                nombre_cliente + " " + apellido_cliente + "\nCedula: " + cliente_ID + "\n\n\n******************************\n\n" + mensaje_imprimir_pre + "\n******************************\n\n" +
                 cuadratura_print + "Estimado cliente, no olvide\nrevisar su tiquete antes de\nque se retire el cobrador.\n\n\n\n\n";
 
         bt_consultar.setEnabled(false);

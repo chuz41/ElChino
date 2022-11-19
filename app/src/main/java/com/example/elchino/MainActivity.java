@@ -122,11 +122,39 @@ public class MainActivity extends AppCompatActivity {
         //abonar();
         //nuevo_credito();
         //estado_cliente();
+
+        verificar_clientes();
         try {
             check_activation();
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void verificar_clientes() {
+
+
+        ocultar_todo();
+        String archivos[] = fileList();
+        boolean crear = true;
+        for (int i = 0; i < archivos.length; i++) {
+            Pattern pattern = Pattern.compile("clientes_cred", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(archivos[i]);
+            boolean matchFound = matcher.find();
+            if (matchFound) {
+                crear = false;
+            } else {
+                //crear = true; (No hace falta hacer esto porque arriba se hizo!!!)
+            }
+        }
+
+        if (crear) {
+            crear_archivo("clientes_cred.txt");
+        } else {
+            //TODO Do nothing.
+        }
+
+
     }
 
     public void abonar(){
@@ -334,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
         return retorno;
     }
 
-    private void check_activation() throws JSONException {
+    private void check_activation () throws JSONException {
         ocultar_todo();
         String archivos[] = fileList();
         boolean crear = true;
@@ -351,6 +379,7 @@ public class MainActivity extends AppCompatActivity {
                     BufferedReader br = new BufferedReader(archivo);
                     String linea = br.readLine();
                     String[] split = linea.split(" ");
+                    Log.v("Check_activation", "Main.\n\nFecha: " + fecha + "\n\nsplit[1]: " + split[1] + "\n\nsplit[2]: "+ split[2] + "\n\n.");
                     if (split[1].equals("TRUE") && split[2].equals(fecha)) {
                         mostrar_todo();
                         Toast.makeText(this, "Bienvenido " + nombre_cobra, Toast.LENGTH_LONG).show();

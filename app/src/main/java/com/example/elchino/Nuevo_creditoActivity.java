@@ -61,6 +61,8 @@ import java.util.regex.Pattern;
 public class Nuevo_creditoActivity extends AppCompatActivity {
 
     private Integer monto_credito = 0;
+    private String nombre_cliente = "";
+    private String apellido_cliente = "";
     private Integer monto_cuota = 0;
     private String fecha_pago = "";//Fecha que debe pagar la proxima cuota.
     private Integer saldo_mas_intereses = 0;
@@ -220,6 +222,12 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                             }
                             if (split[0].equals("monto_disponible")) {
                                 monto_disponible = split[1];
+                            }
+                            if (split[0].equals("nombre_cliente")) {
+                                nombre_cliente = split[1];
+                            }
+                            if (split[0].equals("apellido1_cliente")) {
+                                apellido_cliente = split[1];
                             }
                             if (split[0].equals("interes_mora")) {
                                 interes_mora = split[1];
@@ -516,7 +524,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             BufferedReader br = new BufferedReader(archivo);
             String linea = br.readLine();
             String[] split = linea.split(" ");
-            int monto_nuevo = Integer.parseInt(split[1]) - monto_credito;
+            long monto_nuevo = Integer.parseInt(split[1]) - monto_credito;
             linea = linea.replace(split[1], String.valueOf(monto_nuevo));
             br.close();
             archivo.close();
@@ -887,213 +895,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         }
     }
 
-    /*
-    private void check_onlines () throws JSONException {
-        if (verificar_internet()) {
-            boolean flag = true;
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
-                //imprimir_archivo("facturas_online.txt");
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                //String contenido = "";
-                abajos.clear();
-                Integer countercito = 0;
-                while (linea != null) {
-                    countercito++;
-                    String count = String.valueOf(countercito);
-                    String[] split = linea.split(" ");
-                    if (split[0].equals("abajo")) {
-                        Log.v("OJOF_abajo: ", "\n\nLinea: " + linea + " Fin de linea!!!");
-                        abajos.put(count, split[1]);
-                        flag = false;
-                    } else if (split[0].equals("arriba")) {
-                        Log.v("OJOF_arriba: ", "\n\nLinea: " + linea + " Fin de linea!!!");
-                        //TODO: Pensar que hacer!!!
-                    } else {
-                        Log.v("OJOF_(error): ", "\n\n(No deberia llegar aqui!!!\n\nLinea: " + linea + " Fin de linea!!!");
-                        //Do nothing.
-                    }
-                    linea = br.readLine();
-                }
-                archivo.close();
-                br.close();
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            if (flag) {
-                return;
-            } else {
-                //Do nothing. Continue with the work
-            }
-
-            abajiar();
-            //return objeto_json;
-        } else {
-
-        }
-    }
-
-    private void abajiar() throws JSONException {
-        String sp_clientes = "";
-        String sp_creditos = "";
-        try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
-            //imprimir_archivo("facturas_online.txt");
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            int cont = 0;
-            while (linea != null) {
-                String[] split = linea.split(" ");
-                if (split[0].equals("Screditos")) {
-                    sp_creditos = split[1];
-                }
-                if (split[0].equals("Sclientes")) {
-                    sp_clientes = split[1];
-                }
-                linea = br.readLine();
-                cont++;
-            }
-            br.close();
-            archivo.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String spid = "";
-        String sheet = "";
-        for (String key : abajos.keySet()) {
-            String json_string = "";
-            JSONObject jsonObject = new JSONObject();
-            String[] split_pre = abajos.get(key).split("_");
-            if (split_pre[1].equals("C")) {
-                spid = sp_clientes;
-                sheet = "clientes";
-            } else {
-                spid = sp_creditos;
-                sheet = "creditos";
-            }
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput(abajos.get(key)));
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                while (linea != null && !linea.isEmpty()) {
-                    String[] split = linea.split("_separador_");
-                    json_string = json_string + split[1] + "_n_";
-                    linea = br.readLine();
-                }
-                br.close();
-                archivo.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, split_pre[0]);
-            subir_archivo_resagado(jsonObject, abajos.get(key), key);
-            break;
-        }
-    }
-
-    private void subir_archivo_resagado (JSONObject jsonObject, String file, String key) {
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(this);
-        //Llamada POST usando Volley:
-        RequestQueue requestQueue;
-
-        // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
-
-        // Set up the network to use HttpURLConnection as the HTTP client.
-        Network network = new BasicNetwork(new HurlStack());
-
-        // Instantiate the RequestQueue with the cache and network.
-        requestQueue = new RequestQueue(cache, network);
-
-        // Start the queue
-        requestQueue.start();
-
-        //Toast.makeText(this, "Debug:\nConsecutivo: " + Consecutivo + "\nconsecutivo: " + consecutivo + "\nDeben ser iguales.", Toast.LENGTH_LONG).show();
-
-        String url = addRowURL;
-
-        //ocultar_todo();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        String[] split = response.toString().split("\"");
-                        int length_split = split.length;
-                        Log.v("info_sub_file_resag: ", "\n\n" + response + "\n\n");
-                        if (length_split > 3) {//TODO: Corregir este if. Debe ser mas especifico y detectar si la respuesta no es correcta.
-                            for (int i = 0; i < length_split; i++) {
-                                Log.v("split[" + i + "]", split[i]);
-                            }
-                            if (split[2].equals(":")) {//TODO: Todo de arriba tiene que ver tambien con este.
-                                cambiar_bandera (file, key);
-                                try {
-                                    abajiar();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                String factura_num = split[15];
-                            }
-                        } else {
-                            //No se subio correctamente!
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                    }
-                });
-
-        // Add the request to the RequestQueue.
-        requestQueue.add(jsonObjectRequest);
-
-    }
-
-    private void cambiar_bandera (String file, String key) {
-        try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            String contenido = "";
-            while (linea != null) {
-                Log.v("cambiar_bandera_file", "  Linea: " + linea + "\n\n");
-                String[] split = linea.split(" ");
-                if (split[0].equals("arriba")) {
-                    //Dejar perder la linea
-                } else if (split[0].equals("abajo")) {
-                    if (split[1].equals(file)) {
-                        linea = linea.replace(split[0], "arriba");
-                        abajos.remove(key);
-                        contenido = contenido + linea + "\n";
-                    } else {
-                        contenido = contenido + linea + "\n";
-                    }
-                } else {
-                    //Do nothing. Nunca llega aqui.
-                }
-                linea = br.readLine();
-            }
-            br.close();
-            archivo.close();
-            borrar_archivo(onlines);
-            guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
-            Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    */
-
     private void subir_archivo (String file) throws JSONException {
         ocultar_todito();
         String sp_creditos = "";
@@ -1126,12 +927,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             while (linea != null && !linea.equals("")) {
                 String[] split = linea.split("_separador_");
                 Log.v("subir_archivo", ".\n\nLinea:\n\n" + linea + "\n\n.");
-                if (split[0].equals("credit_ID")) {
-                    id_credito = split[1];
-                } else {
-                    //split = linea.split("_separador_");
-                    json_string = json_string + split[1] + "_n_";
-                }
+                json_string = json_string + split[1] + "_n_";
                 linea = br.readLine();
             }
             br.close();
@@ -1262,6 +1058,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         CuadraturaAc.putExtra("monto_creditito", String.valueOf(monto_credito));
         CuadraturaAc.putExtra("activity_devolver", "MenuPrincipal");
         CuadraturaAc.putExtra("mensaje_imprimir_pre", "");
+        CuadraturaAc.putExtra("nombre_cliente", nombre_cliente + " " + apellido_cliente);
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(CuadraturaAc);
         finish();

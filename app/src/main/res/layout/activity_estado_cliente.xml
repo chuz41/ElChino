@@ -18,6 +18,29 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/bt_find_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:onClick="buscar_por_nombre"
+        android:text="Button"
+        app:layout_constraintBottom_toTopOf="@+id/tv_esperar"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludoEstado"
+        app:layout_constraintHorizontal_bias="0.036"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_caja"
+        app:layout_constraintVertical_bias="0.062" />
+
+    <Spinner
+        android:id="@+id/sp_opciones"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/tv_esperar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_find_name" />
+
+    <Button
         android:id="@+id/bt_consultar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

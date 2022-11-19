@@ -21,7 +21,7 @@
     <string name="apellido2">Segundo apellido</string>
     <string name="apodo">Apodo</string>
     <string name="confirm">Confirmar</string>
-    <string name="monto_cliente">Monto aprovado</string>
+    <string name="monto_cliente">Monto aprobado</string>
     <string name="tasa_cliente">Tasa de interes (%)</string>
     <string name="tasa_mora">Interes moratorio (%)</string>
     <string name="toolow_edad">Fecha invalida!</string>

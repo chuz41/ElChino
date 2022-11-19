@@ -124,7 +124,7 @@ public class BancaActivity extends AppCompatActivity {
             BufferedReader br = new BufferedReader(archivo);
             String linea = br.readLine();
             String[] split = linea.split(" ");
-            int monto_nuevo = 0;
+            long monto_nuevo = 0;
             if (operador.equals("sumar")) {
                 monto_nuevo = Integer.parseInt(split[1]) + monto_abono;
             } else if (operador.equals("restar")) {
@@ -160,7 +160,7 @@ public class BancaActivity extends AppCompatActivity {
         actualizar_disponible("sumar");
     }
 
-    private void text_listener() {
+    private void text_listener () {
 
         //Implementacion de un text listener
         et_ID.addTextChangedListener(new TextWatcher() {
@@ -190,7 +190,7 @@ public class BancaActivity extends AppCompatActivity {
                             BufferedReader br = new BufferedReader(archivo);
                             String linea = br.readLine();
                             String[] split = linea.split(" ");
-                            int monto = Integer.parseInt(split[1]);
+                            long monto = Integer.parseInt(split[1]);
                             monto_en_caja = String.valueOf(monto);
                             br.close();
                             archivo.close();

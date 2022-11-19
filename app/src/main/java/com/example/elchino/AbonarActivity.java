@@ -110,6 +110,8 @@ public class AbonarActivity extends AppCompatActivity {
     private String presentar_et_esperar = "";
     private String cuadratura = "";
     private TextView tv_caja;
+    private String nombre_cliente = "";
+    private String apellido_cliente = "";
 
     private Spinner sp_plazos;
 
@@ -162,31 +164,6 @@ public class AbonarActivity extends AppCompatActivity {
         tv_caja.setText(imprimir_archivo(caja));
     }
 
-/*    private String obtener_morosidad (String file) {
-        String flag = "";
-        InputStreamReader archivo = null;
-        try {
-            archivo = new InputStreamReader(openFileInput(file));
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            while (linea != null) {
-                Log.v("Obteniendo morosidad", ".\n\nLinea:\n\n" + linea + "\n\n.");
-                String[] split = linea.split("_separador_");
-                if (split[0].equals("morosidad")) {
-                    flag = split[1];
-                } else {
-                    //Continue with the execution!!!
-                }
-                linea = br.readLine();
-            }
-            br.close();
-            archivo.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return flag;
-    }*/
-
     private String obtener_cuotas_morosas (String cuotas_pendientes, String plazo, String fecha_proximo_abono) throws ParseException {
         String flag = "";
         int factor = 0;
@@ -237,7 +214,6 @@ public class AbonarActivity extends AppCompatActivity {
         return flag;
     }
 
-    
     private void llenar_spinner () {
         //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
         String creditos = "Escoja el credito...___";
@@ -374,35 +350,6 @@ public class AbonarActivity extends AppCompatActivity {
         return flag;
     }
 
-    /*
-    private void metodo() {
-        separar_fechaYhora();
-        String fecha_mostrar = dia + "/" + mes + "/" + anio;
-        //SimpleDateFormat formato = new SimpleDateFormat("dd/mm/yyyy");
-        String fecha_hoy = "";
-        String fecha_mostrar3 = "";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            fecha_hoy = LocalDate.now().toString();
-            fecha_mostrar3 = LocalDate.now().plusDays(10).toString();
-        }
-        String[] partes = fecha_hoy.split("-");
-        fecha_mostrar = fecha_hoy;//Estas fechas son HOY.
-        LocalDate fecha_hoy_LD = LocalDate.now();
-        fecha_hoy = partes[2] + "/" + partes[1] + "/" + partes[0];
-        String fecha_prueba = "26/10/2022";//FECHA DE PRUEBA...
-        String fecha_prueba_presentar = fecha_prueba;
-        String[] partecitas = fecha_prueba.split("/");
-        fecha_prueba = partecitas[2] + "-" + partecitas[1] + "-" + partecitas[0];
-        //SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
-        //LocalDate nueva_fecha = null;
-        LocalDate fecha_prueba_LD = LocalDate.parse(fecha_prueba);
-        //nueva_fecha = localDate.plusDays(13);
-        //fecha_prueba = localDate.                                                              //              menos esta         esta           (Osea, estan alreves!!!)
-        String diferencia_fechas = String.valueOf(DAYS.between(fecha_prueba_LD, fecha_hoy_LD));//DAYS.between(fecha_hoy_LD, fecha_prueba_LD)) Si es positivo significa que esta atrasado.
-        tv.setText("Hoy: " + fecha_hoy + "\n\n" + "Fecha de prueba: " + fecha_prueba_presentar + "\n\nDiferencia entre fechas: " + diferencia_fechas);
-    }
-     */
-
     private boolean revisar_creditos () {
         Log.v("revisando_creditos0", ".\n\nAbonar. Revisando creditos.");
         boolean flasg = false;
@@ -465,35 +412,6 @@ public class AbonarActivity extends AppCompatActivity {
         return flasg;
     }
 
-    /*private void sumar_disponible () {
-        String ArchivoCompleto = "";
-        int nuevo_monto = 0;
-        try {
-            String file_name = cliente_ID + "_C_.txt";
-            InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            while (linea != null) {
-                Log.v("restar_disponible", ".\n\nLinea:\n\n" + linea + "\n\n.");
-                String[] split = linea.split("_separador_");
-                if (split[0].equals("monto_disponible")) {
-                    nuevo_monto = Integer.parseInt(monto_disponible) - (monto_abono);
-                    linea = linea.replace(split[1], String.valueOf(nuevo_monto));
-                }
-                ArchivoCompleto = ArchivoCompleto + linea + "\n";
-                linea = br.readLine();
-            }
-            br.close();
-            archivo.close();
-            borrar_archivo(file_name);
-            crear_archivo(file_name);
-            guardar(ArchivoCompleto, file_name);
-            Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
-        } catch (IOException e) {
-        }
-    }*/
-
-    
     public void consultar (View view) throws JSONException, IOException, InterruptedException {
         bt_consultar.setClickable(false);
         bt_consultar.setEnabled(false);
@@ -526,6 +444,12 @@ public class AbonarActivity extends AppCompatActivity {
                             if (split[0].equals("ID_cliente")) {
                                 cliente_ID = split[1];
                             }
+                            if (split[0].equals("nombre_cliente")) {
+                                nombre_cliente = split[1];
+                            }
+                            if (split[0].equals("apellido1_cliente")) {
+                                apellido_cliente = split[1];
+                            }
                             if (split[0].equals("monto_disponible")) {
                                 monto_disponible = split[1];
                             }
@@ -538,6 +462,7 @@ public class AbonarActivity extends AppCompatActivity {
                             archivoCompleto = archivoCompleto + linea + "\n";
                             linea = br.readLine();
                         }
+
                         br.close();
                         archivo.close();
                     } catch (IOException e) {
@@ -625,6 +550,8 @@ public class AbonarActivity extends AppCompatActivity {
                     cuotas = split[1];
                 } else if (split[0].equals("tasa")) {
                     tasa = Integer.parseInt(split[1]);
+                } else if (split[0].equals("ID_credito")) {
+                    credit_ID = split[1];
                 } else if (split[0].equals("morosidad")) {
                     morosidad = split[1];
                 //} else if (split[0].equals("intereses_moratorios")) {
@@ -664,7 +591,7 @@ public class AbonarActivity extends AppCompatActivity {
 
     }
 
-    private void actualizar_archivo_credito() {
+    private void actualizar_archivo_credito () {
         //archivo_prestamo
 
         String contenido = "";
@@ -674,7 +601,7 @@ public class AbonarActivity extends AppCompatActivity {
             String linea = br.readLine();
             while (linea != null) {
                 String[] split = linea.split("_separador_");
-
+                Log.v("Linea", linea);
                 if (split[0].equals("cuadratura")) {
                     linea = linea.replace(split[1], cuadratura);
                     contenido = contenido + linea + "\n";
@@ -687,6 +614,10 @@ public class AbonarActivity extends AppCompatActivity {
                 } else if (split[0].equals("cuotas")) {
                     linea = linea.replace(split[1], cuotas);
                     contenido = contenido + linea + "\n";
+                } else if (split[0].equals("ID_credito")) {
+                    contenido = contenido + linea + "\n";
+                    credit_ID = split[1];
+                    //Log.v("act_file_cred", "Abonar.\n\ncredit_ID: " + credit_ID + "\n\n.");
                 } else if (split[0].equals("morosidad")) {
                     linea = linea.replace(split[1], morosidad);
                     contenido = contenido + linea + "\n";
@@ -696,6 +627,7 @@ public class AbonarActivity extends AppCompatActivity {
                 } else {
                     contenido = contenido + linea + "\n";
                 }
+                Log.v("Linea_post", linea);
                 linea = br.readLine();
             }
             br.close();
@@ -711,16 +643,18 @@ public class AbonarActivity extends AppCompatActivity {
         }
     }
 
-    private void presentar_cuadratura() {
+    private void presentar_cuadratura () {
         //TODO: llamar a la activity estado_de_cuenta
         Intent CuadraturaAc = new Intent(this, CuadraturaActivity.class);
         CuadraturaAc.putExtra("cuadratura", cuadratura);
         CuadraturaAc.putExtra("msg", "Abono realizado con exito!!!");
+        Log.v("presentar_cuadra0", "Abonar.\n\nCliente_ID: " + cliente_ID + "\n\n.");
         CuadraturaAc.putExtra("cliente_recivido", cliente_ID);
         CuadraturaAc.putExtra("cambio", String.valueOf(cambio));
         CuadraturaAc.putExtra("monto_creditito", "0");
         CuadraturaAc.putExtra("activity_devolver", "MenuPrincipal");
         CuadraturaAc.putExtra("mensaje_imprimir_pre", mensaje_imprimir);
+        CuadraturaAc.putExtra("nombre_cliente", nombre_cliente + " " + apellido_cliente);
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(CuadraturaAc);
         finish();
@@ -728,7 +662,7 @@ public class AbonarActivity extends AppCompatActivity {
     }
 
     private void actualizar_archivo_cliente (String archivo_P) {
-        String[] spliti = archivo_prestamo.split("_");
+        String[] spliti = archivo_P.split("_");
         String archivo_cliente = spliti[0] + "_C_.txt";
         String contenido = "";
         try {
@@ -756,6 +690,7 @@ public class AbonarActivity extends AppCompatActivity {
             borrar_archivo(archivo_cliente);
             crear_archivo(archivo_cliente);
             guardar(contenido, archivo_cliente);
+            //String file_name = credit_ID + ".txt";
             Log.v("actualiz_archiv_client2", ".\n\nAbonar. Archivo: " + archivo_cliente + "\n\nContenido del archivo:\n\n" + imprimir_archivo(archivo_cliente) + "\n\n.");
             subir_archivo(archivo_P);
 
@@ -803,7 +738,6 @@ public class AbonarActivity extends AppCompatActivity {
         return flag;
     }
 
-    
     private String obtener_cuadratura (String cuadratura, String fecha_next_abono, int factor_semanas, int monto_ingresado) throws ParseException {
 
         String flag = "";
@@ -1016,42 +950,6 @@ public class AbonarActivity extends AppCompatActivity {
 
     }
 
-/*    
-    private String obtener_proximo_abono (String fecha_next_abono) {
-        String flag = "";
-        int factor_semanas = 0;
-        String[] piezas = plazo.split(" ");
-        if (piezas[1].equals("quincenas")) {
-            factor_semanas = 2;
-        } else if (piezas[1].equals("semanas")) {
-            factor_semanas = 1;
-        } else {
-            factor_semanas = -1;
-            //flag = "ERROR";
-        }
-
-        LocalDate fecha_next_abono_LD = LocalDate.parse(fecha_next_abono);
-        String fecha_mostrar2 = "";
-        if (morosidad.equals("D")) {
-            fecha_mostrar2 = fecha_next_abono_LD.plusWeeks(factor_semanas).toString();
-        } else if (morosidad.equals("M")) {
-
-        } else {
-
-        }
-
-        String[] partes = fecha_mostrar2.split("-");
-        fecha_mostrar2 = partes[2] + "/" + partes[1] + "/" + partes[0];
-        flag = fecha_mostrar2;
-        return flag;
-    }
-
-    
-    private void esperar_otro_ratito () throws InterruptedException {
-        //procesar_abono2();
-    }*/
-
-
     private void presentar_monto_a_pagar (int monto_a_pagar) {
 
         et_ID.setEnabled(true);
@@ -1155,7 +1053,6 @@ public class AbonarActivity extends AppCompatActivity {
                 });
     }
 
-    
     private void presentar_info_credito (String s) throws JSONException, IOException, InterruptedException {
 
         if (s.equals("UNO")) {
@@ -1387,7 +1284,6 @@ public class AbonarActivity extends AppCompatActivity {
         }
     }
 
-
     private String obtener_intereses_moratorios (String saldo_plus, String next_pay) throws ParseException {
         String flag = "";
         String saldo = "";
@@ -1424,142 +1320,13 @@ public class AbonarActivity extends AppCompatActivity {
         return flag;
     }
 
-/*    private String calcular_cuota () {
-        String flag = "";
-        int interes = 0;
-        int cuotas = 0;
-        String[] split = credito_aplicar.split(" ");
-        if (split[1].equals("semanas")) {
-            if (split[0].equals("5")) {
-                interes = 20;
-                cuotas = 5;
-            } else if (split[0].equals("6")) {
-                interes = 20;
-                cuotas = 6;
-            } else if (split[0].equals("9")) {
-                interes = 40;
-                cuotas = 9;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else if (split[1].equals("quincenas")) {
-            if (split[0].equals("3")) {
-                interes = 25;
-                cuotas = 3;
-            } else if (split[0].equals("5")) {
-                interes = 40;
-                cuotas = 5;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else {
-            //Do nothing. Never come here!!!
-        }
-        double monto_total = monto_abono + ((monto_abono * interes) / 100);
-        double cuota = monto_total / cuotas;
-        int flag_int = (int) cuota;
-        Log.v("monto_total", ".\n\nMonto total: " + monto_total + "\n\nMonto del credito: " + monto_abono + "\n\n.");
-        flag = String.valueOf(flag_int);
-        Log.v("flag",".\n\nFlag: " + flag + "\n\n.");
-        return flag;
-    }
-
-    private String calcular_saldo () {
-        String flag = "";
-        int interes = 0;
-        String[] split = credito_aplicar.split(" ");
-        if (split[1].equals("semanas")) {
-            if (split[0].equals("5")) {
-                interes = 20;
-            } else if (split[0].equals("6")) {
-                interes = 20;
-            } else if (split[0].equals("9")) {
-                interes = 40;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else if (split[1].equals("quincenas")) {
-            if (split[0].equals("3")) {
-                interes = 25;
-            } else if (split[0].equals("5")) {
-                interes = 40;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else {
-            //Do nothing. Never come here!!!
-        }
-        double monto_total = monto_abono + ((monto_abono * interes) / 100);
-        int flag_int = (int) monto_total;
-        flag = String.valueOf(flag_int);
-        return flag;
-    }
-
-    private String obtener_tasa () {
-        String flag = "";
-        int interes = 0;
-        String[] split = credito_aplicar.split(" ");
-        if (split[1].equals("semanas")) {
-            if (split[0].equals("5")) {
-                interes = 20;
-            } else if (split[0].equals("6")) {
-                interes = 20;
-            } else if (split[0].equals("9")) {
-                interes = 40;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else if (split[1].equals("quincenas")) {
-            if (split[0].equals("3")) {
-                interes = 25;
-            } else if (split[0].equals("5")) {
-                interes = 40;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else {
-            //Do nothing. Never come here!!!
-        }
-        flag = String.valueOf(interes);
-        return flag;
-    }
-
-    private String calcular_cuotas () {
-        String flag = "";
-        int cuotas = 0;
-        String[] split = credito_aplicar.split(" ");
-        if (split[1].equals("semanas")) {
-            if (split[0].equals("5")) {
-                cuotas = 5;
-            } else if (split[0].equals("6")) {
-                cuotas = 6;
-            } else if (split[0].equals("9")) {
-                cuotas = 9;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else if (split[1].equals("quincenas")) {
-            if (split[0].equals("3")) {
-                cuotas = 3;
-            } else if (split[0].equals("5")) {
-                cuotas = 5;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else {
-            //Do nothing. Never come here!!!
-        }
-        flag = String.valueOf(cuotas);
-        return flag;
-    }*/
-
     private void actualizar_caja (int monto_ingresado) {
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput(caja));
             BufferedReader br = new BufferedReader(archivo);
             String linea = br.readLine();
             String[] split = linea.split(" ");
-            int monto_nuevo = Integer.parseInt(split[1]) + monto_ingresado;
+            long monto_nuevo = Integer.parseInt(split[1]) + monto_ingresado;
             linea = linea.replace(split[1], String.valueOf(monto_nuevo));
             br.close();
             archivo.close();
@@ -1570,53 +1337,6 @@ public class AbonarActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-/*    private String obtener_id () {
-        String flag = "";
-        String cliente_file = cliente_ID + "_C_.txt";
-        String lista_archivos = "";
-        String archivos[] = fileList();
-        for (int i = 0; i < archivos.length; i++) {
-            Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(archivos[i]);
-            boolean matchFound = matcher.find();
-            if (matchFound) {
-                lista_archivos = lista_archivos + archivos[i] + "_sep_";
-            }
-        }
-        int end_id = 0;
-        if (lista_archivos.equals("")) {
-            flag = "1";
-        } else {
-            String[] split = lista_archivos.split("_sep_");
-            int spl_long = split.length;
-            end_id = spl_long + 1;
-            flag = String.valueOf(end_id);
-        }
-        flag = cliente_ID + "_P_" + String.valueOf(flag) + "_P_";
-        return flag;
-    }
-
-    private void recibir_fondos_cliente () {
-        //Algoritmo principal
-
-        tv_esperar.setVisibility(View.VISIBLE);
-        tv_esperar.setText("Digite el monto del abono");
-        et_ID.setEnabled(true);
-        et_ID.setVisibility(View.VISIBLE);
-        et_ID.requestFocus();
-        et_ID.setInputType(InputType.TYPE_CLASS_NUMBER);
-        et_ID.setClickable(true);
-        et_ID.setText("");
-        et_ID.setFocusableInTouchMode(true);
-        et_ID.requestFocus();
-        //et_ID.setText("0");
-        bt_consultar.setText("CONFIRMAR");
-        bt_consultar.setVisibility(View.VISIBLE);
-        bt_consultar.setClickable(false);
-        bt_consultar.setEnabled(false);
-        text_listener();
-    }*/
 
     private void text_listener () {
 
@@ -1824,11 +1544,15 @@ public class AbonarActivity extends AppCompatActivity {
         tv_esperar.setText("");
         tv_esperar.setVisibility(View.INVISIBLE);
         bt_consultar.setVisibility(View.VISIBLE);
+        et_ID.setEnabled(true);
+        et_ID.setClickable(true);
     }
 
     private void ocultar_todito () {
         Log.v("ocultar_todito", "Se hace todo invisible");
         tv_esperar.setVisibility(View.VISIBLE);
+        et_ID.setEnabled(false);
+        et_ID.setClickable(false);
         tv_esperar.setText("conectando, por favor espere...");
         bt_consultar.setVisibility(View.INVISIBLE);
     }
@@ -1853,16 +1577,6 @@ public class AbonarActivity extends AppCompatActivity {
         }
         return contenido;
     }
-
-/*    private void msg(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-    }
-
-    private void ocultar_teclado(){
-        View view = this.getCurrentFocus();
-        InputMethodManager imn = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        imn.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }*/
 
     //Metodos comunes online//
 
@@ -1912,12 +1626,7 @@ public class AbonarActivity extends AppCompatActivity {
             while (linea != null && !linea.equals("")) {
                 String[] split = linea.split("_separador_");
                 Log.v("subir_archivo", ".\n\nLinea:\n\n" + linea + "\n\n.");
-                if (split[0].equals("credit_ID")) {
-                    id_credito = split[1];
-                } else {
-                    //split = linea.split("_separador_");
-                    json_string = json_string + split[1] + "_n_";
-                }
+                json_string = json_string + split[1] + "_n_";
                 linea = br.readLine();
             }
             br.close();
