@@ -1417,7 +1417,7 @@ public class AbonarActivity extends AppCompatActivity {
         System.exit(0);
     }
 
-    public  void borrar_archivo(String file) throws IOException {
+    public  void borrar_archivo (String file) throws IOException {
         File archivo = new File(file);
         String empty_string = "";
         guardar(empty_string, file);

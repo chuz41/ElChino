@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditarActivity">
+
+    <Button
+        android:id="@+id/bt_editar_cliente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="editar_cliente"
+        android:text="@string/cliente"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.111"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.213" />
+
+    <Button
+        android:id="@+id/bt_editar_credito"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="editar_credito"
+        android:text="@string/credito"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.894"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.213" />
+
+    <TextView
+        android:id="@+id/tv_mensaje"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="mensaje"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.555"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_editar_cliente"
+        app:layout_constraintVertical_bias="0.484" />
+
+    <TextView
+        android:id="@+id/tv_saludo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Saludo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_esperar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Texto"
+        app:layout_constraintBottom_toBottomOf="@+id/bt_editar_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_saludo"
+        app:layout_constraintVertical_bias="0.352" />
+
+    <TextView
+        android:id="@+id/tv_ID_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_nombre_cliente"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.824" />
+
+    <TextView
+        android:id="@+id/tv_apellido1_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_apellido2_cliente"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.875" />
+
+    <TextView
+        android:id="@+id/tv_nombre_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_apellido1_cliente"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.859" />
+
+    <TextView
+        android:id="@+id/tv_apellido2_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_apodo_cliente"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.905" />
+
+    <TextView
+        android:id="@+id/tv_sexo_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_direccion_cliente"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.919" />
+
+    <TextView
+        android:id="@+id/tv_monto_disponible"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_telefono1_cliente"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.947" />
+
+
+    <TextView
+        android:id="@+id/tv_telefono1_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_telefono2_cliente"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.954" />
+
+    <TextView
+        android:id="@+id/tv_puntuacion_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_monto_disponible"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.938" />
+
+    <TextView
+        android:id="@+id/tv_direccion_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_puntuacion_cliente"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.933" />
+
+    <TextView
+        android:id="@+id/tv_telefono2_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.83" />
+
+    <TextView
+        android:id="@+id/tv_apodo_cliente"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/tv_sexo_cliente"
+        app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.92" />
+
+    <EditText
+        android:id="@+id/et_ID_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="HOLA K ACE"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_nombre_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.769" />
+
+    <EditText
+        android:id="@+id/et_apellido1_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_apellido2_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.859" />
+
+    <EditText
+        android:id="@+id/et_nombre_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_apellido1_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.83" />
+
+    <EditText
+        android:id="@+id/et_apellido2_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_apodo_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.893" />
+
+    <EditText
+        android:id="@+id/et_sexo_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_direccion_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.916" />
+
+    <EditText
+        android:id="@+id/et_monto_disponible"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_telefono1_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.944" />
+
+    <EditText
+        android:id="@+id/et_telefono1_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_telefono2_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.952" />
+
+    <EditText
+        android:id="@+id/et_puntuacion_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_monto_disponible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.934" />
+
+    <EditText
+        android:id="@+id/et_direccion_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_puntuacion_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.93" />
+
+    <EditText
+        android:id="@+id/et_telefono2_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.823" />
+
+    <EditText
+        android:id="@+id/et_apodo_cliente"
+        android:layout_width="160dp"
+        android:layout_height="45dp"
+        android:text="TextView"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_sexo_cliente"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toEndOf="@+id/tv_saludo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.913" />
+
+    <Button
+        android:id="@+id/bt_guardar_cambios"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="confirmar"
+        android:text="@string/guardar_cambios"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_telefono2_cliente" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

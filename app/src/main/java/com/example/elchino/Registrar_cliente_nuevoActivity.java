@@ -1057,6 +1057,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
     private void boton_atras() {
         Intent menu_principal = new Intent(this, MenuPrincipal.class);
+        menu_principal.putExtra("mensaje", "");
         startActivity(menu_principal);
         finish();
         System.exit(0);

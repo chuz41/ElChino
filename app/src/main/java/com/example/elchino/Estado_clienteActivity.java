@@ -49,6 +49,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     private String apellido2_cliente = "";
     private String apodo_cliente = "";
     private String archivo_cliente = "";
+    private Button bt_editar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,8 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         bt_consultar = (Button) findViewById(R.id.bt_consultar);
         bt_consultar.setClickable(false);
         bt_consultar.setEnabled(false);
+        bt_editar = (Button) findViewById(R.id.bt_editar);
+        bt_editar.setVisibility(View.INVISIBLE);
         bt_prestar = (Button) findViewById(R.id.bt_prestar);
         bt_represtar = (Button) findViewById(R.id.bt_represtar);
         bt_prestar.setVisibility(View.INVISIBLE);
@@ -86,6 +89,15 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         } else {
             consultar(null);
         }
+    }
+
+    public void editar_archivo (View view) {
+        Intent editar_ac = new Intent(this, EditarActivity.class);
+        editar_ac.putExtra("archivo_cliente", archivo_cliente);
+        editar_ac.putExtra("cliente_id", cliente_ID);
+        startActivity(editar_ac);
+        finish();
+        System.exit(0);
     }
 
     private void mostrar_caja () {
@@ -453,6 +465,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         bt_represtar.setVisibility(View.VISIBLE);
         bt_abonar.setVisibility(View.VISIBLE);
         bt_estado_cuenta.setVisibility(View.VISIBLE);
+        bt_editar.setVisibility(View.VISIBLE);
         if (puntuacion < 5) {
             bt_prestar.setClickable(false);
             bt_prestar.setEnabled(false);
