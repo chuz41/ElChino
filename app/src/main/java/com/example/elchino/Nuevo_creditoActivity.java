@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -22,6 +23,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -98,6 +100,12 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private String credit_ID = "";
     private String interes_mora = "";
     private String puntuacion_cliente = "";
+    private Button bt_cambiar_fecha;
+    private Integer mes_selected = 0;
+    private Integer anio_selected = 0;
+    private Integer fecha_selected = 0;
+    private String  fecha_credito = "";
+    private boolean flag_fecha = false;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -116,6 +124,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         bt_consultar = (Button) findViewById(R.id.bt_consultar);
         bt_consultar.setClickable(false);
         bt_consultar.setEnabled(false);
+        bt_cambiar_fecha = (Button) findViewById(R.id.bt_cambiar_fecha);
+        bt_cambiar_fecha.setText("Cambiar fecha");
+        bt_cambiar_fecha.setVisibility(View.INVISIBLE);
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
         sp_plazos = (Spinner) findViewById(R.id.sp_plazos);
         sp_plazos.setVisibility(View.INVISIBLE);
@@ -138,6 +149,41 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             }
         }
         text_listener();
+    }
+
+    public void cambiar_fecha (View view) {
+
+        final Calendar c = Calendar.getInstance();
+        final boolean[] edad_permitida = {true};
+        mes_selected = (c.get(Calendar.MONTH));
+        //Toast.makeText(this, "mes selected: " + mes_selected, Toast.LENGTH_LONG).show();
+        anio_selected = c.get(Calendar.YEAR);
+        fecha_selected = c.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                String i_s = String.valueOf(i);
+                String i1_s = String.valueOf(i1 + 1);
+                String i2_s = String.valueOf(i2);
+                if (i_s.length() == 1) {
+                    i_s = "0" + i_s;
+                }
+                if (i1_s.length() == 1) {
+                    i1_s = "0" + i1_s;
+                }
+                if (i2_s.length() == 1) {
+                    i2_s = "0" + i2_s;
+                }
+                fecha_credito = (i2_s + "/" + i1_s + "/" + i_s);
+                //edad_cliente.autofill(AutofillValue.forText(String.valueOf(i2) + "/" + String.valueOf(i1+1) + "/" + String.valueOf(i)));
+                mes_selected = i1+1;
+                anio_selected = i;
+                fecha_selected = i2;
+                flag_fecha = true;
+                Log.v("select_fecha", String.valueOf(fecha_selected) + "/" + String.valueOf(mes_selected + 1) + "/" + String.valueOf(anio_selected));
+            }
+        },anio_selected,mes_selected,fecha_selected);
+        datePickerDialog.show();
     }
 
     private void restar_disponible () {//TODO: Se debe actualizar la informacion en internet.
@@ -470,20 +516,8 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         file_content = file_content + "plazo_separador_" + plazo_presentar + "\n";
         String monto_cuota = calcular_cuota();
         file_content = file_content + "monto_cuota_separador_" + monto_cuota + "\n";
-        String fecha_credito = dia + "/" + mes + "/" + anio;
-        file_content = file_content + "fecha_credito_separador_" + fecha_credito + "\n";
-        String proximo_abono = obtener_proximo_abono();
-        file_content = file_content + "proximo_abono_separador_" + proximo_abono + "\n";
-        String saldo_mas_intereses = calcular_saldo();
-        file_content = file_content + "saldo_mas_intereses_separador_" + saldo_mas_intereses + "\n";
-        String tasa_interes = obtener_tasa();
-        file_content = file_content + "tasa_separador_" + tasa_interes + "\n";
-        String cuotass = calcular_cuotas();
-        file_content = file_content + "cuotas_separador_" + cuotass + "\n";
-        credit_ID = obtener_id();
-        file_content = file_content + "ID_credito_separador_" + credit_ID + "\n";
-        String morosidad = "D";
-        file_content = file_content + "morosidad_separador_" + morosidad + "\n";
+        String fecha_sustituta = "";
+        //fecha_hoy = DateUtilities.stringToDate(fecha_sustituta);
         String sema_quince = "";
         int factor = 0;
         String[] split = plazo_presentar.split("_");
@@ -496,7 +530,63 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } else {
             //do nothing here!!
         }
+        boolean flag_proximo_abono = true;
+        if (flag_fecha) {
+            dia = String.valueOf(fecha_selected);
+            if (dia.length() == 1) {
+                dia = "0" + dia;
+            }
+            mes = String.valueOf(mes_selected);
+            if (mes.length() == 1) {
+                mes = "0" + mes;
+            }
+            anio = String.valueOf(anio_selected);
+            fecha_sustituta = anio + "-" + mes + "-" + dia;
+            Date fecha_hoy = DateUtilities.stringToDate(fecha_sustituta);
+            fecha_hoy = DateUtilities.addWeeks(fecha_hoy, factor);
+            fecha_sustituta = DateUtilities.dateToString(fecha_hoy);
+            String[] split_fecha = fecha_sustituta.split("-");
+            fecha_sustituta = split_fecha[2] + "/" + split_fecha[1] + "/" + split_fecha[0];
+            flag_proximo_abono = false;
+        }
+        String fecha_credit = dia + "/" + mes + "/" + anio;
+        String proximo_abono = "";
+        file_content = file_content + "fecha_credito_separador_" + fecha_credit + "\n";
+        if (flag_proximo_abono) {
+            proximo_abono = obtener_proximo_abono();
+        } else {
+            proximo_abono = fecha_sustituta;
+        }
+        file_content = file_content + "proximo_abono_separador_" + proximo_abono + "\n";
+        String saldo_mas_intereses = calcular_saldo();
+        file_content = file_content + "saldo_mas_intereses_separador_" + saldo_mas_intereses + "\n";
+        String tasa_interes = obtener_tasa();
+        file_content = file_content + "tasa_separador_" + tasa_interes + "\n";
+        String cuotass = calcular_cuotas();
+        file_content = file_content + "cuotas_separador_" + cuotass + "\n";
+        credit_ID = obtener_id();
+        file_content = file_content + "ID_credito_separador_" + credit_ID + "\n";
+        String morosidad = "D";
+        file_content = file_content + "morosidad_separador_" + morosidad + "\n";
+
+
         Date fecha_hoy = Calendar.getInstance().getTime();
+
+        if (flag_fecha) {
+            dia = String.valueOf(fecha_selected);
+            if (dia.length() == 1) {
+                dia = "0" + dia;
+            }
+            mes = String.valueOf(mes_selected);
+            if (mes.length() == 1) {
+                mes = "0" + mes;
+            }
+            anio = String.valueOf(anio_selected);
+
+            fecha_sustituta = anio + "-" + mes + "-" + dia;
+            fecha_hoy = DateUtilities.stringToDate(fecha_sustituta);
+        }
+
         Date fecha_poner = fecha_hoy;
         for (int i = 0; i < Integer.parseInt(cuotass); i++) {
             fecha_poner = DateUtilities.addWeeks(fecha_poner, factor);
@@ -570,12 +660,14 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         //Algoritmo principal
         tv_esperar.setVisibility(View.VISIBLE);
         tv_esperar.setText("Digite el monto del credito");
+        bt_cambiar_fecha.setVisibility(View.VISIBLE);
         et_ID.setEnabled(true);
         et_ID.setVisibility(View.VISIBLE);
         et_ID.requestFocus();
         et_ID.setInputType(InputType.TYPE_CLASS_NUMBER);
         et_ID.setClickable(true);
         et_ID.setText("");
+        et_ID.setHint("Monto solicitado...");
         et_ID.setFocusableInTouchMode(true);
         et_ID.requestFocus();
         //et_ID.setText("0");

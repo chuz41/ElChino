@@ -222,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
             flag_caja = true;
         }
         ////////////////////////////////////////////////////////////////
+
     }
 
     private void salir() {
@@ -480,7 +481,9 @@ public class MainActivity extends AppCompatActivity {
                                                 contenido = contenido + "usuario " + split2[26] + "\n";
                                                 contenido = contenido + "password " + split2[10] + "\n";
                                                 contenido = contenido + "Screditos " + split2[14] + "\n";
-                                                contenido = contenido + "Sclientes " + split2[18];
+                                                contenido = contenido + "Sclientes " + split2[18] + "\n";
+                                                contenido = contenido + "apodo " + split2[34] + "\n";
+                                                contenido = contenido + "telefono " + split2[30];
                                                 borrar_archivo(cobrador);
                                                 guardar(contenido, cobrador);
                                                 Log.v("Debug_file_cobra", ".\n\nArchivo cobrador.txt:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
@@ -1018,7 +1021,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void abajiar() throws JSONException {
+    private void abajiar () throws JSONException {
         String sp_clientes = "";
         String sp_creditos = "";
         try {

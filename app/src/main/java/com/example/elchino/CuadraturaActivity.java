@@ -126,6 +126,8 @@ public class CuadraturaActivity extends AppCompatActivity {
     private String mensaje_imprimir_pre = "";
     private String nombre_cliente = "";
     private String apellido_cliente = "";
+    private String cobrador_s = "";
+    private String telefono_s = "";
 
     
     @Override
@@ -192,7 +194,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
         tv_saludo.setText("ESTADO DE CUENTA\n\nCliente ID: " + cliente_recibido);
         separar_fechaYhora();
-
+        datos_cobrador();
         if (!cuadratura.equals("")) {
             try {
                 presentar_cuadratura();
@@ -266,7 +268,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         cantidad_cuotas_pendientes = Integer.parseInt(flag);
         return flag;
     }
-
     
     private void llenar_spinner () {
         //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
@@ -369,6 +370,27 @@ public class CuadraturaActivity extends AppCompatActivity {
         spinner_listener();
     }
 
+    private void datos_cobrador () {
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            while (linea != null) {
+                String[] split = linea.split(" ");
+                if (split[0].equals("apodo")) {
+                    cobrador_s = split[1];
+                }
+                if (split[0].equals("telefono")) {
+                    telefono_s = split[1];
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private String obtener_intereses_moratorios (String saldo_plus, String next_pay) throws ParseException {
         String flag = "";
@@ -554,7 +576,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
     }*/
 
-    
     public void consultar (View view) throws JSONException, IOException, InterruptedException {
         bt_consultar.setClickable(false);
         bt_consultar.setEnabled(false);
@@ -664,7 +685,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
     }
 
-    
     private void procesar_abono2 () {
 
         String file_name = archivo_prestamo;
@@ -745,7 +765,6 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     }
 
-    
     private void actualizar_archivo_credito () {
         //archivo_prestamo
 
@@ -787,7 +806,6 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     }
 
-    
     private void presentar_cuadratura () throws ParseException {
         //TODO: Imprimir la informacion que esta en la cuadratura
 
@@ -805,7 +823,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
         mensaje_imprimir = "\n\nFecha: " + dia + "/" + mes + "/" + anio + "\n\n\n***** Prestamos El Chino *****\n\nCliente: " +
                 nombre_cliente + " " + apellido_cliente + "\nCedula: " + cliente_ID + "\n\n\n******************************\n\n" + mensaje_imprimir_pre + "\n******************************\n\n" +
-                cuadratura_print + "Estimado cliente, no olvide\nrevisar su tiquete antes de\nque se retire el cobrador.\n\n\n\n\n";
+                cuadratura_print + "Estimado cliente, no olvide\nrevisar su tiquete antes de\nque se retire el cobrador.\n\nSi necesita dinero,\nllame a " + cobrador_s + "\nTelefono: " + telefono_s + "\n\n\n\n\n";
 
         bt_consultar.setEnabled(false);
         bt_consultar.setVisibility(View.INVISIBLE);
@@ -899,7 +917,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         return treeMap;
     }
 
-    
     private void actualizar_archivo_cliente () {
         String[] spliti = archivo_prestamo.split("_");
         String archivo_cliente = spliti[0] + "_C_.txt";
@@ -956,7 +973,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         return flag;
     }
 
-    
     private String obtener_cuadratura (String cuadratura, String fecha_next_abono, int factor_semanas, int monto_ingresado) {
 
         String flag = "";
@@ -1015,7 +1031,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         return flag;
     }*/
 
-    
     private void presentar_monto_a_pagar (int monto_a_pagar) throws JSONException, IOException, InterruptedException {
 
         et_ID.setEnabled(true);

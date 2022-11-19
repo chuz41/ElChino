@@ -134,7 +134,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                         String seleccion = sp_opciones.getSelectedItem().toString();
 
 
-                        if (tv_esperar.getText().toString().equals("Ingrese el nombre del cliente")) {
+                        if (tv_esperar.getText().toString().equals("Ingrese el nombre del cliente") | tv_esperar.getText().toString().equals("Ingrese el apodo del cliente") | tv_esperar.getText().toString().equals("Ingrese el apellido del cliente")) {
                             for (String key : sp_helper.keySet()) {
                                 Log.v("Sp_listener0", "Estado_cliente.\n\nKey:\n\n" + key + "\n\nDato: " + sp_helper.get(key) + "\n\nseleccion: " + seleccion + "\n\n.");
                                 if (seleccion.equals(key)) {
