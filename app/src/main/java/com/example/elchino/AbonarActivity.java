@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -21,6 +22,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -61,6 +63,8 @@ import java.util.regex.Pattern;
 public class AbonarActivity extends AppCompatActivity {
 
     private Integer monto_abono = 0;
+    private boolean flag_fecha = false;
+    private String fecha_abono = "";
     private String mensaje_imprimir = "";
     private Integer intereses_monroe = 0;
     private Integer cambio = 0;
@@ -112,7 +116,11 @@ public class AbonarActivity extends AppCompatActivity {
     private TextView tv_caja;
     private String nombre_cliente = "";
     private String apellido_cliente = "";
-
+    private Button bt_cambiar_fecha;
+    private Integer mes_selected = 0;
+    private Integer anio_selected = 0;
+    private Integer fecha_selected = 0;
+    private Date hoy_LD = Calendar.getInstance().getTime();
     private Spinner sp_plazos;
 
     
@@ -181,8 +189,8 @@ public class AbonarActivity extends AppCompatActivity {
         String[] split_fecha_next = fecha_proximo_abono.split("/");
         fecha_proximo_abono = split_fecha_next[2] + "-" + split_fecha_next[1] + "-" + split_fecha_next[0];
         Date fehca_next_abono = DateUtilities.stringToDate(fecha_proximo_abono);
-        Date fecha_de_hoy = Calendar.getInstance().getTime();
-        dias_atrasados = DateUtilities.daysBetween(fecha_de_hoy, fehca_next_abono);//Cantidad positiva indica morosidad.
+        //Date hoy_LD = Calendar.getInstance().getTime();
+        dias_atrasados = DateUtilities.daysBetween(hoy_LD, fehca_next_abono);//Cantidad positiva indica morosidad.
         Log.v("Cuotas_morosas1", ".\n\nDias atrasados: " + dias_atrasados + "\n\n.");
         if (dias_atrasados < 0) {
             flag = "0";
@@ -325,8 +333,8 @@ public class AbonarActivity extends AppCompatActivity {
         String[] split2 = next_pay.split("/");
         String proximo_abono_formato = split2[2] + "-" + split2[1] + "-" + split2[0];
         Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
-        Date fecha_hoy = Calendar.getInstance().getTime();
-        int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
+        //Date hoy_LD = Calendar.getInstance().getTime();
+        int diferencia_en_dias = DateUtilities.daysBetween(hoy_LD, proximo_abono_LD);
         Log.v("obt_sald_al_dia0", "Abonar.\n\nDiferencia en dias: " + diferencia_en_dias + "\n\nnext_pay: " + next_pay + "\n\nIntereses de mora: " + intereses_de_mora + "\n\nSaldo_plus: " + saldo_plus + "\n\n.");
         if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
             saldo = String.valueOf(Integer.parseInt(saldo_plus) + Integer.parseInt(intereses_de_mora));
@@ -756,7 +764,7 @@ public class AbonarActivity extends AppCompatActivity {
         Log.v("Debug_cuadra0", "Abonar.\n\nCuadratura: " + cuadratura + "\n\ninteres mora total: " + interes_mora_total + "\n\nfecha next abono: " + fecha_next_abono + "\n\nMonto ingresado: " + monto_ingresado + "\n\nMonto temporal: " + monto_temporal + "\n\n.");
         if (monto_temporal < 0) {//No alcanzo siquiera para pagar los intereses. Debe retornar
 
-            Date hoy_LD = Calendar.getInstance().getTime();
+            //Date hoy_LD = Calendar.getInstance().getTime();
             String[] split2 = fecha_next_abono.split("/");
             String fecha_nx_abo = split2[2] + "-" + split2[1] + "-" + split2[0];
             Date fecha_nx_abo_LD = DateUtilities.stringToDate(fecha_nx_abo);
@@ -824,7 +832,7 @@ public class AbonarActivity extends AppCompatActivity {
                     monto_temporal = monto_temporal - Integer.parseInt(split_1[2]);//Esta es la cantidad que va quedando del abono.
 
                     if (monto_temporal < 0) {//Significa que no alcanza para esta cuota. Debe retornar
-                        Date hoy_LD = Calendar.getInstance().getTime();
+                        //Date hoy_LD = Calendar.getInstance().getTime();
                         String fecha_cuadrito = split_1[3];
                         String numero_cuota = split_1[1];
                         Log.v("paga_parcial_cuota", "Abonar.\n\nNumero de cuota: " + numero_cuota + "\n\n");
@@ -898,7 +906,7 @@ public class AbonarActivity extends AppCompatActivity {
                         //
                         cuadratura = cuadratura.replace(split_1[0] + "_" + split_1[1] + "_" + split_1[2] + "_" + split_1[3],
                                 split_1[0] + "_" + split_1[1] + "_0_" + split_1[3]);
-                        Date hoy_LD = Calendar.getInstance().getTime();
+                        //Date hoy_LD = Calendar.getInstance().getTime();
                         String fecha_cuadrito = split_1[3];
                         String[] split_fec = fecha_cuadrito.split("/");
                         fecha_cuadrito = split_fec[2] + "-" + split_fec[1] + "-" + split_fec[0];
@@ -964,6 +972,58 @@ public class AbonarActivity extends AppCompatActivity {
         tv_esperar.setText("Monto a pagar al dia de hoy: ");
         tv_esperar.setVisibility(View.VISIBLE);
         et_ID.requestFocus();
+    }
+
+    public void cambiar_fecha (View view) {
+
+        final Calendar c = Calendar.getInstance();
+        final boolean[] edad_permitida = {true};
+        mes_selected = (c.get(Calendar.MONTH));
+        //Toast.makeText(this, "mes selected: " + mes_selected, Toast.LENGTH_LONG).show();
+        anio_selected = c.get(Calendar.YEAR);
+        fecha_selected = c.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                String i_s = String.valueOf(i);
+                String i1_s = String.valueOf(i1 + 1);
+                String i2_s = String.valueOf(i2);
+                if (i_s.length() == 1) {
+                    i_s = "0" + i_s;
+                }
+                if (i1_s.length() == 1) {
+                    i1_s = "0" + i1_s;
+                }
+                if (i2_s.length() == 1) {
+                    i2_s = "0" + i2_s;
+                }
+                fecha_abono = (i2_s + "/" + i1_s + "/" + i_s);
+                //edad_cliente.autofill(AutofillValue.forText(String.valueOf(i2) + "/" + String.valueOf(i1+1) + "/" + String.valueOf(i)));
+                mes_selected = i1+1;
+                anio_selected = i;
+                fecha_selected = i2;
+                anio = String.valueOf(anio_selected);
+                mes = String.valueOf(mes_selected);
+                dia = String.valueOf(fecha_selected);
+                flag_fecha = true;
+                if (mes.length() == 1) {
+                    mes = "0" + mes;
+                }
+                if (dia.length() == 1) {
+                    dia = "0" + dia;
+                }
+                String fecha_nueva = anio + "-" + mes + "-" + dia;
+                Date fecha_nueva_D = null;
+                try {
+                    fecha_nueva_D = DateUtilities.stringToDate(fecha_nueva);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                hoy_LD = fecha_nueva_D;
+                Log.v("select_fecha", String.valueOf(fecha_selected) + "/" + String.valueOf(mes_selected + 1) + "/" + String.valueOf(anio_selected));
+            }
+        },anio_selected,mes_selected,fecha_selected);
+        datePickerDialog.show();
     }
 
     private Integer obtener_monto_cuota (String s) {
@@ -1291,9 +1351,9 @@ public class AbonarActivity extends AppCompatActivity {
         String proximo_abono_formato = split2[2] + "-" + split2[1] + "-" + split2[0];
         Log.v("obt_int_morat0", ".\n\nProximo abono: " + proximo_abono_formato + "\n\n.");
         Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
-        Date fecha_hoy = Calendar.getInstance().getTime();
-        int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
-        Log.v("obt_int_morat1", ".\n\nDiferencia en dias: " + diferencia_en_dias + "\n\nfecha_hoy: " + fecha_hoy.toString() + "\n\nProximo abono: " + proximo_abono_LD + "\n\n.");
+        //Date fecha_hoy = Calendar.getInstance().getTime();
+        int diferencia_en_dias = DateUtilities.daysBetween(hoy_LD, proximo_abono_LD);
+        Log.v("obt_int_morat1", ".\n\nDiferencia en dias: " + diferencia_en_dias + "\n\nfecha_hoy: " + hoy_LD.toString() + "\n\nProximo abono: " + proximo_abono_LD + "\n\n.");
         if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
             saldo = saldo_plus;
             morosidad = "D";
@@ -1438,8 +1498,8 @@ public class AbonarActivity extends AppCompatActivity {
 
     private void separar_fechaYhora(){
         llenar_mapa_meses();
-        Date now = Calendar.getInstance().getTime();
-        String ahora = now.toString();
+        //Date now = Calendar.getInstance().getTime();
+        String ahora = hoy_LD.toString();
         String[] split = ahora.split(" ");
         nombre_dia = split[0];
         dia = split[2];

@@ -687,7 +687,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         //spinner_listener();
     }
 
-    private void text_listener() {
+    private void text_listener () {
 
         //Implementacion de un text listener
         et_ID.addTextChangedListener(new TextWatcher() {
@@ -705,7 +705,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                     bt_consultar.setClickable(false);
                     bt_consultar.setEnabled(false);
                     if (String.valueOf(s).equals("")) {
-                        //Do nothing.
+                        et_ID.setEnabled(false);
                     } else {
                         boolean flag1 = false;
                         boolean flag2 = false;
