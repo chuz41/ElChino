@@ -241,12 +241,15 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             //Se crea una linea de texto que se va a agregar al archivo nuevo que se va a crear.
             //String linea = "Comision_vendedor  " + u7 + "\n";
             //nuevo_archivo = nuevo_archivo + linea;
-            Log.v("ID_cliente", ".\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\n.");
+            Log.v("ID_cliente0", "Registrar_cliente_nuevo.\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\n.");
+            u0 = u0.replaceAll("[^\\w+]", "");
+            Log.v("ID_cliente1", "Registrar_cliente_nuevo.\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\n.");
             if (flag_u0) {
                 if (u0.equals(ID_clienteS)) {
                     //Do nothing.
                 } else {
                     Log.v("ID_cliente_sep_1", ".\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\nfile_content:\n\n" + file_content + "\n\n.");
+                    u0 = u0.replaceAll("[^\\w+]", "");
                     file_content.replace("ID_cliente_separador_" + ID_clienteS, "ID_cliente_separador_" + u0);
                     Log.v("ID_cliente_sep_2", ".\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\nfile_content:\n\n" + file_content + "\n\n.");
                 }

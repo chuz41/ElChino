@@ -273,85 +273,90 @@ public class CuadraturaActivity extends AppCompatActivity {
         //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
         String creditos = "Escoja el credito...___";
         String archivos[] = fileList();
-        for (int i = 0; i < archivos.length; i++) {
-            Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(archivos[i]);
-            boolean matchFound = matcher.find();
-            if (matchFound) {
-                try {
-                    String fecha_next_abono = "";
-                    String intereses_mor = "";
-                    String saldo_mas_intereses_s = "";
-                    String plazoz = "";
-                    String numero_de_credito = "";
-                    String cuotas_morosas = "";
-                    String cuadratura_pre = "";
-                    int factor_semanas = 0;
-                    String file_name = archivos[i];
-                    String[] split_indice = file_name.split("_P_");
-                    numero_de_credito = split_indice[1];
-                    InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
-                    BufferedReader br = new BufferedReader(archivo);
-                    String linea = br.readLine();
-                    while (linea != null) {
-                        Log.v("llenando_spinner", ".\n\nLinea:\n\n" + linea + "\n\n.");
-                        String[] split = linea.split("_separador_");
-                        if (split[0].equals("proximo_abono")) {
-                            fecha_next_abono = split[1];
+        if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
+            Log.v("text_listener0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+            //Do nothing.
+        } else {
+            for (int i = 0; i < archivos.length; i++) {
+                Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(archivos[i]);
+                boolean matchFound = matcher.find();
+                if (matchFound) {
+                    try {
+                        String fecha_next_abono = "";
+                        String intereses_mor = "";
+                        String saldo_mas_intereses_s = "";
+                        String plazoz = "";
+                        String numero_de_credito = "";
+                        String cuotas_morosas = "";
+                        String cuadratura_pre = "";
+                        int factor_semanas = 0;
+                        String file_name = archivos[i];
+                        String[] split_indice = file_name.split("_P_");
+                        numero_de_credito = split_indice[1];
+                        InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
+                        BufferedReader br = new BufferedReader(archivo);
+                        String linea = br.readLine();
+                        while (linea != null) {
+                            Log.v("llenando_spinner", ".\n\nLinea:\n\n" + linea + "\n\n.");
+                            String[] split = linea.split("_separador_");
+                            if (split[0].equals("proximo_abono")) {
+                                fecha_next_abono = split[1];
+                            }
+                            if (split[0].equals("plazo")) {
+                                plazoz = split[1];
+                            }
+                            if (split[0].equals("cuadratura")) {
+                                cuadratura_pre = split[1];
+                            }
+                            if (split[0].equals("saldo_mas_intereses")) {
+                                saldo_mas_intereses_s = split[1];
+                            }
+                            if (split[0].equals("cuotas")) {
+                                cuotas_morosas = split[1];
+                            }
+                            if (split[0].equals("intereses_moratorios")) {
+                                intereses_mor = split[1];
+                            }
+                            linea = br.readLine();
                         }
-                        if (split[0].equals("plazo")) {
-                            plazoz = split[1];
+
+                        br.close();
+                        archivo.close();
+                        String[] piezas = plazoz.split("_");
+                        Log.v("llenando_spinner2", ".\n\nPlazoz: " + plazoz + "\n\npiezas[0]: " + piezas[0] + "\n\n.");
+                        if (piezas[1].equals("quincenas")) {
+                            factor_semanas = 2;
+                        } else if (piezas[1].equals("semanas")) {
+                            factor_semanas = 1;
+                        } else {
+                            factor_semanas = -1;
+                            //ERROR
                         }
-                        if (split[0].equals("cuadratura")) {
-                            cuadratura_pre = split[1];
+
+                        String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
+                        String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
+                        interes_mora_total = intereses_moritas;
+                        interes_mora_parcial = interes_mora_total;
+                        cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
+                        saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
+                        cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
+
+                        Log.v("llenando_spinner2", "Cuadratura.\n\nMorosidad: " + morosidad + "\n\n.");
+                        double saldo_mas_intereses_D = Double.parseDouble(saldo_mas_intereses_s);
+                        int saldo_mas_intereses_I = (int) saldo_mas_intereses_D;
+                        saldo_mas_intereses_s = String.valueOf(saldo_mas_intereses_I);
+
+                        if (Integer.parseInt(saldo_mas_intereses_s) > 100) {
+                            creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
+                        } else {
+                            //Do notring.
                         }
-                        if (split[0].equals("saldo_mas_intereses")) {
-                            saldo_mas_intereses_s = split[1];
-                        }
-                        if (split[0].equals("cuotas")) {
-                            cuotas_morosas = split[1];
-                        }
-                        if (split[0].equals("intereses_moratorios")) {
-                            intereses_mor = split[1];
-                        }
-                        linea = br.readLine();
+                        //Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
+                    } catch (IOException e) {
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
-
-                    br.close();
-                    archivo.close();
-                    String[] piezas = plazoz.split("_");
-                    Log.v("llenando_spinner2", ".\n\nPlazoz: " + plazoz + "\n\npiezas[0]: " + piezas[0] + "\n\n.");
-                    if (piezas[1].equals("quincenas")) {
-                        factor_semanas = 2;
-                    } else if (piezas[1].equals("semanas")) {
-                        factor_semanas = 1;
-                    } else {
-                        factor_semanas = -1;
-                        //ERROR
-                    }
-
-                    String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
-                    String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
-                    interes_mora_total = intereses_moritas;
-                    interes_mora_parcial = interes_mora_total;
-                    cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
-                    saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
-                    cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
-
-                    Log.v("llenando_spinner2", "Cuadratura.\n\nMorosidad: " + morosidad + "\n\n.");
-                    double saldo_mas_intereses_D = Double.parseDouble(saldo_mas_intereses_s);
-                    int saldo_mas_intereses_I = (int) saldo_mas_intereses_D;
-                    saldo_mas_intereses_s = String.valueOf(saldo_mas_intereses_I);
-
-                    if (Integer.parseInt(saldo_mas_intereses_s) > 100) {
-                        creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
-                    } else {
-                        //Do notring.
-                    }
-                    //Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
-                } catch (IOException e) {
-                } catch (ParseException e) {
-                    e.printStackTrace();
                 }
             }
         }
@@ -494,32 +499,37 @@ public class CuadraturaActivity extends AppCompatActivity {
         lista_archivos = "";
         String cliente_file = cliente_ID + "_C_.txt";
         String archivos[] = fileList();
-        for (int i = 0; i < archivos.length; i++) {
-            String saldo_mas_int_tempo = "";
-            Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(archivos[i]);
-            boolean matchFound = matcher.find();
-            if (matchFound) {
-                try {
-                    InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
-                    BufferedReader br = new BufferedReader(archivo);
-                    String linea = br.readLine();
-                    while (linea != null) {
-                        Log.v("revisar_creditos", ".\n\nlinea:\n\n" + linea + "\n\n.");
-                        String[] split = linea.split("_separador_");
-                        if (split[0].equals("saldo_mas_intereses")) {
-                            saldo_mas_int_tempo = split[1];
-                            if (Integer.parseInt(saldo_mas_int_tempo) < 100) {
-                                //Do nothing. Credito ya ha sido cancelado casi en su totalidad, por lo que se toma como cancelado al 100% y no se muestra.
-                            } else {
-                                lista_archivos = lista_archivos + archivos[i] + "_sep_";//Significa que es un credito activo.
+        if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
+            Log.v("text_listener0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+            //Do nothing.
+        } else {
+            for (int i = 0; i < archivos.length; i++) {
+                String saldo_mas_int_tempo = "";
+                Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(archivos[i]);
+                boolean matchFound = matcher.find();
+                if (matchFound) {
+                    try {
+                        InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                        BufferedReader br = new BufferedReader(archivo);
+                        String linea = br.readLine();
+                        while (linea != null) {
+                            Log.v("revisar_creditos", ".\n\nlinea:\n\n" + linea + "\n\n.");
+                            String[] split = linea.split("_separador_");
+                            if (split[0].equals("saldo_mas_intereses")) {
+                                saldo_mas_int_tempo = split[1];
+                                if (Integer.parseInt(saldo_mas_int_tempo) < 100) {
+                                    //Do nothing. Credito ya ha sido cancelado casi en su totalidad, por lo que se toma como cancelado al 100% y no se muestra.
+                                } else {
+                                    lista_archivos = lista_archivos + archivos[i] + "_sep_";//Significa que es un credito activo.
+                                }
                             }
+                            linea = br.readLine();
                         }
-                        linea = br.readLine();
+                        br.close();
+                        archivo.close();
+                    } catch (IOException e) {
                     }
-                    br.close();
-                    archivo.close();
-                } catch (IOException e) {
                 }
             }
         }
@@ -590,50 +600,55 @@ public class CuadraturaActivity extends AppCompatActivity {
             } else {
                 file_to_consult = et_ID.getText().toString() + "_C_";
             }
-            for (int i = 0; i < archivos.length; i++) {
-                Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
-                Matcher matcher = pattern.matcher(archivos[i]);
-                boolean matchFound = matcher.find();
-                if (matchFound) {
-                    //TODO: Abrir archivo y leerlo.
-                    try {
-                        InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
-                        BufferedReader br = new BufferedReader(archivo);
-                        String linea = br.readLine();
-                        while (linea != null) {
-                            Log.v("Digite_cedula", ".\n\nlinea:\n\n" + linea + "\n\n.");
-                            String[] split = linea.split("_separador_");
-                            if (split[0].equals("puntuacion_cliente")) {
-                                puntuacion_cliente = split[1];
+            if (file_to_consult.contains("*") || file_to_consult.contains(" ")) {
+                Log.v("text_listener0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+                //Do nothing.
+            } else {
+                for (int i = 0; i < archivos.length; i++) {
+                    Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(archivos[i]);
+                    boolean matchFound = matcher.find();
+                    if (matchFound) {
+                        //TODO: Abrir archivo y leerlo.
+                        try {
+                            InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                            BufferedReader br = new BufferedReader(archivo);
+                            String linea = br.readLine();
+                            while (linea != null) {
+                                Log.v("Digite_cedula", ".\n\nlinea:\n\n" + linea + "\n\n.");
+                                String[] split = linea.split("_separador_");
+                                if (split[0].equals("puntuacion_cliente")) {
+                                    puntuacion_cliente = split[1];
+                                }
+                                if (split[0].equals("ID_cliente")) {
+                                    cliente_ID = split[1];
+                                }
+                                if (split[0].equals("monto_disponible")) {
+                                    monto_disponible = split[1];
+                                }
+                                if (split[0].equals("interes_mora")) {
+                                    interes_mora = split[1];
+                                }
+                                if (split[0].equals("nombre_cliente")) {
+                                    nombre_cliente = split[1];
+                                }
+                                if (split[0].equals("apellido1_cliente")) {
+                                    apellido_cliente = split[1];
+                                }
+                                linea = linea.replace("_separador_", ": ");
+                                linea = linea.replace("_cliente", "");
+                                linea = linea.replace("_", " ");
+                                archivoCompleto = archivoCompleto + linea + "\n";
+                                linea = br.readLine();
                             }
-                            if (split[0].equals("ID_cliente")) {
-                                cliente_ID = split[1];
-                            }
-                            if (split[0].equals("monto_disponible")) {
-                                monto_disponible = split[1];
-                            }
-                            if (split[0].equals("interes_mora")) {
-                                interes_mora = split[1];
-                            }
-                            if (split[0].equals("nombre_cliente")) {
-                                nombre_cliente = split[1];
-                            }
-                            if (split[0].equals("apellido1_cliente")) {
-                                apellido_cliente = split[1];
-                            }
-                            linea = linea.replace("_separador_", ": ");
-                            linea = linea.replace("_cliente", "");
-                            linea = linea.replace("_", " ");
-                            archivoCompleto = archivoCompleto + linea + "\n";
-                            linea = br.readLine();
+                            br.close();
+                            archivo.close();
+                        } catch (IOException e) {
                         }
-                        br.close();
-                        archivo.close();
-                    } catch (IOException e) {
+                        break;
+                    } else {
+                        //Continue with the execution.
                     }
-                    break;
-                } else {
-                    //Continue with the execution.
                 }
             }
             if (archivoCompleto.equals("")) {
@@ -1051,35 +1066,40 @@ public class CuadraturaActivity extends AppCompatActivity {
         Log.v("obt_monto_cuota", ".\n\nString: "+ s + "\n\nSplit[0]: " + split[0] + "\n\nSplit[1]: " + split[1] + "\n\n.");
         String archivos[] = fileList();
         s = split[1];
-        for (int i = 0; i < archivos.length; i++) {
-            Pattern pattern = Pattern.compile(cliente_ID + "_P_" + s + "_P_", Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(archivos[i]);
-            boolean matchFound = matcher.find();
-            if (matchFound) {
-                try {
-                    String numero_de_credito = "";
-                    String file_name = archivos[i];
-                    String[] split_indice = file_name.split("_P_");
-                    numero_de_credito = split_indice[1];
-                    if (numero_de_credito.equals(split[1])) {
-                        archivo_prestamo = file_name;
-                        InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
-                        BufferedReader br = new BufferedReader(archivo);
-                        String linea = br.readLine();
-                        while (linea != null) {
-                            String[] splitre = linea.split("_separador_");
-                            if (split[0].equals("monto_cuota")) {
-                                monto_cuota = Integer.parseInt(splitre[1]);
-                                flag = monto_cuota;
-                                Log.v("obt_mont_cuota2", ".\n\nLinea:\n\n" + linea + "\n\n.");
+        if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
+            Log.v("text_listener0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+            //Do nothing.
+        } else {
+            for (int i = 0; i < archivos.length; i++) {
+                Pattern pattern = Pattern.compile(cliente_ID + "_P_" + s + "_P_", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(archivos[i]);
+                boolean matchFound = matcher.find();
+                if (matchFound) {
+                    try {
+                        String numero_de_credito = "";
+                        String file_name = archivos[i];
+                        String[] split_indice = file_name.split("_P_");
+                        numero_de_credito = split_indice[1];
+                        if (numero_de_credito.equals(split[1])) {
+                            archivo_prestamo = file_name;
+                            InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
+                            BufferedReader br = new BufferedReader(archivo);
+                            String linea = br.readLine();
+                            while (linea != null) {
+                                String[] splitre = linea.split("_separador_");
+                                if (split[0].equals("monto_cuota")) {
+                                    monto_cuota = Integer.parseInt(splitre[1]);
+                                    flag = monto_cuota;
+                                    Log.v("obt_mont_cuota2", ".\n\nLinea:\n\n" + linea + "\n\n.");
+                                }
+                                linea = br.readLine();
                             }
-                            linea = br.readLine();
+                            br.close();
+                            archivo.close();
                         }
-                        br.close();
-                        archivo.close();
+                        //Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
+                    } catch (IOException e) {
                     }
-                    //Log.v("restar_disponible2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\n.");
-                } catch (IOException e) {
                 }
             }
         }
@@ -1142,97 +1162,102 @@ public class CuadraturaActivity extends AppCompatActivity {
             } else {
                 file_to_consult = archivo_prestamo;
             }
-            for (int i = 0; i < archivos.length; i++) {
-                Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
-                Matcher matcher = pattern.matcher(archivos[i]);
-                boolean matchFound = matcher.find();
-                if (matchFound) {
-                    //TODO: Abrir archivo y leerlo.
-                    try {
-                        String fecha_next_abono = "";
-                        String intereses_mor = "";
-                        String saldo_mas_intereses_s = "";
-                        String plazoz = "";
-                        String numero_de_credito = "";
-                        String cuotas_morosas = "";
-                        String valor_presentar_s = "";
-                        String cuadratura_pre = "";
-                        int factor_semanas = 0;
-                        //String indice_file = "";
-                        String file_name = archivos[i];
-                        String[] split_indice = file_name.split("_P_");
-                        numero_de_credito = split_indice[1];
-                        InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
-                        BufferedReader br = new BufferedReader(archivo);
-                        String linea = br.readLine();
-                        while (linea != null) {
-                            Log.v("Presentar_info_cli_ONE", ".\n\nlinea:\n\n" + linea + "\n\n.");
-                            String[] split = linea.split("_separador_");
-                            if (split[0].equals("proximo_abono")) {
-                                fecha_next_abono = split[1];
+            if (file_to_consult.contains("*") || file_to_consult.contains(" ")) {
+                Log.v("text_listener0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+                //Do nothing.
+            } else {
+                for (int i = 0; i < archivos.length; i++) {
+                    Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(archivos[i]);
+                    boolean matchFound = matcher.find();
+                    if (matchFound) {
+                        //TODO: Abrir archivo y leerlo.
+                        try {
+                            String fecha_next_abono = "";
+                            String intereses_mor = "";
+                            String saldo_mas_intereses_s = "";
+                            String plazoz = "";
+                            String numero_de_credito = "";
+                            String cuotas_morosas = "";
+                            String valor_presentar_s = "";
+                            String cuadratura_pre = "";
+                            int factor_semanas = 0;
+                            //String indice_file = "";
+                            String file_name = archivos[i];
+                            String[] split_indice = file_name.split("_P_");
+                            numero_de_credito = split_indice[1];
+                            InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                            BufferedReader br = new BufferedReader(archivo);
+                            String linea = br.readLine();
+                            while (linea != null) {
+                                Log.v("Presentar_info_cli_ONE", ".\n\nlinea:\n\n" + linea + "\n\n.");
+                                String[] split = linea.split("_separador_");
+                                if (split[0].equals("proximo_abono")) {
+                                    fecha_next_abono = split[1];
+                                }
+                                if (split[0].equals("plazo")) {
+                                    plazoz = split[1];
+                                }
+                                if (split[0].equals("saldo_mas_intereses")) {
+                                    saldo_mas_intereses_s = split[1];
+                                }
+                                if (split[0].equals("cuotas")) {
+                                    cuotas_morosas = split[1];
+                                }
+                                if (split[0].equals("cuadratura")) {
+                                    cuadratura_pre = split[1];
+                                }
+                                if (split[0].equals("intereses_moratorios")) {
+                                    intereses_mor = split[1];
+                                }
+                                linea = br.readLine();
                             }
-                            if (split[0].equals("plazo")) {
-                                plazoz = split[1];
+
+                            br.close();
+                            archivo.close();
+
+                            String[] piezas = plazoz.split("_");
+                            if (piezas[1].equals("quincenas")) {
+                                factor_semanas = 2;
+                            } else if (piezas[1].equals("semanas")) {
+                                factor_semanas = 1;
+                            } else {
+                                factor_semanas = -1;
+                                //ERROR
                             }
-                            if (split[0].equals("saldo_mas_intereses")) {
-                                saldo_mas_intereses_s = split[1];
-                            }
-                            if (split[0].equals("cuotas")) {
-                                cuotas_morosas = split[1];
-                            }
-                            if (split[0].equals("cuadratura")) {
-                                cuadratura_pre = split[1];
-                            }
-                            if (split[0].equals("intereses_moratorios")) {
-                                intereses_mor = split[1];
-                            }
-                            linea = br.readLine();
+
+                            String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
+                            String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
+                            interes_mora_total = intereses_moritas;
+                            interes_mora_parcial = interes_mora_total;
+                            cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
+                            saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
+                            cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
+
+
+                            valor_presentar_s = "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas;
+                            presentar_et_esperar = valor_presentar_s;
+                            et_ID.setText("");
+                            et_ID.setFocusableInTouchMode(false);
+                            et_ID.setClickable(false);
+                            et_ID.setEnabled(true);
+                            et_ID.setVisibility(View.VISIBLE);
+                            et_ID.setText(valor_presentar_s);
+                            et_ID.setEnabled(false);
+                            tv_esperar.setEnabled(true);
+                            tv_esperar.setText("");
+                            tv_esperar.setVisibility(View.VISIBLE);
+                            tv_esperar.setText("Prestamo a consultar:");
+                            consultar(null);
+                        } catch (IOException e) {
+                        } catch (ParseException e) {
+                            e.printStackTrace();
                         }
 
-                        br.close();
-                        archivo.close();
-
-                        String[] piezas = plazoz.split("_");
-                        if (piezas[1].equals("quincenas")) {
-                            factor_semanas = 2;
-                        } else if (piezas[1].equals("semanas")) {
-                            factor_semanas = 1;
-                        } else {
-                            factor_semanas = -1;
-                            //ERROR
-                        }
-
-                        String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
-                        String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
-                        interes_mora_total = intereses_moritas;
-                        interes_mora_parcial = interes_mora_total;
-                        cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
-                        saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
-                        cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
-
-
-                        valor_presentar_s = "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas;
-                        presentar_et_esperar = valor_presentar_s;
-                        et_ID.setText("");
-                        et_ID.setFocusableInTouchMode(false);
-                        et_ID.setClickable(false);
-                        et_ID.setEnabled(true);
-                        et_ID.setVisibility(View.VISIBLE);
-                        et_ID.setText(valor_presentar_s);
-                        et_ID.setEnabled(false);
-                        tv_esperar.setEnabled(true);
-                        tv_esperar.setText("");
-                        tv_esperar.setVisibility(View.VISIBLE);
-                        tv_esperar.setText("Prestamo a consultar:");
-                        consultar(null);
-                    } catch (IOException e) {
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                        break;
+                    } else {
+                        //Continue with the execution.
                     }
-
-                    break;
-                } else {
-                    //Continue with the execution.
                 }
             }
         } else {
@@ -1248,98 +1273,103 @@ public class CuadraturaActivity extends AppCompatActivity {
             } else {
                 file_to_consult = cliente_ID + "_P_" + num_credit + "_P_";
             }
-            for (int i = 0; i < archivos.length; i++) {
-                Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
-                Matcher matcher = pattern.matcher(archivos[i]);
-                boolean matchFound = matcher.find();
-                if (matchFound) {
-                    //TODO: Abrir archivo y leerlo.
-                    try {
-                        String fecha_next_abono = "";
-                        String intereses_mor = "";
-                        String saldo_mas_intereses_s = "";
-                        String plazoz = "";
-                        String numero_de_credito = "";
-                        String cuotas_morosas = "";
-                        String cuadratura_pre = "";
-                        int factor_semanas = 0;
-                        String file_name = archivos[i];
-                        String[] split_indice = file_name.split("_P_");
-                        numero_de_credito = split_indice[1];
-                        InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
-                        BufferedReader br = new BufferedReader(archivo);
-                        String linea = br.readLine();
-                        while (linea != null) {
-                            Log.v("Presentar_info_cli_MORE", ".\n\nlinea:\n\n" + linea + "\n\n.");
-                            String[] split = linea.split("_separador_");
-                            if (split[0].equals("proximo_abono")) {
-                                fecha_next_abono = split[1];
+            if (file_to_consult.contains("*") || file_to_consult.contains(" ")) {
+                Log.v("text_listener0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+                //Do nothing.
+            } else {
+                for (int i = 0; i < archivos.length; i++) {
+                    Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(archivos[i]);
+                    boolean matchFound = matcher.find();
+                    if (matchFound) {
+                        //TODO: Abrir archivo y leerlo.
+                        try {
+                            String fecha_next_abono = "";
+                            String intereses_mor = "";
+                            String saldo_mas_intereses_s = "";
+                            String plazoz = "";
+                            String numero_de_credito = "";
+                            String cuotas_morosas = "";
+                            String cuadratura_pre = "";
+                            int factor_semanas = 0;
+                            String file_name = archivos[i];
+                            String[] split_indice = file_name.split("_P_");
+                            numero_de_credito = split_indice[1];
+                            InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                            BufferedReader br = new BufferedReader(archivo);
+                            String linea = br.readLine();
+                            while (linea != null) {
+                                Log.v("Presentar_info_cli_MORE", ".\n\nlinea:\n\n" + linea + "\n\n.");
+                                String[] split = linea.split("_separador_");
+                                if (split[0].equals("proximo_abono")) {
+                                    fecha_next_abono = split[1];
+                                }
+                                if (split[0].equals("plazo")) {
+                                    plazoz = split[1];
+                                }
+                                if (split[0].equals("saldo_mas_intereses")) {
+                                    saldo_mas_intereses_s = split[1];
+                                }
+                                if (split[0].equals("cuotas")) {
+                                    cuotas_morosas = split[1];
+                                }
+                                if (split[0].equals("cuadratura")) {
+                                    cuadratura_pre = split[1];
+                                }
+                                if (split[0].equals("intereses_moratorios")) {
+                                    intereses_mor = split[1];
+                                }
+                                linea = br.readLine();
                             }
-                            if (split[0].equals("plazo")) {
-                                plazoz = split[1];
+                            br.close();
+                            archivo.close();
+
+                            //TODO: calcular intereses moratorios aqui!!!
+
+                            String[] piezas = plazoz.split("_");
+                            if (piezas[1].equals("quincenas")) {
+                                factor_semanas = 2;
+                            } else if (piezas[1].equals("semanas")) {
+                                factor_semanas = 1;
+                            } else {
+                                factor_semanas = -1;
+                                //ERROR
                             }
-                            if (split[0].equals("saldo_mas_intereses")) {
-                                saldo_mas_intereses_s = split[1];
-                            }
-                            if (split[0].equals("cuotas")) {
-                                cuotas_morosas = split[1];
-                            }
-                            if (split[0].equals("cuadratura")) {
-                                cuadratura_pre = split[1];
-                            }
-                            if (split[0].equals("intereses_moratorios")) {
-                                intereses_mor = split[1];
-                            }
-                            linea = br.readLine();
+
+                            String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
+                            String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
+                            interes_mora_total = intereses_moritas;
+                            cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
+                            saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
+                            cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
+
+
+                            valor_presentar_s = "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas;
+                            presentar_et_esperar = valor_presentar_s;
+                            et_ID.setText("");
+                            et_ID.setFocusableInTouchMode(false);
+                            et_ID.setClickable(false);
+                            et_ID.setEnabled(true);
+                            et_ID.setVisibility(View.VISIBLE);
+                            et_ID.setText(valor_presentar_s);
+                            et_ID.setEnabled(false);
+                            tv_esperar.setEnabled(true);
+                            tv_esperar.setText("");
+                            tv_esperar.setVisibility(View.VISIBLE);
+                            tv_esperar.setText("Prestamo a consultar:");
+                            consultar(null);
+                            //bt_consultar.setEnabled(true);
+                            //bt_consultar.setVisibility(View.VISIBLE);
+                            //bt_consultar.setClickable(true);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
                         }
-                        br.close();
-                        archivo.close();
-
-                        //TODO: calcular intereses moratorios aqui!!!
-
-                        String[] piezas = plazoz.split("_");
-                        if (piezas[1].equals("quincenas")) {
-                            factor_semanas = 2;
-                        } else if (piezas[1].equals("semanas")) {
-                            factor_semanas = 1;
-                        } else {
-                            factor_semanas = -1;
-                            //ERROR
-                        }
-
-                        String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
-                        String intereses_moritas = obtener_intereses_moratorios(saldo_plus_s, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
-                        interes_mora_total = intereses_moritas;
-                        cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0);
-                        saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mor);
-                        cuotas_morosas = obtener_cuotas_morosas(cuotas_morosas, plazoz, fecha_next_abono);
-
-
-                        valor_presentar_s = "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas;
-                        presentar_et_esperar = valor_presentar_s;
-                        et_ID.setText("");
-                        et_ID.setFocusableInTouchMode(false);
-                        et_ID.setClickable(false);
-                        et_ID.setEnabled(true);
-                        et_ID.setVisibility(View.VISIBLE);
-                        et_ID.setText(valor_presentar_s);
-                        et_ID.setEnabled(false);
-                        tv_esperar.setEnabled(true);
-                        tv_esperar.setText("");
-                        tv_esperar.setVisibility(View.VISIBLE);
-                        tv_esperar.setText("Prestamo a consultar:");
-                        consultar(null);
-                        //bt_consultar.setEnabled(true);
-                        //bt_consultar.setVisibility(View.VISIBLE);
-                        //bt_consultar.setClickable(true);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
                     }
                 }
             }
@@ -1553,15 +1583,20 @@ public class CuadraturaActivity extends AppCompatActivity {
                     et_ID.setFocusableInTouchMode(true);
                     et_ID.requestFocus();
                     String archivos[] = fileList();
-                    for (int i = 0; i < archivos.length; i++) {
-                        Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(archivos[i]);
-                        Log.v("text_listener_identifi", ".\n\narchivos[" + i + "]: " + archivos[i] + "\n\n.");
-                        boolean matchFound = matcher.find();
-                        if (matchFound) {
-                            if (s.length() >= 9) {
-                                bt_consultar.setEnabled(true);
-                                bt_consultar.setClickable(true);
+                    if (et_ID.getText().toString().contains("*") || et_ID.getText().toString().contains(" ")) {
+                        Log.v("text_listener0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+                        //Do nothing.
+                    } else {
+                        for (int i = 0; i < archivos.length; i++) {
+                            Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
+                            Matcher matcher = pattern.matcher(archivos[i]);
+                            Log.v("text_listener_identifi", ".\n\narchivos[" + i + "]: " + archivos[i] + "\n\n.");
+                            boolean matchFound = matcher.find();
+                            if (matchFound) {
+                                if (s.length() >= 9) {
+                                    bt_consultar.setEnabled(true);
+                                    bt_consultar.setClickable(true);
+                                }
                             }
                         }
                     }

@@ -134,7 +134,7 @@ public class EditarActivity extends AppCompatActivity {
 
         String texto = "####!#### CUIDADO!!! ####!####\n\nEstimado usuario, se recomienda\nseguir los siguientes consejos:\n\n" +
                 "1. Recuerde que todo cambio que\ntenga que ver con las cuentas debe\nser aprobado por la banca.\n\n" +
-                "2. Debe estar seguro que el cambio\nque va a realizar sea necesario.\n\n" +
+                "2. Debe estar seguro que el cambio\nque va a realizar sea\nABSOLUTAMENTE necesario.\n\n" +
                 "3. Nunca debe utilizar esta funcion\ncon fines que atenten contra las\nfinanzas de la empresa.\n\n" +
                 "4. Se recomienda tomar nota manual\ndel cambio que aqui se va a realizar.\n\n" +
                 "5. NO DEJE ESPACIOS EN BLANCO!!!";
@@ -255,122 +255,241 @@ public class EditarActivity extends AppCompatActivity {
     public void confirmar (View view) throws IOException {
         String contenido = "";
         boolean flag = true;
-        try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput(archivo_cliente));
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
+        if (archivo_cliente.contains(" ") || archivo_cliente.contains("*")) {
+            flag = false;// Archivo corrompido.
+        } else {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput(archivo_cliente));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
 
-            while (linea != null) {
-                String[] split = linea.split("_separador_");
-                if (split[0].equals("ID_cliente")) {
-                    ID_cliente = et_ID_cliente.getText().toString();
-                    if (ID_cliente.equals("")) {
-                        flag = false;
-                        msg("Identificacion vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                while (linea != null) {
+                    String[] split = linea.split("_separador_");
+
+                    if (split[0].equals("ID_cliente")) {
+                        ID_cliente = et_ID_cliente.getText().toString();
+                        if (ID_cliente.equals("")) {
+                            flag = false;
+                            msg("Identificacion vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+                            ID_cliente.replace("\n", "");
+                            ID_cliente.replace(" ", "");
+                            if (ID_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en Identificacion del cliente.");
+                            } else {
+                                tv_ID_cliente.setEnabled(false);
+                                et_ID_cliente.setEnabled(false);
+                                msg("La identificacion del cliente no se puede cambiar!!!");
+                                //linea = linea.replace(split[1], ID_cliente);
+                            }
+                        }
+
+                    } else if (split[0].equals("nombre_cliente")) {
+                        nombre_cliente = et_nombre_cliente.getText().toString();
+                        if (nombre_cliente.equals("")) {
+                            flag = false;
+                            msg("Nombre vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+                            if (nombre_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en nombre del cliente.");
+                            } else {
+                                nombre_cliente.replace("\n", "");
+                                tv_nombre_cliente.setEnabled(false);
+                                et_nombre_cliente.setEnabled(false);
+                                linea = linea.replace(split[1], nombre_cliente);
+                            }
+                        }
+
+
+                    } else if (split[0].equals("apellido1_cliente")) {
+                        apellido1_cliente = et_apellido1_cliente.getText().toString();
+                        if (apellido1_cliente.equals("")) {
+                            flag = false;
+                            msg("Primer apellido vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+                            if (apellido1_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en apellido 1 del cliente.");
+                            } else {
+                                apellido1_cliente.replace("\n", "");
+                                tv_apellido1_cliente.setEnabled(false);
+                                et_apellido1_cliente.setEnabled(false);
+                                linea = linea.replace(split[1], apellido1_cliente);
+                            }
+                        }
+                    } else if (split[0].equals("apellido2_cliente")) {
+                        apellido2_cliente = et_apellido2_cliente.getText().toString();
+                        if (apellido2_cliente.equals("")) {
+                            flag = false;
+                            msg("Segundo apellido vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+                            if (apellido2_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en apellido 2 del cliente.");
+                            } else {
+                                apellido2_cliente.replace("\n", "");
+                                tv_apellido2_cliente.setEnabled(false);
+                                et_apellido2_cliente.setEnabled(false);
+                                linea = linea.replace(split[1], apellido2_cliente);
+                            }
+                        }
+                    } else if (split[0].equals("apodo_cliente")) {
+                        apodo_cliente = et_apodo_cliente.getText().toString();
+                        if (apodo_cliente.equals("")) {
+                            flag = false;
+                            msg("Apodo vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+                            if (apodo_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en apodo del cliente.");
+                            } else {
+                                apodo_cliente.replace("\n", "");
+                                tv_apodo_cliente.setEnabled(false);
+                                et_apodo_cliente.setEnabled(false);
+                                linea = linea.replace(split[1], apodo_cliente);
+                            }
+                        }
+                    } else if (split[0].equals("sexo_cliente")) {
+                        sexo_cliente = et_sexo_cliente.getText().toString();
+                        if (sexo_cliente.equals("")) {
+                            flag = false;
+                            msg("Sexo vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+                            if (sexo_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en sexo del cliente.");
+                            } else {
+                                sexo_cliente.replace("\n", "");
+                                tv_sexo_cliente.setEnabled(false);
+                                et_sexo_cliente.setEnabled(false);
+                                linea = linea.replace(split[1], sexo_cliente);
+                            }
+                        }
+                    } else if (split[0].equals("direccion_cliente")) {
+                        direccion_cliente = et_direccion_cliente.getText().toString();
+                        if (direccion_cliente.equals("")) {
+                            flag = false;
+                            msg("Direccion vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+                            if (direccion_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en apodo del cliente.");
+                            } else {
+                                direccion_cliente.replace("\n", "");
+                                tv_direccion_cliente.setEnabled(false);
+                                et_direccion_cliente.setEnabled(false);
+                                linea = linea.replace(split[1], direccion_cliente);
+                            }
+                        }
+                    } else if (split[0].equals("monto_disponible")) {
+                        monto_disponible = et_monto_disponible.getText().toString();
+                        if (monto_disponible.equals("")) {
+                            flag = false;
+                            msg("Monto disponible vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+
+                            if (monto_disponible.contains("\n")) {
+                                flag = false;
+                                msg("Error en monto disponible.");
+                            } else {
+                                boolean isNumeric = monto_disponible.matches("[+-]?\\d*(\\.\\d+)?");
+
+                                if (isNumeric) {
+
+                                    if (Integer.valueOf(monto_disponible) < 1000 | Long.valueOf(monto_disponible) > 30000000) {
+                                        flag = false;
+                                        msg("Monto disponible debe ser un numero valido!");
+                                    } else {
+                                        tv_monto_disponible.setEnabled(false);
+                                        et_monto_disponible.setEnabled(false);
+                                        linea = linea.replace(split[1], monto_disponible);
+                                    }
+
+                                } else {
+                                    flag = false;
+                                    msg("Monto disponible debe ser un numero!");
+                                }
+                            }
+
+                        }
+                    } else if (split[0].equals("telefono1_cliente")) {
+                        telefono1_cliente = et_telefono1_cliente.getText().toString();
+                        if (telefono1_cliente.equals("")) {
+                            flag = false;
+                            msg("Telefono 1 vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+                            if (telefono1_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en telefono 1 del cliente.");
+                            } else {
+                                tv_telefono1_cliente.setEnabled(false);
+                                et_telefono1_cliente.setEnabled(false);
+                                linea = linea.replace(split[1], telefono1_cliente);
+                            }
+                        }
+                    } else if (split[0].equals("telefono2_cliente")) {
+                        telefono2_cliente = et_telefono2_cliente.getText().toString();
+                        if (telefono2_cliente.equals("")) {
+                            flag = false;
+                            msg("Telefono 2 vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+                            if (telefono2_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en telefono 2 del cliente.");
+                            } else {
+                                tv_telefono2_cliente.setEnabled(false);
+                                et_telefono2_cliente.setEnabled(false);
+                                linea = linea.replace(split[1], telefono2_cliente);
+                            }
+                        }
+                    } else if (split[0].equals("puntuacion_cliente")) {
+
+                        puntuacion_cliente = et_puntuacion_cliente.getText().toString();
+                        puntuacion_cliente.replace("\n", "");
+                        puntuacion_cliente.replace(" ", "");
+                        if (puntuacion_cliente.equals("")) {
+                            flag = false;
+                            msg("Puntuacion vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                        } else {
+
+
+                            if (puntuacion_cliente.contains("\n")) {
+                                flag = false;
+                                msg("Error en puntuacion del cliente.");
+                            } else {
+                                boolean isNumeric = puntuacion_cliente.matches("[+-]?\\d*(\\.\\d+)?");
+
+                                if (isNumeric) {
+
+                                    if (Integer.valueOf(puntuacion_cliente) < 1 | Integer.valueOf(puntuacion_cliente) > 9) {
+                                        flag = false;
+                                        msg("Puntuacion debe ser un numero del 1 al 9.");
+                                    } else {
+                                        tv_puntuacion_cliente.setEnabled(false);
+                                        et_puntuacion_cliente.setEnabled(false);
+                                        linea = linea.replace(split[1], puntuacion_cliente);
+                                    }
+
+
+                                } else {
+                                    flag = false;
+                                    msg("Puntuacion debe ser un numero del 1 al 9.");
+                                }
+                            }
+                        }
+                    } else {
+                        //Do nothing. La linea se queda igual.
                     }
-                    tv_ID_cliente.setEnabled(false);
-                    et_ID_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], ID_cliente);
-                } else if (split[0].equals("nombre_cliente")) {
-                    nombre_cliente = et_nombre_cliente.getText().toString();
-                    if (nombre_cliente.equals("")) {
-                        flag = false;
-                        msg("Nombre vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_nombre_cliente.setEnabled(false);
-                    et_nombre_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], nombre_cliente);
-                } else if (split[0].equals("apellido1_cliente")) {
-                    apellido1_cliente = et_apellido1_cliente.getText().toString();
-                    if (apellido1_cliente.equals("")) {
-                        flag = false;
-                        msg("Primer apellido vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_apellido1_cliente.setEnabled(false);
-                    et_apellido1_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], apellido1_cliente);
-                } else if (split[0].equals("apellido2_cliente")) {
-                    apellido2_cliente = et_apellido2_cliente.getText().toString();
-                    if (apellido2_cliente.equals("")) {
-                        flag = false;
-                        msg("Segundo apellido vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_apellido2_cliente.setEnabled(false);
-                    et_apellido2_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], apellido2_cliente);
-                } else if (split[0].equals("apodo_cliente")) {
-                    apodo_cliente = et_apodo_cliente.getText().toString();
-                    if (apodo_cliente.equals("")) {
-                        flag = false;
-                        msg("Apodo vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_apodo_cliente.setEnabled(false);
-                    et_apodo_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], apodo_cliente);
-                } else if (split[0].equals("sexo_cliente")) {
-                    sexo_cliente = et_sexo_cliente.getText().toString();
-                    if (sexo_cliente.equals("")) {
-                        flag = false;
-                        msg("Sexo vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_sexo_cliente.setEnabled(false);
-                    et_sexo_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], sexo_cliente);
-                } else if (split[0].equals("direccion_cliente")) {
-                    direccion_cliente = et_direccion_cliente.getText().toString();
-                    if (direccion_cliente.equals("")) {
-                        flag = false;
-                        msg("Direccion vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_direccion_cliente.setEnabled(false);
-                    et_direccion_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], direccion_cliente);
-                } else if (split[0].equals("monto_disponible")) {
-                    monto_disponible = et_monto_disponible.getText().toString();
-                    if (monto_disponible.equals("")) {
-                        flag = false;
-                        msg("Monto disponible vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_monto_disponible.setEnabled(false);
-                    et_monto_disponible.setEnabled(false);
-                    linea = linea.replace(split[1], monto_disponible);
-                } else if (split[0].equals("telefono1_cliente")) {
-                    telefono1_cliente = et_telefono1_cliente.getText().toString();
-                    if (telefono1_cliente.equals("")) {
-                        flag = false;
-                        msg("Telefono 1 vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_telefono1_cliente.setEnabled(false);
-                    et_telefono1_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], telefono1_cliente);
-                } else if (split[0].equals("telefono2_cliente")) {
-                    telefono2_cliente = et_telefono2_cliente.getText().toString();
-                    if (telefono2_cliente.equals("")) {
-                        flag = false;
-                        msg("Telefono 2 vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_telefono2_cliente.setEnabled(false);
-                    et_telefono2_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], telefono2_cliente);
-                } else if (split[0].equals("puntuacion_cliente")) {
-                    puntuacion_cliente = et_telefono2_cliente.getText().toString();
-                    if (puntuacion_cliente.equals("")) {
-                        flag = false;
-                        msg("Puntuacion vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
-                    }
-                    tv_puntuacion_cliente.setEnabled(false);
-                    et_puntuacion_cliente.setEnabled(false);
-                    linea = linea.replace(split[1], puntuacion_cliente);
-                } else {
-                    //Do nothing. La linea se queda igual.
+                    contenido = contenido + linea + "\n";
+                    linea = br.readLine();
                 }
-                contenido = contenido + linea + "\n";
-                linea = br.readLine();
+                //archivoCompleto = archivoCompleto + linea + "\n";
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
             }
-            //archivoCompleto = archivoCompleto + linea + "\n";
-            br.close();
-            archivo.close();
-        } catch (IOException e) {
         }
         if (flag) {
             borrar_archivo(archivo_cliente);
@@ -379,6 +498,7 @@ public class EditarActivity extends AppCompatActivity {
             Toast.makeText(this, "Archivo del cliente se ha\nmodificado correctamente!!!", Toast.LENGTH_LONG).show();
             mostrar_todo();
         } else {
+            Toast.makeText(this, "ARCHIVO CORROMPIDO!\nNo se realizo ninguna accion!", Toast.LENGTH_LONG).show();
             mostrar_todo();
         }
 

@@ -247,50 +247,55 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             } else {
                 file_to_consult = et_ID.getText().toString() + "_C_";
             }
-            for (int i = 0; i < archivos.length; i++) {
-                Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
-                Matcher matcher = pattern.matcher(archivos[i]);
-                boolean matchFound = matcher.find();
-                if (matchFound) {
-                    //TODO: Abrir archivo y leerlo.
-                    try {
-                        InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
-                        BufferedReader br = new BufferedReader(archivo);
-                        String linea = br.readLine();
-                        while (linea != null) {
-                            Log.v("Digite_cedula", ".\n\nlinea:\n\n" + linea + "\n\n.");
-                            String[] split = linea.split("_separador_");
-                            if (split[0].equals("puntuacion_cliente")) {
-                                puntuacion_cliente = split[1];
+            if (file_to_consult.contains("*") || file_to_consult.contains(" ")) {
+                Log.v("llenar_spinner0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+                //Do nothing.
+            } else {
+                for (int i = 0; i < archivos.length; i++) {
+                    Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(archivos[i]);
+                    boolean matchFound = matcher.find();
+                    if (matchFound) {
+                        //TODO: Abrir archivo y leerlo.
+                        try {
+                            InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                            BufferedReader br = new BufferedReader(archivo);
+                            String linea = br.readLine();
+                            while (linea != null) {
+                                Log.v("Digite_cedula", ".\n\nlinea:\n\n" + linea + "\n\n.");
+                                String[] split = linea.split("_separador_");
+                                if (split[0].equals("puntuacion_cliente")) {
+                                    puntuacion_cliente = split[1];
+                                }
+                                if (split[0].equals("ID_cliente")) {
+                                    cliente_ID = split[1];
+                                }
+                                if (split[0].equals("monto_disponible")) {
+                                    monto_disponible = split[1];
+                                }
+                                if (split[0].equals("nombre_cliente")) {
+                                    nombre_cliente = split[1];
+                                }
+                                if (split[0].equals("apellido1_cliente")) {
+                                    apellido_cliente = split[1];
+                                }
+                                if (split[0].equals("interes_mora")) {
+                                    interes_mora = split[1];
+                                }
+                                linea = linea.replace("_separador_", ": ");
+                                linea = linea.replace("_cliente", "");
+                                linea = linea.replace("_", " ");
+                                archivoCompleto = archivoCompleto + linea + "\n";
+                                linea = br.readLine();
                             }
-                            if (split[0].equals("ID_cliente")) {
-                                cliente_ID = split[1];
-                            }
-                            if (split[0].equals("monto_disponible")) {
-                                monto_disponible = split[1];
-                            }
-                            if (split[0].equals("nombre_cliente")) {
-                                nombre_cliente = split[1];
-                            }
-                            if (split[0].equals("apellido1_cliente")) {
-                                apellido_cliente = split[1];
-                            }
-                            if (split[0].equals("interes_mora")) {
-                                interes_mora = split[1];
-                            }
-                            linea = linea.replace("_separador_", ": ");
-                            linea = linea.replace("_cliente", "");
-                            linea = linea.replace("_", " ");
-                            archivoCompleto = archivoCompleto + linea + "\n";
-                            linea = br.readLine();
+                            br.close();
+                            archivo.close();
+                        } catch (IOException e) {
                         }
-                        br.close();
-                        archivo.close();
-                    } catch (IOException e) {
+                        break;
+                    } else {
+                        //Continue with the execution.
                     }
-                    break;
-                } else {
-                    //Continue with the execution.
                 }
             }
             if (archivoCompleto.equals("")) {
@@ -631,12 +636,17 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         String cliente_file = cliente_ID + "_C_.txt";
         String lista_archivos = "";
         String archivos[] = fileList();
-        for (int i = 0; i < archivos.length; i++) {
-            Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(archivos[i]);
-            boolean matchFound = matcher.find();
-            if (matchFound) {
-                lista_archivos = lista_archivos + archivos[i] + "_sep_";
+        if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
+            Log.v("llenar_spinner0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+            //Do nothing.
+        } else {
+            for (int i = 0; i < archivos.length; i++) {
+                Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(archivos[i]);
+                boolean matchFound = matcher.find();
+                if (matchFound) {
+                    lista_archivos = lista_archivos + archivos[i] + "_sep_";
+                }
             }
         }
         int end_id = 0;
@@ -756,15 +766,20 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                     //bt_consultar.setClickable(false);
                     //bt_consultar.setEnabled(false);
                     String archivos[] = fileList();
-                    for (int i = 0; i < archivos.length; i++) {
-                        Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(archivos[i]);
-                        Log.v("text_listener_identifi", ".\n\narchivos[" + i + "]: " + archivos[i] + "\n\n.");
-                        boolean matchFound = matcher.find();
-                        if (matchFound) {
-                            if (s.length() >= 9) {
-                                bt_consultar.setEnabled(true);
-                                bt_consultar.setClickable(true);
+                    if (et_ID.getText().toString().contains("*") || et_ID.getText().toString().contains(" ")) {
+                        Log.v("llenar_spinner0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+                        //Do nothing.
+                    } else {
+                        for (int i = 0; i < archivos.length; i++) {
+                            Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
+                            Matcher matcher = pattern.matcher(archivos[i]);
+                            Log.v("text_listener_identifi", ".\n\narchivos[" + i + "]: " + archivos[i] + "\n\n.");
+                            boolean matchFound = matcher.find();
+                            if (matchFound) {
+                                if (s.length() >= 9) {
+                                    bt_consultar.setEnabled(true);
+                                    bt_consultar.setClickable(true);
+                                }
                             }
                         }
                     }

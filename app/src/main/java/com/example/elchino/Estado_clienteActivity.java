@@ -222,17 +222,22 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                     sp_opciones.setVisibility(View.INVISIBLE);
                     String archivos[] = fileList();
                     boolean crear_lot = true;
-                    for (int i = 0; i < archivos.length; i++) {
-                        Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(archivos[i]);
-                        boolean matchFound = matcher.find();
-                        if (matchFound) {
-                            if (s.length() >= 9) {
-                                bt_consultar.setEnabled(true);
-                                bt_consultar.setClickable(true);
+                    if (et_ID.getText().toString().contains("*") || et_ID.getText().toString().contains(" ")) {
+                        Log.v("TextListener0.1", "Estado_cliente.\n\nClienteID: " + cliente_ID + "\n\n");
+                        //Do nothing.
+                    } else {
+                        for (int i = 0; i < archivos.length; i++) {
+                            Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
+                            Matcher matcher = pattern.matcher(archivos[i]);
+                            boolean matchFound = matcher.find();
+                            if (matchFound) {
+                                if (s.length() >= 9) {
+                                    bt_consultar.setEnabled(true);
+                                    bt_consultar.setClickable(true);
 
-                                //String texto = et_ID.getText().toString();
-                                //et_ID.setBackgroundResource(R.drawable.);
+                                    //String texto = et_ID.getText().toString();
+                                    //et_ID.setBackgroundResource(R.drawable.);
+                                }
                             }
                         }
                     }
@@ -242,56 +247,76 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
 
                     String parametro = "";
                     String archivos[] = fileList();
-                    for (int i = 0; i < archivos.length; i++) {
-                        Pattern pattern = Pattern.compile("_", Pattern.CASE_INSENSITIVE);
-                        Matcher matcher = pattern.matcher(archivos[i]);
-                        boolean matchFound = true;
-                        if (matchFound) {
-                            //TODO: Abrir archivo y leerlo.
-                            try {
-                                InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
-                                BufferedReader br = new BufferedReader(archivo);
-                                String linea = br.readLine();
-                                boolean param_encontrado = false;
-                                while (linea != null) {
+                    if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
+                        Log.v("Consultarxxx", "Estado_cliente.\n\nClienteID: " + cliente_ID + "\n\n");
+                        //Do nothing.
+                    } else {
+                        for (int i = 0; i < archivos.length; i++) {
+                            if (archivos[i].contains(" ") || archivos[i].contains("*")) {
+                                // Do nothing. Es un archivo con error.
+                            } else {
+                                String cliente_ID_s = "";
+                                Pattern pattern = Pattern.compile("_", Pattern.CASE_INSENSITIVE);
+                                Matcher matcher = pattern.matcher(archivos[i]);
+                                boolean matchFound = true;
+                                if (matchFound) {
+                                    //TODO: Abrir archivo y leerlo.
+                                    try {
+                                        InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                                        BufferedReader br = new BufferedReader(archivo);
+                                        String linea = br.readLine();
 
-                                    String[] split = linea.split("_separador_");
-                                    //Log.v("no_cedula", "Estado_cliente.\n\nLinea:\n\n" + linea + "\n\n.");
-                                    if (split[0].equals(buscar_por)) {
-                                        if (split[1].contains(s)) {
-                                            param_encontrado = true;
-                                            Log.v("param_encontrado", "Estado_cliente.\n\nParam: " + split[0] + "\n\nContenido del parametro: " + split[1] + "\n\n.");
+                                        boolean param_encontrado = false;
+                                        while (linea != null) {
+
+                                            if (linea.contains("_separador_")) {
+                                                String[] split = linea.split("_separador_");
+                                                //Log.v("no_cedula", "Estado_cliente.\n\nLinea:\n\n" + linea + "\n\n.");
+                                                if (split[0].equals(buscar_por)) {
+                                                    if (split[1].contains(s)) {
+                                                        param_encontrado = true;
+                                                        Log.v("param_encontrado", "Estado_cliente.\n\nParam: " + split[0] + "\n\nContenido del parametro: " + split[1] + "\n\n.");
+                                                    }
+                                                }
+
+                                                if (split[0].equals("nombre_cliente")) {
+                                                    nombre_cliente = split[1];
+                                                } else if (split[0].equals("apellido1_cliente")) {
+                                                    apellido1_cliente = split[1];
+                                                } else if (split[0].equals("apellido2_cliente")) {
+                                                    apellido2_cliente = split[1];
+                                                } else if (split[0].equals("ID_cliente")) {
+                                                    cliente_ID_s = split[1];
+                                                    if (cliente_ID_s.contains(" ") || cliente_ID_s.contains("*")) {
+                                                        param_encontrado = false;
+                                                    }
+                                                } else if (split[0].equals("apodo_cliente")) {
+                                                    apodo_cliente = split[1];
+                                                } else {
+                                                    //Do nothing. Continue...
+                                                }
+                                            } else {
+                                                //Do nothing. No es un archivo relevante en este metodo.
+                                            }
+                                            linea = br.readLine();
                                         }
+
+                                        if (param_encontrado) {
+                                            Log.v("param_encontrado0", "Estrado_cliente.\n\nNombre cliente: " + nombre_cliente + "\n\napellido1 cliente: " + apellido1_cliente +
+                                                    "\n\napellido2 cliente: " + apellido2_cliente + "\n\nApodo cliente: " + apodo_cliente + "\n\n.");
+                                            parametro = parametro + nombre_cliente + "_sep_" + apellido1_cliente + "_sep_" + apellido2_cliente + "_sep_(" + apodo_cliente + ")" + "_sep_" + archivos[i] + "_sep_" + "_sop_";
+                                            Log.v("param_encontrado1", "Estado_cliente.\n\nparametro:\n\n" + parametro + "\n\n.");
+                                            //param_encontrado = false;
+                                        }
+
+                                        br.close();
+                                        archivo.close();
+                                    } catch (IOException e) {
                                     }
-
-                                    if (split[0].equals("nombre_cliente")){
-                                        nombre_cliente = split[1];
-                                    } else if (split[0].equals("apellido1_cliente")){
-                                        apellido1_cliente = split[1];
-                                    } else if (split[0].equals("apellido2_cliente")){
-                                        apellido2_cliente = split[1];
-                                    } else if (split[0].equals("apodo_cliente")){
-                                        apodo_cliente = split[1];
-                                    } else {
-                                        //Do nothing. Continue...
-                                    }
-                                    linea = br.readLine();
+                                } else {
+                                    //Continue with the execution.
                                 }
-
-                                if (param_encontrado) {
-                                    Log.v("param_encontrado0", "Estrado_cliente.\n\nNombre cliente: " + nombre_cliente + "\n\napellido1 cliente: " + apellido1_cliente +
-                                            "\n\napellido2 cliente: " + apellido2_cliente + "\n\nApodo cliente: " + apodo_cliente + "\n\n.");
-                                    parametro = parametro + nombre_cliente + "_sep_" + apellido1_cliente + "_sep_" + apellido2_cliente + "_sep_(" + apodo_cliente + ")" + "_sep_" + archivos[i] + "_sep_"  + "_sop_";
-                                    Log.v("param_encontrado1", "Estado_cliente.\n\nparametro:\n\n" + parametro + "\n\n.");
-                                    //param_encontrado = false;
-                                }
-
-                                br.close();
-                                archivo.close();
-                            } catch (IOException e) {
                             }
-                        } else {
-                            //Continue with the execution.
                         }
                     }
 
@@ -381,54 +406,59 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
             //bt_consultar.setVisibility(View.INVISIBLE);
         }
         Log.v("consultar0", "Estado_cliente.\n\nCliente ID: " + cliente_ID + "\n\n");
-        for (int i = 0; i < archivos.length; i++) {
-            Pattern pattern = Pattern.compile(consultador, Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(archivos[i]);
-            boolean matchFound = matcher.find();
-            if (matchFound) {
-                //TODO: Abrir archivo y leerlo.
-                try {
-                    InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
-                    BufferedReader br = new BufferedReader(archivo);
-                    String linea = br.readLine();
-                    while (linea != null) {
-                        String[] split = linea.split("_separador_");
-                        if (split[0].equals("puntuacion_cliente")) {
-                            Log.v("consultar1", "Estado_cliente.\n\nPuntuacion cliente: " + split[1] + "\n\n");
-                            puntuacion_cliente = split[1];
-                        } else if (split[0].equals("ID_cliente")) {
-                            if (cliente_ID.equals(split[1])) {
-                                flag = true;
-                                //break;
+        if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
+            Log.v("Consultar0.1", "Estado_cliente.\n\nClienteID: " + cliente_ID + "\n\n");
+            //Do nothing.
+        } else {
+            for (int i = 0; i < archivos.length; i++) {
+                Pattern pattern = Pattern.compile(consultador, Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(archivos[i]);
+                boolean matchFound = matcher.find();
+                if (matchFound) {
+                    //TODO: Abrir archivo y leerlo.
+                    try {
+                        InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                        BufferedReader br = new BufferedReader(archivo);
+                        String linea = br.readLine();
+                        while (linea != null) {
+                            String[] split = linea.split("_separador_");
+                            if (split[0].equals("puntuacion_cliente")) {
+                                Log.v("consultar1", "Estado_cliente.\n\nPuntuacion cliente: " + split[1] + "\n\n");
+                                puntuacion_cliente = split[1];
+                            } else if (split[0].equals("ID_cliente")) {
+                                if (cliente_ID.equals(split[1])) {
+                                    flag = true;
+                                    //break;
+                                }
+                            } else {
+                                //Do nothing.
                             }
-                        } else {
-                            //Do nothing.
+                            linea = linea.replace("_separador_", ": ");
+                            linea = linea.replace("_cliente", "");
+                            linea = linea.replace("_", " ");
+                            archivoCompleto = archivoCompleto + linea + "\n";
+                            linea = br.readLine();
                         }
-                        linea = linea.replace("_separador_", ": ");
-                        linea = linea.replace("_cliente", "");
-                        linea = linea.replace("_", " ");
-                        archivoCompleto = archivoCompleto + linea + "\n";
-                        linea = br.readLine();
+                        br.close();
+                        archivo.close();
+                    } catch (IOException e) {
                     }
-                    br.close();
-                    archivo.close();
-                } catch (IOException e) {
+                    //break;
+                } else {
+                    //Continue with the execution.
                 }
-                //break;
-            } else {
-                //Continue with the execution.
-            }
-            if (archivoCompleto.equals("")) {
-                //No se encontro el cliente
-                //Toast.makeText(this, "Cliente no encontrado", Toast.LENGTH_SHORT).show();
-                //continue
-            } else {
-                //Toast.makeText(this, "Cliente encontrado", Toast.LENGTH_SHORT).show();
-                //bt_consultar.setVisibility(View.INVISIBLE);
-                //sp_opciones.setVisibility(View.INVISIBLE);
-                Log.v("consultar2", "Estado_cliente.\n\narchivoCompleto:\n\n" + archivoCompleto + "\n\n.");
-                presentar_cliente(archivoCompleto, puntuacion_cliente);
-                break;
+                if (archivoCompleto.equals("")) {
+                    //No se encontro el cliente
+                    //Toast.makeText(this, "Cliente no encontrado", Toast.LENGTH_SHORT).show();
+                    //continue
+                } else {
+                    //Toast.makeText(this, "Cliente encontrado", Toast.LENGTH_SHORT).show();
+                    //bt_consultar.setVisibility(View.INVISIBLE);
+                    //sp_opciones.setVisibility(View.INVISIBLE);
+                    Log.v("consultar2", "Estado_cliente.\n\narchivoCompleto:\n\n" + archivoCompleto + "\n\n.");
+                    presentar_cliente(archivoCompleto, puntuacion_cliente);
+                    break;
+                }
             }
         }
 
@@ -500,13 +530,18 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         cuadra_tura.putExtra("cuadratura", "");
         cuadra_tura.putExtra("cliente_recivido", cliente_ID);
         Log.v("estado_cuenta0", "Estado_cliente.\n\nCliente recibido: " + cliente_ID + "\n\n.");
+        //msg("Estado_cliente.\n\nCliente recibido: " + cliente_ID + "\n\n.");
         cuadra_tura.putExtra("cambio", "0");
         cuadra_tura.putExtra("monto_creditito", "0");
         cuadra_tura.putExtra("activity_devolver", "Estado_cliente");
-        //cuadra_tura.putExtra("mensaje_imprimir_pre", ""); //Para que sea: null.
+        cuadra_tura.putExtra("mensaje_imprimir_pre", ""); //Para que sea: null.
         startActivity(cuadra_tura);
         finish();
         System.exit(0);
+    }
+
+    private void msg (String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     public void abonar(View view) {

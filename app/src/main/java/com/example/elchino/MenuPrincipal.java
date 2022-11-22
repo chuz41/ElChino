@@ -123,7 +123,7 @@ public class MenuPrincipal extends AppCompatActivity {
         tv_fecha.setText(fecha + "/" + mes + "/" + anio);
         tv_saludo.setText("Menu principal");
         mensaje_recibido = getIntent().getStringExtra( "mensaje");
-        if (mensaje_recibido.equals(null) | (mensaje_recibido == "")) {
+        if (mensaje_recibido.equals(null) || (mensaje_recibido == "")) {
             //Do nothing.
         } else {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
