@@ -60,6 +60,7 @@ import java.util.regex.Pattern;
 public class CuadraturaActivity extends AppCompatActivity {
 
     private Integer monto_abono = 0;
+    private String abonar = "";
     private String imprimir_intermedio = "";
     private Button bt_imprimir;
     private Integer monto_cuota = 0;
@@ -135,6 +136,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cuadratura);
         String mensaje_recibido = getIntent().getStringExtra( "msg");
+        abonar = getIntent().getStringExtra("abonar");
         cuadratura = getIntent().getStringExtra( "cuadratura");
         nombre_cliente = getIntent().getStringExtra("nombre_cliente");
         cambio = getIntent().getStringExtra("cambio");
@@ -249,7 +251,14 @@ public class CuadraturaActivity extends AppCompatActivity {
         } else {
             morosidad = "M";
             //Algoritmo que calcula las cuotas pendientes.
-            double cantidad_de_cuotas_pendientes = (dias_atrasados / (7 * factor));
+            int sumar_o_no = 0;
+            int modulo = dias_atrasados % (7 * factor);
+            Log.v("Obteniend_cuotas_moros0", "cuadraturac.\n\nModulo: " + modulo + "\n\nDias atrasados: " + dias_atrasados + "\n\n.");
+            if (modulo > 0) {
+                sumar_o_no = 1;
+            }
+            double cantidad_de_cuotas_pendientes = (dias_atrasados / (7 * factor)) + sumar_o_no;//TODO: Revisar correccion de sumar 1.
+            Log.v("Obteniend_cuotas_moros1", "Cuadratura.\n\nCantidad de cuotas morosas: " + cantidad_de_cuotas_pendientes + "\n\n.");
             if (cantidad_de_cuotas_pendientes <= 1) {
                 puntuacion_cliente = String.valueOf(Integer.parseInt(puntuacion_cliente) - 1);
                 flag = "1";
@@ -264,9 +273,13 @@ public class CuadraturaActivity extends AppCompatActivity {
                 }
             }
         }
-        Log.v("Obteniend_cuotas_moros", ".\n\nflag: " + flag + "\n\n.");
-        cantidad_cuotas_pendientes = Integer.parseInt(flag);
-        return flag;
+        double flag_pre_pre = Double.parseDouble(flag);
+        int flag_pre = (int) flag_pre_pre;
+        Log.v("Obteniend_cuotas_moros", ".\n\nflag: " + flag_pre + "\n\n.");
+        cantidad_cuotas_pendientes = flag_pre;
+        //int flag_pre = (int) cantidad_cuotas_pendientes;
+        Log.v("Obteniend_cuotas_moro1", "Cuadratura.\n\nCantidad de cuotas morosas: " + flag_pre + "\n\n.");
+        return String.valueOf(flag_pre);
     }
     
     private void llenar_spinner () {
@@ -718,6 +731,7 @@ public class CuadraturaActivity extends AppCompatActivity {
                 if (split[0].equals("cuadratura")) {
                     cuadratura = split[1];
                 } else if (split[0].equals("proximo_abono")) {
+                    Log.v("Proc_ab_dos0.1", "proximo abono: " + split[1] + "\n\n");
                     proximo_abono = split[1];
                     fecha_next_abono = proximo_abono;
                 } else if (split[0].equals("plazo")) {
@@ -761,8 +775,9 @@ public class CuadraturaActivity extends AppCompatActivity {
                 Date fecha_next_abono_D = Calendar.getInstance().getTime();
                 String fecha_next_abono_S = DateUtilities.dateToString(fecha_next_abono_D);
                 String[] splittte = fecha_next_abono_S.split("-");
-                fecha_next_abono_S = splittte[2] + "/" + splittte[1] + "/" + splittte[0];
-                fecha_next_abono = fecha_next_abono_S;//Es la fecha de hoy.
+                //fecha_next_abono_S = splittte[2] + "/" + splittte[1] + "/" + splittte[0];
+                //fecha_next_abono = fecha_next_abono_S;//Es la fecha de hoy.
+                fecha_next_abono = proximo_abono;
                 Log.v("proc_ab_2", "Cuadratura.\n\nfecha_next_abono (Debe ser hoy): " + fecha_next_abono);
             } else {
                 fecha_next_abono = proximo_abono;
@@ -866,11 +881,14 @@ public class CuadraturaActivity extends AppCompatActivity {
         Date hoy_LD = Calendar.getInstance().getTime();
         for (int i = 0; i < largo_split; i++) {
             String[] split = split_1[i].split("_");//TODO: Si estan en cero o al dia, se debe pintar verde el boton, si es hoy el dia, pintar amarillo, si esta atrazado, pintar verde.
+            Log.v("presentar_cuadratura0", "Cuadratura.\n\nfecha cuadro: " + split[3] + "\n\n");
             String fecha_cuadrito = split[3];
             String[] split_fec = fecha_cuadrito.split("/");
             fecha_cuadrito = split_fec[2] + "-" + split_fec[1] + "-" + split_fec[0];
             Date fecha_cuadrito_LD = DateUtilities.stringToDate(fecha_cuadrito);
+            Log.v("presentar_cuadratura1", "Cuadratura.\n\nfecha_cuadro_D: " + fecha_cuadrito_LD.toString() + "\n\nfea_cuadrito: " + fecha_cuadrito + "\n\n");
             String diferencia_fechas = String.valueOf(DateUtilities.daysBetween(hoy_LD, fecha_cuadrito_LD));
+            Log.v("presentar_cuadratura2", "Cuadratura.\n\nhoy_LD:\n" + hoy_LD + "\n\nFecha cuadrito_LD:\n" + fecha_cuadrito_LD + "\n\nDiferencia en dias: "+ diferencia_fechas + "\n\n.");
             String info_boton = split[3] + "\n" + split[0] + " " + split[1] + "\n" + split[2];
             if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado.
                 if (Integer.parseInt(split[2]) == 0) {
@@ -918,7 +936,11 @@ public class CuadraturaActivity extends AppCompatActivity {
             }
         }
 
-        flag = flag + "\n******************************\n" + imprimir_intermedio + "\n******************************\n\n";
+        if (abonar != null) {
+            flag = "\n******************************\n";
+        } else {
+            flag = flag + "\n******************************\n" + imprimir_intermedio + "\n******************************\n\n";
+        }
 
         return flag;
     }
