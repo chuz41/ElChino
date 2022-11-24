@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         //abonar();
         //nuevo_credito();
         //estado_cliente();
-        menu_principal("Hola Chuz");
+        //menu_principal("Hola Chuz");
         //verificar_clientes();
         try {
             check_activation();

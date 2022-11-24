@@ -16,10 +16,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.elchino.Util.DateUtilities;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +36,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     private Button bt_prestar;
     private Button bt_represtar;
     private Button bt_abonar;
+    private String fecha_credito;
     private String cliente_ID = "";
     private Button bt_estado_cuenta;
     private boolean flag_consultar = false;
@@ -134,7 +138,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                         String seleccion = sp_opciones.getSelectedItem().toString();
 
 
-                        if (tv_esperar.getText().toString().equals("Ingrese el nombre del cliente") | tv_esperar.getText().toString().equals("Ingrese el apodo del cliente") | tv_esperar.getText().toString().equals("Ingrese el apellido del cliente")) {
+                        if (tv_esperar.getText().toString().equals("Ingrese el nombre del cliente") || tv_esperar.getText().toString().equals("Ingrese el dia de la semana") || tv_esperar.getText().toString().equals("Ingrese el apodo del cliente") || tv_esperar.getText().toString().equals("Ingrese el apellido del cliente")) {
                             for (String key : sp_helper.keySet()) {
                                 Log.v("Sp_listener0", "Estado_cliente.\n\nKey:\n\n" + key + "\n\nDato: " + sp_helper.get(key) + "\n\nseleccion: " + seleccion + "\n\n.");
                                 if (seleccion.equals(key)) {
@@ -161,7 +165,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     public void buscar_por_nombre (View view) {
 
         contador_de_opciones = contador_de_opciones + 1;
-        if (contador_de_opciones == 5) {
+        if (contador_de_opciones == 6) {
             contador_de_opciones = 1;
         }
 
@@ -187,6 +191,12 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
             et_ID.setHint("Apodo...");
             tv_esperar.setText("Ingrese el apodo del cliente");
             buscar_por = "apodo_cliente";
+            bt_consultar.setClickable(false);
+            bt_consultar.setEnabled(false);
+        } else if (contador_de_opciones == 5) {
+            et_ID.setHint("Dia de pago...");
+            tv_esperar.setText("Ingrese el dia de la semana");
+            buscar_por = "dia_semana";
             bt_consultar.setClickable(false);
             bt_consultar.setEnabled(false);
         }
@@ -256,7 +266,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                                 // Do nothing. Es un archivo con error.
                             } else {
                                 String cliente_ID_s = "";
-                                Pattern pattern = Pattern.compile("_", Pattern.CASE_INSENSITIVE);
+                                Pattern pattern = Pattern.compile("_C_", Pattern.CASE_INSENSITIVE);
                                 Matcher matcher = pattern.matcher(archivos[i]);
                                 boolean matchFound = true;
                                 if (matchFound) {
@@ -322,6 +332,176 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
 
                     llenar_spinner(parametro);
 
+                } else if (tv_esperar.getText().toString().equals("Ingrese el dia de la semana")) {
+                    //TODO
+
+                    String parametro = "";
+                    String archivos[] = fileList();
+                    String dia_encontrado = "";
+                    boolean param_encontrado = false;
+                    boolean param_encontrado2 = false;
+                    String cliente_ID_obtenido = "";
+                    if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
+                        Log.v("Consultarxxx1", "Estado_cliente.\n\nClienteID: " + cliente_ID + "\n\n");
+                        //Do nothing.
+                    } else {
+                        for (int i = 0; i < archivos.length; i++) {
+                            param_encontrado = false;
+                            param_encontrado2 = false;
+                            if (archivos[i].contains(" ") || archivos[i].contains("*")) {
+                                // Do nothing. Es un archivo con error.
+                            } else {
+                                String cliente_ID_s = "";
+                                Pattern pattern = Pattern.compile("_P_", Pattern.CASE_INSENSITIVE);
+                                Matcher matcher = pattern.matcher(archivos[i]);
+
+                                boolean matchFound = matcher.find();
+                                if (matchFound) {
+                                    //TODO: Abrir archivo y leerlo.
+                                    try {
+                                        InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                                        BufferedReader br = new BufferedReader(archivo);
+                                        String linea = br.readLine();
+
+
+                                        while (linea != null) {
+
+                                            if (linea.contains("_separador_")) {
+                                                String[] split = linea.split("_separador_");
+                                                Log.v("por_fecha1", "Estado_cliente.\n\nLinea:\n\n" + linea + "\n\n.");
+                                                if (split[0].equals("fecha_credito")) {
+                                                    String fecha_creditico = split[1];
+                                                    String[] split_fecha_creditico = fecha_creditico.split("/");
+                                                    fecha_creditico = split_fecha_creditico[2] + "-" + split_fecha_creditico[1] + "-" + split_fecha_creditico[0];
+                                                    Date fecha_creditico_D = DateUtilities.stringToDate(fecha_creditico);
+                                                    String[] split_fecha_creditico_D = fecha_creditico_D.toString().split(" ");
+
+                                                    dia_encontrado = obtener_dia_espaniol(split_fecha_creditico_D[0]);
+                                                    Log.v("por_fecha1", "Estado_cliente.\n\nDia encontrado: " + dia_encontrado + "\n\n.");
+
+                                                    /*for (int o = 0; o < split_fecha_creditico_D.length; o++) {
+                                                        Log.v("por_fecha0", "Estado_cliente. Split[" + o + "]: " + split_fecha_creditico_D[o]);
+                                                    }*/
+
+                                                    if (dia_encontrado.contains(s)) {
+                                                        param_encontrado2 = true;
+                                                        Log.v("param_encontrado", "Estado_cliente.\n\nParam: " + split[0] + "\n\nContenido del parametro: " + split[1] + "\n\n.");
+                                                    }
+                                                }
+
+                                                if (split[0].equals("saldo_mas_intereses")) {
+
+                                                    if (Integer.parseInt(split[1]) < 100) {
+                                                        param_encontrado2 = false;
+                                                    }
+
+                                                } else if (split[0].equals("ID_credito")) {
+
+                                                    cliente_ID_obtenido = split[1];
+                                                    Log.v("semana0", "Estado_cliente.\n\ncliente obtenido: " + cliente_ID_obtenido);
+                                                    String[] split_ID = cliente_ID_obtenido.split("_");
+                                                    cliente_ID_obtenido = split_ID[0];
+                                                    Log.v("semana1", "Estado_cliente.\n\ncliente obtenido: " + cliente_ID_obtenido);
+
+                                                } else {
+                                                    //Do nothing. Continue...
+                                                }
+                                            } else {
+                                                //Do nothing. No es un archivo relevante en este metodo.
+                                            }
+                                            linea = br.readLine();
+                                        }
+
+                                        br.close();
+                                        archivo.close();
+                                    } catch (IOException | ParseException e) {
+                                    }
+
+                                    if (param_encontrado2) {
+
+                                        /////////////trtrtrtrt///////////////////
+
+
+
+                                        if (cliente_ID_obtenido.contains("*") || cliente_ID_obtenido.contains(" ")) {
+                                            Log.v("Consultarxxx", "Estado_cliente.\n\nClienteID: " + cliente_ID_obtenido + "\n\n");
+                                            //Do nothing.
+                                        } else {
+
+                                            boolean matchFound2 = true;
+                                            if (matchFound2) {
+                                                //TODO: Abrir archivo y leerlo.
+                                                try {
+                                                    InputStreamReader archivo = new InputStreamReader(openFileInput(cliente_ID_obtenido + "_C_.txt"));
+                                                    BufferedReader br = new BufferedReader(archivo);
+                                                    String linea = br.readLine();
+                                                    param_encontrado = false;
+                                                    while (linea != null) {
+
+                                                        if (linea.contains("_separador_")) {
+                                                            String[] split = linea.split("_separador_");
+                                                            Log.v("semana2", "Estado_cliente.\n\nLinea:\n\n" + linea + "\n\n.");
+                                                            if (split[0].equals("ID_cliente")) {
+                                                                if (split[1].equals(cliente_ID_obtenido)) {
+                                                                    param_encontrado = true;
+                                                                    Log.v("param_encontrado_semana", "Estado_cliente.\n\nParam: " + split[0] + "\n\nContenido del parametro: " + split[1] + "\n\n.");
+                                                                }
+                                                            }
+
+                                                            if (split[0].equals("nombre_cliente")) {
+                                                                nombre_cliente = split[1];
+                                                            } else if (split[0].equals("apellido1_cliente")) {
+                                                                apellido1_cliente = split[1];
+                                                            } else if (split[0].equals("apellido2_cliente")) {
+                                                                apellido2_cliente = split[1];
+                                                            } else if (split[0].equals("ID_cliente")) {
+                                                                cliente_ID_s = split[1];
+                                                                if (cliente_ID_s.contains(" ") || cliente_ID_s.contains("*")) {
+                                                                    param_encontrado = false;
+                                                                }
+                                                            } else if (split[0].equals("apodo_cliente")) {
+                                                                apodo_cliente = split[1];
+                                                            } else {
+                                                                //Do nothing. Continue...
+                                                            }
+                                                        } else {
+                                                            //Do nothing. No es un archivo relevante en este metodo.
+                                                        }
+                                                        linea = br.readLine();
+                                                    }
+
+                                                    if (param_encontrado) {
+                                                        Log.v("param_encontrado0", "Estrado_cliente.\n\nNombre cliente: " + nombre_cliente + "\n\napellido1 cliente: " + apellido1_cliente +
+                                                                "\n\napellido2 cliente: " + apellido2_cliente + "\n\nApodo cliente: " + apodo_cliente + "\n\n.");
+                                                        parametro = parametro + nombre_cliente + "_sep_" + apellido1_cliente + "_sep_" + apellido2_cliente + "_sep_(" + dia_encontrado + ")" + "_sep_" + cliente_ID_obtenido + "_C_.txt" + "_sep_" + "_sop_";
+                                                        Log.v("param_encontrado1", "Estado_cliente.\n\nparametro:\n\n" + parametro + "\n\n.");
+                                                        //param_encontrado = false;
+                                                    }
+
+                                                    br.close();
+                                                    archivo.close();
+                                                } catch (IOException ee) {
+                                                }
+                                            } else {
+                                                //Continue with the execution.
+                                            }
+                                        }
+
+
+                                        //////////////////rererererr//////////////////
+
+
+                                    }
+
+                                } else {
+                                    //Continue with the execution.
+                                }
+                            }
+                        }
+                    }
+
+                    llenar_spinner(parametro);
+
                 } else {
                     //Do nothing.
                 }
@@ -330,6 +510,31 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
             public void afterTextChanged(Editable editable) {
             }
         });
+    }
+
+    private String obtener_dia_espaniol (String dia_ingles) {
+        //Sun, Mon, Tue, Wed, Thu, Fri, Sat.
+        String flag = "";
+        if (dia_ingles.equals("Sun")) {
+            flag = "Domingo";
+        } else if (dia_ingles.equals("Mon")) {
+            flag = "Lunes";
+        } else if (dia_ingles.equals("Tue")) {
+            flag = "Martes";
+        } else if (dia_ingles.equals("Wed")) {
+            flag = "Miercoles";
+        } else if (dia_ingles.equals("Thu")) {
+            flag = "Jueves";
+        } else if (dia_ingles.equals("Fri")) {
+            flag = "Viernes";
+        } else if (dia_ingles.equals("Sat")) {
+            flag = "Sabado";
+        } else {
+            //Do nothing.
+        }
+
+        return flag;
+
     }
 
     private void llenar_spinner (String parametro) {
