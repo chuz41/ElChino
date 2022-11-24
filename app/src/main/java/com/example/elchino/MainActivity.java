@@ -124,11 +124,11 @@ public class MainActivity extends AppCompatActivity {
         //estado_cliente();
         menu_principal("Hola Chuz");
         //verificar_clientes();
-        /*try {
+        try {
             check_activation();
         } catch (JSONException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
     private void verificar_clientes() {

@@ -504,6 +504,11 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         }
 
         Date fecha_hoy = Calendar.getInstance().getTime();
+        Log.v("obt_prox_abo0", "Nuevo_credito.\n\nFecha hoy: " + fecha_hoy.toString() + "\n\n.");
+        String fecha_hoy_string = DateUtilities.dateToString(fecha_hoy);
+        Log.v("obt_prox_abo1", "Nuevo_credito.\n\nFecha hoy: " + fecha_hoy_string + "\n\n.");
+        fecha_hoy = DateUtilities.stringToDate(fecha_hoy_string);
+        Log.v("obt_prox_abo2", "Nuevo_credito.\n\nFecha hoy: " + fecha_hoy.toString() + "\n\n.");
         Date fecha_mostrar_D = DateUtilities.addWeeks(fecha_hoy, factor_semanas);
         String fecha_mostrar2 = DateUtilities.dateToString(fecha_mostrar_D);
         String[] partes = fecha_mostrar2.split("-");

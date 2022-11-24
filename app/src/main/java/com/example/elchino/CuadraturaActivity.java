@@ -129,6 +129,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     private String apellido_cliente = "";
     private String cobrador_s = "";
     private String telefono_s = "";
+    private Date hoy_LD;
 
     
     @Override
@@ -195,6 +196,20 @@ public class CuadraturaActivity extends AppCompatActivity {
         sequi9.setVisibility(View.INVISIBLE);
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
         tv_saludo.setText("ESTADO DE CUENTA\n\nCliente ID: " + cliente_recibido);
+
+        hoy_LD = Calendar.getInstance().getTime();
+        Log.v("obt_prox_abo0", "Cuadratura.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
+        String fecha_hoy_string = DateUtilities.dateToString(hoy_LD);
+        Log.v("obt_prox_abo1", "Cuadratura.\n\nFecha hoy: " + fecha_hoy_string + "\n\n.");
+        try {
+            hoy_LD = DateUtilities.stringToDate(fecha_hoy_string);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Log.v("obt_prox_abo2", "cuadratura.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
+
+        separar_fechaYhora();
+
         separar_fechaYhora();
         datos_cobrador();
         if (!cuadratura.equals("")) {
@@ -241,8 +256,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         String[] split_fecha_next = fecha_proximo_abono.split("/");
         fecha_proximo_abono = split_fecha_next[2] + "-" + split_fecha_next[1] + "-" + split_fecha_next[0];
         Date fehca_next_abono = DateUtilities.stringToDate(fecha_proximo_abono);
-        Date fecha_de_hoy = Calendar.getInstance().getTime();
-        dias_atrasados = DateUtilities.daysBetween(fecha_de_hoy, fehca_next_abono);//Cantidad positiva indica morosidad.
+        dias_atrasados = DateUtilities.daysBetween(hoy_LD, fehca_next_abono);//Cantidad positiva indica morosidad.
 
         if (dias_atrasados < 0) {
             flag = "0";
@@ -417,9 +431,8 @@ public class CuadraturaActivity extends AppCompatActivity {
         String proximo_abono_formato = split2[2] + "-" + split2[1] + "-" + split2[0];
         Log.v("obt_int_morat0", ".\n\nCuadratura. Proximo abono: " + proximo_abono_formato + "\n\n.");
         Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
-        Date fecha_hoy = Calendar.getInstance().getTime();
-        int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
-        Log.v("obt_int_morat1", ".\n\nCuadratura. Diferencia en dias: " + diferencia_en_dias + "\n\nfecha_hoy: " + fecha_hoy.toString() + "\n\nProximo abono: " + proximo_abono_LD + "\n\n.");
+        int diferencia_en_dias = DateUtilities.daysBetween(hoy_LD, proximo_abono_LD);
+        Log.v("obt_int_morat1", ".\n\nCuadratura. Diferencia en dias: " + diferencia_en_dias + "\n\nfecha_hoy: " + hoy_LD.toString() + "\n\nProximo abono: " + proximo_abono_LD + "\n\n.");
         if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
             saldo = saldo_plus;
             morosidad = "D";
@@ -452,8 +465,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         String[] split2 = next_pay.split("/");
         String proximo_abono_formato = split2[2] + "-" + split2[1] + "-" + split2[0];
         Date proximo_abono_LD = DateUtilities.stringToDate(proximo_abono_formato);
-        Date fecha_hoy = Calendar.getInstance().getTime();
-        int diferencia_en_dias = DateUtilities.daysBetween(fecha_hoy, proximo_abono_LD);
+        int diferencia_en_dias = DateUtilities.daysBetween(hoy_LD, proximo_abono_LD);
         Log.v("obt_sald_al_dia0", "Cuadratura.\n\nDiferencia en dias: " + diferencia_en_dias + "\n\nnext_pay: " + next_pay + "\n\nIntereses de mora: " + intereses_de_mora + "\n\nSaldo_plus: " + saldo_plus + "\n\n.");
         if (diferencia_en_dias <= 0) {//Significa que esta al dia!!!
             saldo = saldo_plus;
@@ -772,7 +784,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             //cuotas = obtener_cuotas_nuevas(cuadratura);
             saldo_mas_intereses = Integer.parseInt(obtener_saldo_plus(cuadratura));
             if (morosidad.equals("M")) {
-                Date fecha_next_abono_D = Calendar.getInstance().getTime();
+                Date fecha_next_abono_D = hoy_LD;
                 String fecha_next_abono_S = DateUtilities.dateToString(fecha_next_abono_D);
                 String[] splittte = fecha_next_abono_S.split("-");
                 //fecha_next_abono_S = splittte[2] + "/" + splittte[1] + "/" + splittte[0];
@@ -878,7 +890,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         botones.put(8, sequi9);
         TreeMap<Integer, Button> botones_tree = getTreeMapBotones(botones);
         //Map<Integer, Button> botones_treeMap = getTreeMap(botones);
-        Date hoy_LD = Calendar.getInstance().getTime();
+
         for (int i = 0; i < largo_split; i++) {
             String[] split = split_1[i].split("_");//TODO: Si estan en cero o al dia, se debe pintar verde el boton, si es hoy el dia, pintar amarillo, si esta atrazado, pintar verde.
             Log.v("presentar_cuadratura0", "Cuadratura.\n\nfecha cuadro: " + split[3] + "\n\n");
@@ -1677,7 +1689,7 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     private void separar_fechaYhora(){
         llenar_mapa_meses();
-        Date now = Calendar.getInstance().getTime();
+        Date now = hoy_LD;
         String ahora = now.toString();
         String[] split = ahora.split(" ");
         nombre_dia = split[0];
