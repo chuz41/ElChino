@@ -80,7 +80,8 @@ public class AbonarActivity extends AppCompatActivity {
     private String cuotas = "";
     private EditText et_ID;
     private TextView tv_esperar;
-    private Map<String, Integer> meses = new HashMap<String, Integer>();private String dia;
+    private Map<String, Integer> meses = new HashMap<String, Integer>();
+    private String dia;
     private String mes;
     private String anio;
     private String fecha;
@@ -156,7 +157,6 @@ public class AbonarActivity extends AppCompatActivity {
         bt_cambiar_fecha.setVisibility(View.INVISIBLE);
         //imprimir_archivos_todos(null);
         mostrar_caja();
-        //separar_fechaYhora();
 
         hoy_LD = Calendar.getInstance().getTime();
         Log.v("obt_prox_abo0", "Abonar.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
@@ -174,7 +174,7 @@ public class AbonarActivity extends AppCompatActivity {
         if (cliente_recibido.equals("")) {
             //Do nothing.
         } else if (cliente_recibido.equals("CERO")) {
-
+            //Do nothing.
         } else {
             flag_client_reciv = true;
             cliente_ID = cliente_recibido;
@@ -977,8 +977,10 @@ public class AbonarActivity extends AppCompatActivity {
                         //
                         cuadratura = cuadratura.replace(split_1[0] + "_" + split_1[1] + "_" + split_1[2] + "_" + split_1[3],
                                 split_1[0] + "_" + split_1[1] + "_0_" + split_1[3]);//TODO: Hacer que if (i == split_length) {retornar_cambio}
+                        Log.v("obtener_cuadra4", "Abonar.\n\ncuadratura:\n\n" + cuadratura + "\n\n.");
 
                         if (i == (largo_split - 1)) {
+                            proximo_abono = "Prestamo cancelado.\nSaldo pendiente: 0 colones";
                             cambio = monto_temporal;//TODO: CORREGIR MONTO DISPONIBLE CUANDO SOBRA CAMBIO
                             actualizar_caja((0-cambio));
                             monto_disponible = String.valueOf(Integer.parseInt(monto_disponible) - cambio);
@@ -1012,22 +1014,31 @@ public class AbonarActivity extends AppCompatActivity {
                         fecha_cuadrito = split_fec[2] + "-" + split_fec[1] + "-" + split_fec[0];
                         Date fecha_cuadrito_LD = DateUtilities.stringToDate(fecha_cuadrito);
                         String diferencia_fechas = String.valueOf(DateUtilities.daysBetween(hoy_LD, fecha_cuadrito_LD));
-                        if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado. Pago todos los intereses, pero sigue atrasado. proximo_abono = hoy.
-                            morosidad = "M";
-                            String fecha_de_hoy = DateUtilities.dateToString(hoy_LD);
-                            String[] split_hoy = fecha_de_hoy.split("-");
-                            fecha_de_hoy = split_hoy[2] + "/" + split_hoy[1] + "/" + split_hoy[0];
-                            proximo_abono = fecha_de_hoy;
-                        } else if (Integer.parseInt(diferencia_fechas) <= 0 ) {
+                        Log.v("obtener_cuadra2", "Abonar.\n\nfecha cuadrito Date: " + fecha_cuadrito_LD.toString() + "\n\nDiferencia entre la fecha de hoy\ny la fecha de la cuota que acaba de pagar: " + diferencia_fechas + " dias.\n\n.");
+                        if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado y se va a cancelar esta cuota.
+                            Date next_pago = DateUtilities.addWeeks(fecha_cuadrito_LD, factor_semanas);
+                            String next_pago_S = DateUtilities.dateToString(next_pago);
+                            String[] split_pago = next_pago_S.split("-");
+                            next_pago_S = split_pago[2] + "/" + split_pago[1] + "/" + split_pago[0];
+                            proximo_abono = next_pago_S;
+                            int diferencia_a_hoy = DateUtilities.daysBetween(hoy_LD, next_pago);
+                            Log.v("obtener_cuadra5", "Abonar.\n\nproximo abono: " + proximo_abono + "\n\nDiferencia en dias a hoy: " + diferencia_a_hoy + "\n\n.");
+                            if (diferencia_a_hoy > 0) {//Esta atrasado
+                                morosidad = "M";
+                            } else {
+                                morosidad = "D";
+                            }
+                        } else if (Integer.parseInt(diferencia_fechas) <= 0 ) {//Cuota al dia que se va a cancelar.
                             morosidad = "D";
                             Date proximo_abono_LD = DateUtilities.addWeeks(fecha_cuadrito_LD, factor_semanas);
+                            Log.v("obtener_cuadra3", "Abonar.\n\nProximo abono calculado: " + proximo_abono_LD.toString() + "\n\n.");
                             fecha_cuadrito = DateUtilities.dateToString(proximo_abono_LD);
                             String[] split_fe_cua = fecha_cuadrito.split("-");
                             fecha_cuadrito = split_fe_cua[2] + "/" + split_fe_cua[1] + "/" + split_fe_cua[0];
+                            Log.v("obtener_cuadra4", "Abonar.\n\nProximo abono calculado: " + fecha_cuadrito + "\n\n.");
                             proximo_abono = fecha_cuadrito;
-                        } else {
-                            //Do nothing.
                         }
+
                         if (monto_ingresado > 0) {
                             mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ": " + split_1[2] +
                                     " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0 colones\n";
@@ -1042,7 +1053,7 @@ public class AbonarActivity extends AppCompatActivity {
                     }
 
                 } else if (Integer.parseInt(split_1[2]) < 0) {//Nunca debe ser negativo el monto pendiente
-                    Log.v("Obtener_cuadratura", ".\n\nERROR EN DATO DE ARCHIVO\n\nContenido del archivo: \n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
+                    Log.v("Obtener_cuadratura3", ".\n\nERROR EN DATO DE ARCHIVO\n\nContenido del archivo: \n\n" + imprimir_archivo(archivo_prestamo) + "\n\n.");
                 } else if (Integer.parseInt(split_1[2]) == 0) {//Esta cuota ya ha sido pagada, continuar...
                     //Do nothing. Continue...
                 }

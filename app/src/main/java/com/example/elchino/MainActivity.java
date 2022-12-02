@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         separar_fechaYhora();
         //abonar();
         //nuevo_credito();
-        //estado_cliente();
+        estado_cliente();
         //menu_principal("Hola Chuz");
         //verificar_clientes();
         try {
