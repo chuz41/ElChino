@@ -54,6 +54,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     private String apodo_cliente = "";
     private String archivo_cliente = "";
     private Button bt_editar;
+    private String mensaje;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,10 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
 
         saludo_estado = (TextView) findViewById(R.id.tv_saludoEstado);
         cliente_ID = getIntent().getStringExtra("cliente_ID");
+        mensaje = getIntent().getStringExtra("mensaje");
+        if (mensaje != null) {
+            msg(mensaje);
+        }
         saludo_estado.setText(" Estado del cliente");
         et_ID = (EditText) findViewById(R.id.et_ID);
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
@@ -539,13 +544,11 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
 
     private void llenar_spinner (String parametro) {
         //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
-
         Log.v("llenando_spinner0", "Estado_cliente.\n\nCantidad de archivos: " + "No se sabe aqui!!!"+ "\n\nParametro:\n\n" + parametro + "\n\n.");
         String[] split = parametro.split("_sop_");
         int largo_split = split.length;
         String spinner_llenar = "";
         sp_helper.clear();
-
         if (largo_split > 0) {
             for (int i = 0; i < largo_split; i++) {
                 String[] splitw = split[i].split("_sep_");
@@ -566,15 +569,11 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         } else {
             //Do nothing.
         }
-
         String[] split_spinner = spinner_llenar.split("_sip_");
-
         int largo_otroSpinner = split_spinner.length;
-
         if (largo_otroSpinner == 0) {
             //Do nothing.
         } else {
-
             sp_opciones.setEnabled(true);
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.custom_spinner, split_spinner);
             sp_opciones.setVisibility(View.VISIBLE);
@@ -620,6 +619,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                 Matcher matcher = pattern.matcher(archivos[i]);
                 boolean matchFound = matcher.find();
                 if (matchFound) {
+                    archivo_cliente = archivos[i];
                     //TODO: Abrir archivo y leerlo.
                     try {
                         InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
@@ -723,6 +723,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         Intent nuevo_credito = new Intent(this, Nuevo_creditoActivity.class);
         nuevo_credito.putExtra("msg", "");
         nuevo_credito.putExtra("cliente_recivido", cliente_ID);
+        nuevo_credito.putExtra("activity_devolver", "Estado_cliente");
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(nuevo_credito);
         finish();
@@ -754,6 +755,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         abonar.putExtra("msg", "");
         abonar.putExtra("cliente_recivido", cliente_ID);
         abonar.putExtra("abono_cero", "");
+        abonar.putExtra("activity_devolver", "Estado_cliente");
         startActivity(abonar);
         finish();
         System.exit(0);

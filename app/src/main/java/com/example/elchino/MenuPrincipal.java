@@ -61,9 +61,9 @@ public class MenuPrincipal extends AppCompatActivity {
     private String onlines = "onlines.txt";
     private Button bt_nuevo_cliente;
     private Button bt_estado_cliente;
-    private Button bt_abonar;
-    private Button bt_refinanciar;
-    private Button bt_nuevo_credito;
+    private Button bt_cierre;
+    //private Button bt_refinanciar;
+    //private Button bt_nuevo_credito;
     private Button bt_banca;
     private TextView tv_saludo;
     private TextView tv_fecha;
@@ -109,11 +109,11 @@ public class MenuPrincipal extends AppCompatActivity {
         setContentView(R.layout.activity_menu_principal);
         bt_nuevo_cliente = (Button) findViewById(R.id.bt_nuevo_cliente);
         bt_estado_cliente = (Button) findViewById(R.id.bt_estado_cliente);
-        bt_abonar = (Button) findViewById(R.id.bt_abonar);
+        bt_cierre = (Button) findViewById(R.id.bt_cierre);
         bt_banca = (Button) findViewById(R.id.bt_banca);
         bt_banca.setText("ENTREGAR/RECIBIR FONDOS DE BANCA");
-        bt_refinanciar = (Button) findViewById(R.id.bt_refinanciar);
-        bt_nuevo_credito = (Button) findViewById(R.id.bt_nuevo_credito);
+        //bt_refinanciar = (Button) findViewById(R.id.bt_refinanciar);
+        //bt_nuevo_credito = (Button) findViewById(R.id.bt_nuevo_credito);
         tv_saludo = (TextView) findViewById(R.id.tv_saludoMenu);
         tv_fecha = (TextView) findViewById(R.id.tv_fecha);
         tv_caja = (TextView) findViewById(R.id.tv_caja);
@@ -169,10 +169,15 @@ public class MenuPrincipal extends AppCompatActivity {
 
     public void registrar_cliente_nuevo(View view){
         Intent registrar_cliente_nuevo = new Intent(this, Registrar_cliente_nuevoActivity.class);
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(registrar_cliente_nuevo);
         finish();
         System.exit(0);
+    }
+
+    public void cierre(View view){
+
+
+
     }
 
     public void refinanciar(View view){
@@ -189,6 +194,7 @@ public class MenuPrincipal extends AppCompatActivity {
         Intent nuevo_credito = new Intent(this, Nuevo_creditoActivity.class);
         nuevo_credito.putExtra("msg", "");
         nuevo_credito.putExtra("cliente_recivido", "");
+        nuevo_credito.putExtra("activity_devolver", "MenuPrincipal");
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(nuevo_credito);
         finish();

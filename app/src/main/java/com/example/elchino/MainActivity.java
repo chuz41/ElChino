@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         checkedTextView.setText("Mostrar password");
         checkedTextView.setVisibility(View.INVISIBLE);
         separar_fechaYhora();
+        corregir_archivos();
         //abonar();
         //nuevo_credito();
         estado_cliente();
@@ -131,9 +132,84 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void corregir_archivos () {
+
+        //////////  ARCHIVOS CREDITOS  /////////////////////////////////////////////////////////
+        String archivos[] = fileList();
+        boolean flag_cobrador_ID = true;
+        for (int i = 0; i < archivos.length; i++) {
+            String file = archivos[i];
+            Pattern pattern = Pattern.compile("_P_", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(file);
+            boolean flag = true;
+            boolean matchFound = matcher.find();
+            Log.v("corregir_archivos0", "Main.\n\nfile: " + file +
+                    "\n\nContenido de file (pre):\n\n" + imprimir_archivo(file) + "\n\n.");
+            if (matchFound) {
+                try {
+                    InputStreamReader archivo = new InputStreamReader(openFileInput(file));
+                    BufferedReader br = new BufferedReader(archivo);
+                    String linea = br.readLine();
+                    while (linea != null) {
+                        String[] split = linea.split("_separador_");
+                        if (split[0].equals("monto_abono")) {
+                            flag = false;
+                        } else {
+                            //Do nothing.
+                        }
+                        linea = br.readLine();
+                    }
+                    br.close();
+                    archivo.close();
+                    if (flag) {
+                        agregar_linea_archivo("monto_abono_separador_0", file);
+                        Log.v("corregir_archivos1", "Main.\n\nfile: " + file +
+                                "\n\nContenido de file (post):\n\n" + imprimir_archivo(file) + "\n\n.");
+                    }
+                } catch (IOException e) {
+                }
+            } else {
+                //Do nothing.
+            }
+        }
+        /////////////////////////////////////////////////////////////////////////////////////
+
+
+
+        //////// ARCHIVO cobrador  ////////////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////////////////////////////////////
+
+    }
+
+    private void guardar_datos_cobrador () {
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String archivo_completo = "";
+            while (linea != null) {
+                String[] split = linea.split(" ");
+                if (split[0].equals("cobrador_ID")) {
+                    linea = linea.replace("cobrador_ID " + split[1], "cobrador_ID " + ID_cobrador);
+                    archivo_completo = archivo_completo + linea + "\n";
+                } else {
+                    archivo_completo = archivo_completo + linea + "\n";
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+
+            borrar_archivo(cobrador);
+            crear_archivo(cobrador);
+            guardar(archivo_completo, cobrador);
+            Log.v("guardar_datos_cobrador0", "Main.\n\narchivo cobrador: " + cobrador + "\n\nContenido del archivo:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
+        } catch (IOException e) {
+        }
+    }
+
     private void verificar_clientes() {
-
-
         ocultar_todo();
         String archivos[] = fileList();
         boolean crear = true;
@@ -147,7 +223,6 @@ public class MainActivity extends AppCompatActivity {
                 //crear = true; (No hace falta hacer esto porque arriba se hizo!!!)
             }
         }
-
         if (crear) {
             crear_archivo("clientes_cred.txt");
         } else {
@@ -530,7 +605,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void verificar_usuario(String codigo) {//codigo corresponde al ID del cobrador.
+    private void verificar_usuario (String codigo) {//codigo corresponde al ID del cobrador.
 
         boolean dato_listo = true;
 
@@ -599,7 +674,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void verificar_password(String codigo) {//codigo corresponde al ID del cobrador.
+    private void verificar_password (String codigo) {//codigo corresponde al ID del cobrador.
 
         boolean dato_listo = true;
 
@@ -645,6 +720,7 @@ public class MainActivity extends AppCompatActivity {
                                             if (flag_caja) {
                                                 pedir_caja();
                                             } else {
+                                                guardar_datos_cobrador();
                                                 menu_principal("");
                                             }
                                             break;

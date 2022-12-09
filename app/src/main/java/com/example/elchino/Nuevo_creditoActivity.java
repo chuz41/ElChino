@@ -62,6 +62,18 @@ import java.util.regex.Pattern;
 
 public class Nuevo_creditoActivity extends AppCompatActivity {
 
+    private boolean flag_cuotass = false;
+    private boolean flag_sema_quince_mes = false;
+    private boolean flag_interess = false;
+    private String activity_devolver;
+    private String cuotass_S = "";
+    private String sema_quince_mes_S = "";
+    private String interess_S = "";
+    private String cliente_Id_volver;
+    private Spinner sp_cuotas;
+    private Spinner sp_tipo_cobro;
+    private Spinner sp_interes;
+    private Button bt_personalizar;
     private Integer monto_credito = 0;
     private String nombre_cliente = "";
     private String apellido_cliente = "";
@@ -106,6 +118,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private Integer fecha_selected = 0;
     private String  fecha_credito = "";
     private boolean flag_fecha = false;
+    private Date hoy_LD = new Date();
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -132,6 +145,23 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         sp_plazos.setVisibility(View.INVISIBLE);
         tv_saludo.setText("NUEVO CREDITO");
         tv_caja = (TextView) findViewById(R.id.tv_caja);
+        sp_cuotas = (Spinner) findViewById(R.id.sp_cuotas);
+        sp_tipo_cobro = (Spinner) findViewById(R.id.sp_tipo_cobro);
+        sp_interes = (Spinner) findViewById(R.id.sp_interes);
+        bt_personalizar = (Button) findViewById(R.id.bt_personalizar);
+        activity_devolver = getIntent().getStringExtra("activity_devolver");
+        hoy_LD = Calendar.getInstance().getTime();
+        Log.v("OnCreate0", "Nuevo_credito.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
+        String fecha_hoy_string = DateUtilities.dateToString(hoy_LD);
+        Log.v("OnCreate1", "Nuevo_credito.\n\nFecha hoy: " + fecha_hoy_string + "\n\n.");
+        cliente_Id_volver = cliente_recibido;
+        try {
+            hoy_LD = DateUtilities.stringToDate(fecha_hoy_string);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Log.v("OnCreate2", "Nuevo_credito.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
+
         tv_caja.setHint("Caja...");
         mostrar_caja();
         separar_fechaYhora();
@@ -346,9 +376,13 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                             bt_consultar.setEnabled(true);
                             bt_consultar.setClickable(true);
                             bt_consultar.setVisibility(View.VISIBLE);
-                            bt_consultar.setFocusableInTouchMode(true);
-                            bt_consultar.requestFocus();
+                            Log.v("spinner_listener0", "Nuevo_credito.\n\nplazo: " + plazo + "\n\n.");
+                            //bt_consultar.setFocusableInTouchMode(true);
+                            //bt_consultar.requestFocus();
                         }
+                        bt_personalizar.setEnabled(true);
+                        bt_personalizar.setClickable(true);
+                        bt_personalizar.setVisibility(View.VISIBLE);
                     }
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
@@ -357,72 +391,47 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     }
 
     private String calcular_cuota () {
+        //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
         String flag = "";
-        int interes = 0;
-        int cuotas = 0;
         String[] split = plazo.split(" ");
-        if (split[1].equals("semanas")) {
-            if (split[0].equals("5")) {
-                interes = 20;
-                cuotas = 5;
-            } else if (split[0].equals("6")) {
-                interes = 20;
-                cuotas = 6;
-            } else if (split[0].equals("9")) {
-                interes = 40;
-                cuotas = 9;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else if (split[1].equals("quincenas")) {
-            if (split[0].equals("3")) {
-                interes = 25;
-                cuotas = 3;
-            } else if (split[0].equals("5")) {
-                interes = 40;
-                cuotas = 5;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else {
-            //Do nothing. Never come here!!!
-        }
+        Log.v("calcular_cuota0", "Nuevo_credito.\n\nPlazo: " + plazo + "\n\n.");
+        String intereses_S = split[2].replace("(", "");
+        intereses_S = intereses_S.replace(")", "");
+        intereses_S = intereses_S.replace("%", "");
+        intereses_S = intereses_S.replace("\n", "");
+        intereses_S = intereses_S.replace(",", "");
+        intereses_S = intereses_S.replace(" ", "");
+        Log.v("calcular_cuota1", "Nuevo_credito.\n\nintereses_S: " + intereses_S + "\n\n.");
+        int interes = Integer.parseInt(intereses_S);
+        String cuotas_S = split[0];
+        cuotas_S = cuotas_S.replace("semanas", "");
+        cuotas_S = cuotas_S.replace("meses", "");
+        cuotas_S = cuotas_S.replace("quincenas", "");
+        cuotas_S = cuotas_S.replace(" ", "");
+        cuotas_S = cuotas_S.replace(",", "");
+        cuotas_S = cuotas_S.replace("\n", "");
+        int cuotas = Integer.parseInt(cuotas_S);
         double monto_parcial = (monto_credito * interes);
         monto_parcial = monto_parcial / 100;
         double monto_total = monto_credito + monto_parcial;
         double cuota = monto_total / cuotas;
         int flag_int = (int) cuota;
-        Log.v("monto_total", ".\n\nMonto total: " + monto_total + "\n\nMonto del credito: " + monto_credito + "\n\n.");
+        Log.v("calcular_cuota0", "Nuevo_credito.\n\nMonto total: " + monto_total + "\n\nMonto del credito: " + monto_credito + "\n\n.");
         flag = String.valueOf(flag_int);
-        Log.v("flag",".\n\nFlag: " + flag + "\n\n.");
+        Log.v("calcular_cuota1","Nuevo_credito.\n\nFlag: " + flag + "\n\n.");
         return flag;
     }
 
     private String calcular_saldo () {
         String flag = "";
-        int interes = 0;
         String[] split = plazo.split(" ");
-        if (split[1].equals("semanas")) {
-            if (split[0].equals("5")) {
-                interes = 20;
-            } else if (split[0].equals("6")) {
-                interes = 20;
-            } else if (split[0].equals("9")) {
-                interes = 40;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else if (split[1].equals("quincenas")) {
-            if (split[0].equals("3")) {
-                interes = 25;
-            } else if (split[0].equals("5")) {
-                interes = 40;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else {
-            //Do nothing. Never come here!!!
-        }
+        String intereses_S = split[2].replace("(", "");
+        intereses_S = intereses_S.replace(")", "");
+        intereses_S = intereses_S.replace("%", "");
+        intereses_S = intereses_S.replace("\n", "");
+        intereses_S = intereses_S.replace(",", "");
+        intereses_S = intereses_S.replace(" ", "");
+        int interes = Integer.parseInt(intereses_S);
         double monto_parcial = (monto_credito * interes);
         monto_parcial = monto_parcial / 100;
         double monto_total = monto_credito + monto_parcial;
@@ -433,58 +442,29 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
 
     private String obtener_tasa () {
         String flag = "";
-        int interes = 0;
         String[] split = plazo.split(" ");
-        if (split[1].equals("semanas")) {
-            if (split[0].equals("5")) {
-                interes = 20;
-            } else if (split[0].equals("6")) {
-                interes = 20;
-            } else if (split[0].equals("9")) {
-                interes = 40;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else if (split[1].equals("quincenas")) {
-            if (split[0].equals("3")) {
-                interes = 25;
-            } else if (split[0].equals("5")) {
-                interes = 40;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else {
-            //Do nothing. Never come here!!!
-        }
+        String intereses_S = split[2].replace("(", "");
+        intereses_S = intereses_S.replace(")", "");
+        intereses_S = intereses_S.replace("%", "");
+        intereses_S = intereses_S.replace("\n", "");
+        intereses_S = intereses_S.replace(",", "");
+        intereses_S = intereses_S.replace(" ", "");
+        int interes = Integer.parseInt(intereses_S);
         flag = String.valueOf(interes);
         return flag;
     }
 
     private String calcular_cuotas () {
         String flag = "";
-        int cuotas = 0;
         String[] split = plazo.split(" ");
-        if (split[1].equals("semanas")) {
-            if (split[0].equals("5")) {
-                cuotas = 5;
-            } else if (split[0].equals("6")) {
-                cuotas = 6;
-            } else if (split[0].equals("9")) {
-                cuotas = 9;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else if (split[1].equals("quincenas")) {
-            if (split[0].equals("3")) {
-                cuotas = 3;
-            } else if (split[0].equals("5")) {
-                cuotas = 5;
-            } else {
-                //Do nothing. Never come here!!!
-            }
-        } else {
-            //Do nothing. Never come here!!!
-        }
+        String cuotas_S = split[0];
+        cuotas_S = cuotas_S.replace("semanas", "");
+        cuotas_S = cuotas_S.replace("meses", "");
+        cuotas_S = cuotas_S.replace("quincenas", "");
+        cuotas_S = cuotas_S.replace(" ", "");
+        cuotas_S = cuotas_S.replace(",", "");
+        cuotas_S = cuotas_S.replace("\n", "");
+        int cuotas = Integer.parseInt(cuotas_S);
         flag = String.valueOf(cuotas);
         return flag;
     }
@@ -492,29 +472,45 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private String obtener_proximo_abono () throws ParseException {
         String flag = "";
+
         int factor_semanas = 0;
         String[] piezas = plazo.split(" ");
         if (piezas[1].equals("quincenas")) {
             factor_semanas = 2;
         } else if (piezas[1].equals("semanas")) {
             factor_semanas = 1;
+        } else if (piezas[1].equals("meses")) {
+            factor_semanas = 4;
         } else {
             factor_semanas = -1;
             //flag = "ERROR";
         }
 
-        Date fecha_hoy = Calendar.getInstance().getTime();
-        Log.v("obt_prox_abo0", "Nuevo_credito.\n\nFecha hoy: " + fecha_hoy.toString() + "\n\n.");
-        String fecha_hoy_string = DateUtilities.dateToString(fecha_hoy);
-        Log.v("obt_prox_abo1", "Nuevo_credito.\n\nFecha hoy: " + fecha_hoy_string + "\n\n.");
-        fecha_hoy = DateUtilities.stringToDate(fecha_hoy_string);
-        Log.v("obt_prox_abo2", "Nuevo_credito.\n\nFecha hoy: " + fecha_hoy.toString() + "\n\n.");
-        Date fecha_mostrar_D = DateUtilities.addWeeks(fecha_hoy, factor_semanas);
+        Log.v("obt_prox_abo0", "Nuevo_credito.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
+        String hoy_LD_string = DateUtilities.dateToString(hoy_LD);
+        Log.v("obt_prox_abo1", "Nuevo_credito.\n\nFecha hoy: " + hoy_LD_string + "\n\n.");
+        hoy_LD = DateUtilities.stringToDate(hoy_LD_string);
+        Log.v("obt_prox_abo2", "Nuevo_credito.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
+        Date fecha_mostrar_D = new Date();
+        if (factor_semanas == 2) {
+            Log.v("Obt_prox_abo3F2", "Nuevo_credito.\n\nfecha_mostrar_D_pre:\n\n" + fecha_mostrar_D + "\n\n");
+            fecha_mostrar_D = DateUtilities.addQuincenas(hoy_LD, 1, hoy_LD);
+            Log.v("Obt_prox_abo4F2", "Nuevo_credito.\n\nfecha_mostrar_D_post:\n\n" + fecha_mostrar_D + "\n\n");
+        } else if (factor_semanas == 4) {
+            Log.v("Obt_prox_abo3F3", "Nuevo_credito.\n\nfecha_mostrar_D_pre:\n\n" + fecha_mostrar_D + "\n\n");
+            fecha_mostrar_D = DateUtilities.addMonths(hoy_LD, 1);
+            Log.v("Obt_prox_abo4F3", "Nuevo_credito.\n\nfecha_mostrar_D_post:\n\n" + fecha_mostrar_D + "\n\n");
+        } else {
+            Log.v("Obt_prox_abo3F4", "Nuevo_credito.\n\nfecha_mostrar_D_pre:\n\n" + fecha_mostrar_D + "\n\n");
+            fecha_mostrar_D = DateUtilities.addWeeks(hoy_LD, 1);
+            Log.v("Obt_prox_abo4F3", "Nuevo_credito.\n\nfecha_mostrar_D_post:\n\n" + fecha_mostrar_D + "\n\n");
+        }
+        Log.v("Obt_prox_abo5", "Nuevo_credito.\n\nfecha_mostrar_D:\n\n" + fecha_mostrar_D + "\n\n");
         String fecha_mostrar2 = DateUtilities.dateToString(fecha_mostrar_D);
         String[] partes = fecha_mostrar2.split("-");
         fecha_mostrar2 = partes[2] + "/" + partes[1] + "/" + partes[0];
         flag = fecha_mostrar2;
-
+        Log.v("Obt_prox_abo6", "Nuevo_credito.\n\nfecha_mostrar2:\n\n" + fecha_mostrar2 + "\n\n");
         return flag;
     }
 
@@ -537,6 +533,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } else if (split[1].equals("quincenas")) {
             sema_quince = "quincena";
             factor = 2;
+        } else if (split[1].equals("meses")) {
+            sema_quince = "mes";
+            factor = 4;
         } else {
             //do nothing here!!
         }
@@ -553,7 +552,15 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             anio = String.valueOf(anio_selected);
             fecha_sustituta = anio + "-" + mes + "-" + dia;
             Date fecha_hoy = DateUtilities.stringToDate(fecha_sustituta);
-            fecha_hoy = DateUtilities.addWeeks(fecha_hoy, factor);
+            String fecha_creditt = anio + "-" + mes + "-" + dia;
+            Date fecha_creditt_D = DateUtilities.stringToDate(fecha_creditt);
+            if (factor == 2) {
+                fecha_hoy = DateUtilities.addQuincenas(fecha_hoy, 1, fecha_creditt_D);
+            } else if (factor == 4) {
+                fecha_hoy = DateUtilities.addMonths(fecha_hoy, 1);
+            } else {
+                fecha_hoy = DateUtilities.addWeeks(fecha_hoy, 1);
+            }
             fecha_sustituta = DateUtilities.dateToString(fecha_hoy);
             String[] split_fecha = fecha_sustituta.split("-");
             fecha_sustituta = split_fecha[2] + "/" + split_fecha[1] + "/" + split_fecha[0];
@@ -564,9 +571,11 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         file_content = file_content + "fecha_credito_separador_" + fecha_credit + "\n";
         if (flag_proximo_abono) {
             proximo_abono = obtener_proximo_abono();
+            Log.v("generar_credito0", "Nuevo_credito.\n\nproximo_abono: " + proximo_abono + "\n\n.");
         } else {
             proximo_abono = fecha_sustituta;
         }
+        Log.v("generar_credito1", "Nuevo_credito.\n\nproximo_abono: " + proximo_abono + "\n\n.");
         file_content = file_content + "proximo_abono_separador_" + proximo_abono + "\n";
         String saldo_mas_intereses = calcular_saldo();
         file_content = file_content + "saldo_mas_intereses_separador_" + saldo_mas_intereses + "\n";
@@ -578,10 +587,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         file_content = file_content + "ID_credito_separador_" + credit_ID + "\n";
         String morosidad = "D";
         file_content = file_content + "morosidad_separador_" + morosidad + "\n";
-
-
-        Date fecha_hoy = Calendar.getInstance().getTime();
-
+        Date fecha_hoy = hoy_LD;
         if (flag_fecha) {
             dia = String.valueOf(fecha_selected);
             if (dia.length() == 1) {
@@ -592,14 +598,18 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                 mes = "0" + mes;
             }
             anio = String.valueOf(anio_selected);
-
             fecha_sustituta = anio + "-" + mes + "-" + dia;
             fecha_hoy = DateUtilities.stringToDate(fecha_sustituta);
         }
-
         Date fecha_poner = fecha_hoy;
         for (int i = 0; i < Integer.parseInt(cuotass); i++) {
-            fecha_poner = DateUtilities.addWeeks(fecha_poner, factor);
+            if (factor == 2) {
+                fecha_poner = DateUtilities.addQuincenas(fecha_poner, 1, fecha_hoy);
+            } else if (factor == 4) {
+                fecha_poner = DateUtilities.addMonths(fecha_poner, 1);
+            } else {
+                fecha_poner = DateUtilities.addWeeks(fecha_poner, 1);
+            }
             String fecha_poner_S = DateUtilities.dateToString(fecha_poner);
             String[] splet = fecha_poner_S.split("-");
             Log.v("generar_credito", ".\n\nFecha_poner: " + String.valueOf(fecha_poner) + "\n\n.");
@@ -607,15 +617,14 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             cuadratura = cuadratura + sema_quince + "_" + String.valueOf(i + 1) + "_" + monto_cuota + "_" + fecha_S_poner + "__";
         }
         file_content = file_content + "cuadratura_separador_" + cuadratura + "\n";
-        file_content = file_content + "intereses_moratorios_separador_0";
-
+        file_content = file_content + "intereses_moratorios_separador_0\n";
+        file_content = file_content + "monto_abono_separador_0";
         String file_name = credit_ID + ".txt";
         crear_archivo(file_name);
         guardar(file_content, file_name);
         actualizar_caja();
         Log.v("antes_de_subir", ".\n\nArchivo a subir: " + file_name + "\n\nContenido de " + file_name + ":\n\n" + imprimir_archivo(file_name) + "\n\n.");
         subir_archivo(file_name);
-
     }
 
     private void actualizar_caja () {
@@ -631,6 +640,164 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             borrar_archivo(caja);
             crear_archivo(caja);
             guardar(linea, caja);
+            crear_archivo("cajax.txt");
+            borrar_archivo("cajax.txt");
+            crear_archivo("cajax.txt");
+            linea = linea.replace(" ", "_separador_");
+            guardar(linea, "cajax.txt");
+            subir_caja();
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void subir_caja () throws JSONException, IOException {
+        String sp_creditos = "";
+        String cobrador_ID_S = "";
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String[] splitr = linea.split(" ");
+            cobrador_ID_S = splitr[0];
+            while (linea != null) {
+                String[] split = linea.split(" ");
+                if (split[0].equals("Screditos")) {
+                    sp_creditos = split[1];
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String archivos[] = fileList();
+        Log.v("subir_caja1", ".\n\nAbonar. \n\nTotal de archivos: " + archivos.length + "\n\n.");
+        Log.v("subir_caja2", "Abonar.\n\ncobrador_ID_S: " + cobrador_ID_S + "\n\n");
+
+        subir_caja2(sp_creditos);
+    }
+
+    private void subir_caja2 (String sp_creditos) throws JSONException {
+        String spid = sp_creditos;
+        String json_string = "";
+        JSONObject jsonObject = new JSONObject();
+        String sheet = "caja";
+        String id_caja = "";
+        Log.v("subir_caja20", "Abonar.\n\nfile: " + "cajax.txt" + "\n\ncontenido del archivo:\n\n" + imprimir_archivo("cajax.txt"));
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput("cajax.txt"));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            while (linea != null && !linea.equals("")) {
+                String[] split = linea.split("_separador_");
+                Log.v("subir_caja21", "Abonar.\n\nLinea:\n\n" + linea + "\n\n.");
+                json_string = json_string + split[1] + "_n_";
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.v("subir_caja22", "Abonar.\n\njson_string: " + "\n\n" + json_string + "\n\n.");
+        jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_caja);
+        subir_nuevo_caj(jsonObject, "cajax.txt");
+    }
+
+    private void subir_nuevo_caj (JSONObject jsonObject, String file) {
+        if (verificar_internet()) {
+            agregar_linea_archivo("abajo " + file, onlines);
+            RequestQueue queue;
+            queue = Volley.newRequestQueue(this);
+            //Llamada POST usando Volley:
+            RequestQueue requestQueue;
+
+            // Instantiate the cache
+            Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+
+            // Set up the network to use HttpURLConnection as the HTTP client.
+            Network network = new BasicNetwork(new HurlStack());
+
+            // Instantiate the RequestQueue with the cache and network.
+            requestQueue = new RequestQueue(cache, network);
+
+            // Start the queue
+            requestQueue.start();
+
+            //Toast.makeText(this, "Debug:\nConsecutivo: " + Consecutivo + "\nconsecutivo: " + consecutivo + "\nDeben ser iguales.", Toast.LENGTH_LONG).show();
+
+            String url = addRowURL;
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            String[] split = response.toString().split("\"");
+                            int length_split = split.length;
+                            Log.v("subir_nuevo_caj0", "Abonar.\n\nresponse:\n\n" + response + "\n\n.");
+                            if (length_split > 3) {//
+                                for (int i = 0; i < length_split; i++) {
+                                    Log.v("subir_nuevo_caj1" + i, "split[" + i + "]: " + split[i]);
+                                }
+                                cambiar_bandera2(file);
+                            } else {
+                                //No se subio correctamente!
+                            }
+
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // TODO: Handle error
+                            //mensaje_error_en_subida();
+
+                        }
+                    });
+
+            // Add the request to the RequestQueue.
+            requestQueue.add(jsonObjectRequest);
+        } else {//No hay internet!!!
+            agregar_linea_archivo("abajo " + file, onlines);
+            //msg("Para registrar al vendedor en el servidor, debe estar conectado a internet.");
+        }
+    }
+
+    private void cambiar_bandera2 (String file) {
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String contenido = "";
+            while (linea != null) {
+                Log.v("cambiar_bandera_file", "  Linea: " + linea + "\n\n");
+                String[] split = linea.split(" ");
+                if (split[0].equals("arriba")) {
+                    //Dejar perder la linea
+                } else if (split[0].equals("abajo")) {
+                    if (split[1].equals(file)) {
+                        linea = linea.replace(split[0], "arriba");
+                        contenido = contenido + linea + "\n";
+                    } else {
+                        contenido = contenido + linea + "\n";
+                    }
+                } else {
+                    //Do nothing. Nunca llega aqui.
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+            borrar_archivo(onlines);
+            guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
+            //mostrar_todito();
+            Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
+            //presentar_cuadratura();
+            Log.v("camb_band_nuev_cred", "\"Credito generado y registrado correctamente en el servidor.\"");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -643,7 +810,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         String archivos[] = fileList();
         if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
             Log.v("llenar_spinner0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
-            //Do nothing.
         } else {
             for (int i = 0; i < archivos.length; i++) {
                 Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
@@ -660,10 +826,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } else {
             String[] split = lista_archivos.split("_sep_");
             int spl_long = split.length;
-            /*for (int i = 0; i < spl_long; i++) {
-                String[] splii = split[i].split("_P_");
-                end_id = end_id + Integer.parseInt(splii[1]);
-            }*/
             end_id = spl_long + 1;
             flag = String.valueOf(end_id);
         }
@@ -685,7 +847,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         et_ID.setHint("Monto solicitado...");
         et_ID.setFocusableInTouchMode(true);
         et_ID.requestFocus();
-        //et_ID.setText("0");
         bt_consultar.setText("CONFIRMAR");
         bt_consultar.setVisibility(View.VISIBLE);
         bt_consultar.setClickable(false);
@@ -694,16 +855,13 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     }
 
     private void obtener_plazo () {
-
         tv_esperar.setVisibility(View.VISIBLE);
         tv_esperar.setText("Escoja el plazo del credito");
         bt_consultar.setText("CONFIRMAR");
         llenar_spinner();
-        //spinner_listener();
     }
 
     private void text_listener () {
-
         //Implementacion de un text listener
         et_ID.addTextChangedListener(new TextWatcher() {
             @Override
@@ -712,7 +870,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (tv_esperar.getText().toString().equals("Digite el monto del credito")) {
-
                     et_ID.setVisibility(View.VISIBLE);
                     et_ID.setEnabled(true);
                     et_ID.setFocusableInTouchMode(true);
@@ -727,10 +884,8 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                         Log.v("text_listener", ".\n\nMonto disponible: " + monto_disponible + "\n\nmonto solicitado: " + String.valueOf(s) + "\n\ns:\n\n-->" + s + "<--\n\n.");
                         if ((Integer.parseInt(String.valueOf(s))) > Integer.parseInt(monto_disponible)) {
                             flag1 = false;
-
                         } else {
                             flag1 = true;
-
                         }
                         try {
                             InputStreamReader archivo = new InputStreamReader(openFileInput(caja));
@@ -766,14 +921,10 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                 } else if (tv_esperar.getText().toString().equals("Digite la identificacion del cliente")) {
                     et_ID.setEnabled(true);
                     et_ID.setFocusableInTouchMode(true);
-                    //et_ID.setText("");
                     et_ID.requestFocus();
-                    //bt_consultar.setClickable(false);
-                    //bt_consultar.setEnabled(false);
                     String archivos[] = fileList();
                     if (et_ID.getText().toString().contains("*") || et_ID.getText().toString().contains(" ")) {
                         Log.v("llenar_spinner0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
-                        //Do nothing.
                     } else {
                         for (int i = 0; i < archivos.length; i++) {
                             Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
@@ -843,7 +994,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
 
     private void separar_fechaYhora(){
         llenar_mapa_meses();
-        Date now = Calendar.getInstance().getTime();
+        Date now = hoy_LD;
         String ahora = now.toString();
         String[] split = ahora.split(" ");
         nombre_dia = split[0];
@@ -938,11 +1089,22 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     }
 
     private void boton_atras() {
-        Intent menu_principal = new Intent(this, MenuPrincipal.class);
-        menu_principal.putExtra("mensaje", "");
-        startActivity(menu_principal);
-        finish();
-        System.exit(0);
+        if (activity_devolver.equals("MenuPrincipal")) {
+            Intent activity_volver = new Intent(this, MenuPrincipal.class);
+            activity_volver.putExtra("mensaje", "");
+            startActivity(activity_volver);
+            finish();
+            System.exit(0);
+        } else if (activity_devolver.equals("Estado_cliente")) {
+            Intent activity_volver = new Intent(this, Estado_clienteActivity.class);
+            activity_volver.putExtra("mensaje", "");
+            activity_volver.putExtra("cliente_ID", cliente_Id_volver);
+            startActivity(activity_volver);
+            finish();
+            System.exit(0);
+        } else {
+
+        }
     }
 
     private void mostrar_todito() {
@@ -950,6 +1112,10 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         tv_esperar.setVisibility(View.INVISIBLE);
         bt_consultar.setVisibility(View.VISIBLE);
         sp_plazos.setVisibility(View.VISIBLE);
+        sp_plazos.setClickable(true);
+        sp_plazos.setEnabled(true);
+        bt_personalizar.setVisibility(View.VISIBLE);
+        bt_cambiar_fecha.setVisibility(View.VISIBLE);
     }
 
     private void ocultar_todito() {
@@ -958,10 +1124,146 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         tv_esperar.setText("conectando, por favor espere...");
         bt_consultar.setVisibility(View.INVISIBLE);
         sp_plazos.setVisibility(View.INVISIBLE);
+        bt_personalizar.setVisibility(View.INVISIBLE);
+        bt_cambiar_fecha.setVisibility(View.INVISIBLE);
     }
 
-    private String imprimir_archivo(String file_name){
+    public void personalizar (View v) {
+        flag_cuotass = false;
+        flag_interess = false;
+        flag_sema_quince_mes = false;
+        bt_personalizar.setClickable(false);
+        bt_personalizar.setEnabled(false);
+        bt_personalizar.setVisibility(View.INVISIBLE);
+        sp_cuotas.setVisibility(View.VISIBLE);
+        sp_interes.setVisibility(View.VISIBLE);
+        sp_tipo_cobro.setVisibility(View.VISIBLE);
+        sp_plazos.setClickable(false);
+        sp_plazos.setEnabled(false);
+        llenar_spinner1();
+        llenar_spinner2();
+        llenar_spinner3();
+    }
 
+    private void llenar_spinner1 () {
+        String cuotass = "Cuotas_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18_19_20_21";
+        String[] split = cuotass.split("_");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.custom_spinner, split);
+        sp_cuotas.setAdapter(adapter);
+        sp_listener1();
+    }
+
+    private void llenar_spinner2 () {
+        String sema_quince_mes = "Periodo_semanas_quincenas_meses";
+        String[] split = sema_quince_mes.split("_");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.custom_spinner, split);
+        sp_tipo_cobro.setAdapter(adapter);
+        sp_listener2();
+    }
+
+    private void llenar_spinner3 () {
+        String interess = "Interes_5%_10%_15%_20%_25%_30%_35%_40%_45%_50%_55%_60%_65%_70%_75%_80%_85%_90%_95%";
+        String[] split = interess.split("_");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.custom_spinner, split);
+        sp_interes.setAdapter(adapter);
+        sp_listener3();
+    }
+
+    private void sp_listener1 () {
+        sp_cuotas.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        //Crear diccionario con la informacion de la loteria seleccionada
+                        String seleccion = sp_cuotas.getSelectedItem().toString();
+                        if (seleccion.equals("Coutas")) {
+                            //Do nothing!
+                        }else {
+                            flag_cuotass = true;
+                            cuotass_S = sp_cuotas.getSelectedItem().toString();
+                            if (flag_interess & flag_sema_quince_mes & flag_cuotass) {
+                                confirm_new_credit_config();
+                            } else {
+                                //Do nothing.
+                            }
+                        }
+                    }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+    }
+
+    private void sp_listener2 () {
+        sp_tipo_cobro.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        //Crear diccionario con la informacion de la loteria seleccionada
+                        String seleccion = sp_tipo_cobro.getSelectedItem().toString();
+                        if (seleccion.equals("Periodo")) {
+                            //Do nothing!
+                        }else {
+                            flag_sema_quince_mes = true;
+                            sema_quince_mes_S = sp_tipo_cobro.getSelectedItem().toString();
+                            if (flag_interess & flag_sema_quince_mes & flag_cuotass) {
+                                confirm_new_credit_config();
+                            } else {
+                                //Do nothing.
+                            }
+                        }
+                    }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+    }
+
+    private void sp_listener3 () {
+        sp_interes.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        //Crear diccionario con la informacion de la loteria seleccionada
+                        String seleccion = sp_interes.getSelectedItem().toString();
+                        if (seleccion.equals("Interes")) {
+                            //Do nothing!
+                        }else {
+                            flag_interess = true;
+                            interess_S = sp_interes.getSelectedItem().toString();
+                            if (flag_interess & flag_sema_quince_mes & flag_cuotass) {
+                                confirm_new_credit_config();
+                            } else {
+                                //Do nothing.
+                            }
+                        }
+                    }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+    }
+
+    private void confirm_new_credit_config () {
+        sp_interes.setVisibility(View.INVISIBLE);
+        sp_tipo_cobro.setVisibility(View.INVISIBLE);
+        sp_cuotas.setVisibility(View.INVISIBLE);
+        llenar_spinner_aux();
+    }
+
+    private void llenar_spinner_aux () {
+        //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
+        String plazos = cuotass_S + " " + sema_quince_mes_S + " (" + interess_S + ")";
+        String[] split = plazos.split("_");
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, R.layout.custom_spinner, split);
+        sp_plazos.setAdapter(adapter2);
+        bt_consultar.setClickable(false);
+        bt_consultar.setEnabled(false);
+        spinner_listener();
+    }
+
+
+    private String imprimir_archivo (String file_name){
         String archivos[] = fileList();
         String contenido = "";//Aqui se lee el contenido del archivo guardado.
         if (archivo_existe(archivos, file_name)) {//Archivo nombre_archivo es el archivo que vamos a imprimir
@@ -981,11 +1283,11 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         return contenido;
     }
 
-    private void msg(String s) {
+    private void msg (String s) {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 
-    private void ocultar_teclado(){
+    private void ocultar_teclado (){
         View view = this.getCurrentFocus();
         InputMethodManager imn = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imn.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -993,7 +1295,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
 
     //Metodos comunes online//
 
-    private boolean verificar_internet() {
+    private boolean verificar_internet () {
         ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
@@ -1026,19 +1328,19 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         String spid = sp_creditos;
         String json_string = "";
         JSONObject jsonObject = new JSONObject();
         String sheet = "creditos";
         String id_credito = "";
+        Log.v("subir_archivo0", "Nuevo_credito.\n\nfile: " + file + "\n\ncontenido del archivo:\n\n" + imprimir_archivo(file));
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput(file));
             BufferedReader br = new BufferedReader(archivo);
             String linea = br.readLine();
             while (linea != null && !linea.equals("")) {
                 String[] split = linea.split("_separador_");
-                Log.v("subir_archivo", ".\n\nLinea:\n\n" + linea + "\n\n.");
+                Log.v("subir_archivo1", ".\n\nLinea:\n\n" + linea + "\n\n.");
                 json_string = json_string + split[1] + "_n_";
                 linea = br.readLine();
             }
@@ -1059,26 +1361,18 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             queue = Volley.newRequestQueue(this);
             //Llamada POST usando Volley:
             RequestQueue requestQueue;
-
             // Instantiate the cache
             Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
-
             // Set up the network to use HttpURLConnection as the HTTP client.
             Network network = new BasicNetwork(new HurlStack());
-
             // Instantiate the RequestQueue with the cache and network.
             requestQueue = new RequestQueue(cache, network);
-
             // Start the queue
             requestQueue.start();
-
             //Toast.makeText(this, "Debug:\nConsecutivo: " + Consecutivo + "\nconsecutivo: " + consecutivo + "\nDeben ser iguales.", Toast.LENGTH_LONG).show();
-
             String url = addRowURL;
-
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                     (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
-
                         @Override
                         public void onResponse(JSONObject response) {
                             String[] split = response.toString().split("\"");
@@ -1090,14 +1384,12 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                                 }
                                 if (split[23].equals(credit_ID)) {//
                                     cambiar_bandera1(file);
-
                                 } else {
                                     Log.v("onResponse_nuev_cred", "Error al subir informacion del credito al servidor.");
                                 }
                             } else {
                                 //No se subio correctamente!
                             }
-
                         }
                     }, new Response.ErrorListener() {
 
@@ -1105,10 +1397,8 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                         public void onErrorResponse(VolleyError error) {
                             // TODO: Handle error
                             //mensaje_error_en_subida();
-
                         }
                     });
-
             // Add the request to the RequestQueue.
             requestQueue.add(jsonObjectRequest);
         } else {//No hay internet!!!
@@ -1116,9 +1406,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             //msg("Para registrar al vendedor en el servidor, debe estar conectado a internet.");
             mostrar_todito();
             presentar_cuadratura();
-
         }
-
     }
 
     private void cambiar_bandera1 (String file) {
@@ -1161,7 +1449,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         tv_caja.setText(imprimir_archivo(caja));
     }
 
-    private void presentar_cuadratura() {
+    private void presentar_cuadratura () {
         Intent CuadraturaAc = new Intent(this, CuadraturaActivity.class);
         CuadraturaAc.putExtra("cuadratura", cuadratura);
         CuadraturaAc.putExtra("msg", "Operacion realizada con exito!!!");

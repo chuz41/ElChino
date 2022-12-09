@@ -110,7 +110,7 @@
         app:layout_constraintVertical_bias="0.905" />
 
     <TextView
-        android:id="@+id/tv_sexo_cliente"
+        android:id="@+id/tv_notas_cliente"
         android:layout_width="160dp"
         android:layout_height="25dp"
         android:text="TextView"
@@ -182,7 +182,7 @@
         android:layout_width="160dp"
         android:layout_height="25dp"
         android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/tv_sexo_cliente"
+        app:layout_constraintBottom_toTopOf="@+id/tv_notas_cliente"
         app:layout_constraintEnd_toStartOf="@+id/tv_saludo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -241,7 +241,7 @@
         app:layout_constraintVertical_bias="0.893" />
 
     <EditText
-        android:id="@+id/et_sexo_cliente"
+        android:id="@+id/et_notas_cliente"
         android:layout_width="160dp"
         android:layout_height="45dp"
         android:text="TextView"
@@ -324,7 +324,7 @@
         android:layout_height="45dp"
         android:text="TextView"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/tv_sexo_cliente"
+        app:layout_constraintBottom_toTopOf="@+id/tv_notas_cliente"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toEndOf="@+id/tv_saludo"

@@ -84,5 +84,33 @@
         app:layout_constraintStart_toStartOf="@+id/et_ID"
         app:layout_constraintTop_toBottomOf="@+id/et_ID" />
 
+    <Button
+        android:id="@+id/bt_perdon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="perdonar"
+        android:text="@string/bt_perdon"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.486"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_consultar_ab"
+        app:layout_constraintVertical_bias="0.801"
+        app:strokeColor="#EA1F39DA" />
+
+    <EditText
+        android:id="@+id/et_mensaje"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/bt_perdon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_consultar_ab" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,6 +20,8 @@
     <string name="apellido1">Primer apellido</string>
     <string name="apellido2">Segundo apellido</string>
     <string name="apodo">Apodo</string>
+    <string name="bt_perdon">PERDONAR</string>
+    <string name="bt_cierre">CIERRE</string>
     <string name="confirm">Confirmar</string>
     <string name="monto_cliente">Monto aprobado</string>
     <string name="tasa_cliente">Tasa de interes (%)</string>
@@ -28,9 +30,9 @@
     <string name="toolong_edad">Fecha invalida!</string>
     <string name="cantempty_edad">Debe indicar la fecha de nacimiento</string>
     <string name="fecha_nacimiento">Fecha de nacimiento dd/mm/aaaa</string>
-    <string name="sexo">Sexo</string>
-    <string name="cantempty_sexo">Debe indicar el sexo del cliente...</string>
-    <string name="toolong_sexo">Inforamcion incorrecta!!!</string>
+    <string name="notas">Notas</string>
+    <string name="cantempty_notas">Debe indicar una nota del cliente...</string>
+    <string name="toolong_notas">Inforamcion incorrecta!!!</string>
     <string name="direccion_cliente">Direccion... </string>
     <string name="toolow_direccion">Direccion muy corta</string>
     <string name="toolong_direccion">Direccion demasiado larga</string>
@@ -64,8 +66,7 @@
     <string name="estado_cuenta">Ver estado de cuenta</string>
     <string name="fecha_registro">Fecha de registro del cliente</string>
     <string name="muy_joven">Acreedor debe ser mayor de 15 anios.</string>
-
-
+    <string name="bt_personalizar">PERSONALIZAR CREDITO</string>
     <string name="app_name">El Chino</string>
     <string name="pedir_codigo_tv">Introduzca su codigo de cobrador...</string>
     <string name="pedir_codigo_et">CODIGO COBRADOR</string>

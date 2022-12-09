@@ -52,8 +52,8 @@ import java.util.Map;
 
 public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
-    TextInputLayout nombre_cliente,telefono2_cliente,telefono1_cliente,apellido1_cliente,apellido2_cliente,apodo_cliente,edad_cliente,sexo_cliente,direccion_cliente,monto_disponible,ID_cliente;
-    private String u0,u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13,u14;//u0: cedula, u1: nombre, u2: apellido, u4: Apodo
+    TextInputLayout nombre_cliente,telefono2_cliente,telefono1_cliente,apellido1_cliente,apellido2_cliente,apodo_cliente,notas_cliente,direccion_cliente,monto_disponible,ID_cliente;
+    private String u0,u1,u2,u3,u4,u5,u6,u7,u9,u10,u11,u12,u13,u14;//u0: cedula, u1: nombre, u2: apellido, u4: Apodo
     private boolean flag_u0 = false;
     private boolean flag_u1 = false;
     private boolean flag_u2 = false;
@@ -62,7 +62,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     private boolean flag_u5 = false;
     private boolean flag_u6 = false;
     private boolean flag_u7 = false;
-    private boolean flag_u8 = false;
+    //private boolean flag_u8 = false;
     private boolean flag_u9 = false;
     private boolean flag_u10 = false;
     private boolean flag_u11 = false;
@@ -75,8 +75,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     private String apellido1_clienteS = "";
     private String apellido2_clienteS = "";
     private String apodo_clienteS = "";
-    private String edad_clienteS = "";
-    private String sexo_clienteS = "";
+    private String notas_clienteS = "";
     private String direccion_clienteS = "";
     private String puntuacion_clienteS = "9";
     private String tasa_clienteS = "25";
@@ -117,10 +116,10 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         apellido2_cliente = (TextInputLayout) findViewById(R.id.apellido2_cliente);
         telefono1_cliente = (TextInputLayout) findViewById(R.id.telefono1_cliente);
         telefono2_cliente = (TextInputLayout) findViewById(R.id.telefono2_cliente);
-        tiet_fecha_nacimiento = (TextInputEditText) findViewById(R.id.tiet_fecha_nacimiento);
+        //tiet_fecha_nacimiento = (TextInputEditText) findViewById(R.id.tiet_fecha_nacimiento);
         apodo_cliente = (TextInputLayout) findViewById(R.id.apodo_cliente);
-        edad_cliente = (TextInputLayout) findViewById(R.id.edad_cliente);
-        sexo_cliente = (TextInputLayout) findViewById(R.id.sexo_cliente);
+        //edad_cliente = (TextInputLayout) findViewById(R.id.edad_cliente);
+        notas_cliente = (TextInputLayout) findViewById(R.id.notas_cliente);
         direccion_cliente = (TextInputLayout) findViewById(R.id.direccion_cliente);
         //puntuacion_cliente = (TextInputLayout) findViewById(R.id.puntuacion_cliente);
         //tasa_cliente = (TextInputLayout) findViewById(R.id.tasa_cliente);
@@ -134,7 +133,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         separar_fechaYhora();
     }
 
-    public void select_fecha_nacimiento (View view) {
+ /*   public void select_fecha_nacimiento (View view) {
         //tiet_fecha_nacimiento.setClickable(false);
         //tiet_fecha_nacimiento.setEnabled(false);
         final Calendar c = Calendar.getInstance();
@@ -186,14 +185,14 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             }
         },anio_selected,mes_selected,fecha_selected);
         datePickerDialog.show();
-    }
+    }*/
 
     public void confirm(View view) throws IOException, JSONException {
         confirmar.setClickable(false);
         confirmar.setEnabled(false);
         if (!ID_cliente() | !nombre_cliente() | !apellido1_cliente() | !apellido2_cliente() | !apodo_cliente() |
-                !edad_cliente() | !sexo_cliente() | !direccion_cliente() | !puntuacion_cliente() |
-                !tasa_cliente() | !monto_disponible() | !interes_mora() | !telefono1_cliente() | !telefono2_cliente() | !fecha_registro()){
+                !notas_cliente() | !direccion_cliente() | !puntuacion_cliente() | !tasa_cliente() | !monto_disponible() |
+                !interes_mora() | !telefono1_cliente() | !telefono2_cliente() | !fecha_registro()){
             Toast.makeText(this, "Debe llenar todos los campos! ", Toast.LENGTH_LONG).show();
             confirmar.setClickable(true);
             confirmar.setEnabled(true);
@@ -511,7 +510,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
     }
 
-    public boolean edad_cliente () {//Se llena con un onClick listener!!!\
+    /*public boolean edad_cliente () {//Se llena con un onClick listener!!!\
 
         int anio_selected_n = 0;
         int mes_selected_n = 0;
@@ -587,7 +586,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
         }
 
-    }
+    }*/
 
     public boolean fecha_registro () {//Se llena con un onClick listener!!!
 
@@ -638,37 +637,33 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
     }
 
-    public boolean sexo_cliente () {//Se llena con un onClick listener!!!
-        if (sexo_cliente.getEditText()!=null){
-            u9 = sexo_cliente.getEditText().getText().toString().trim();
+    public boolean notas_cliente () {//Se llena con un onClick listener!!!
+        if (notas_cliente.getEditText()!=null){
+            u9 = notas_cliente.getEditText().getText().toString().trim();
         }
 
         if (u9.isEmpty()) {
 
-            sexo_cliente.setError(getText(R.string.cantempty_sexo));
-            return false;
+            u9 = "Sin notas...";
 
         }
 
-        else if (u9.length() > 6) {
-
-            sexo_cliente.setError(getText(R.string.toolong_sexo));
+        if (u9.length() > 100) {
+            notas_cliente.setError(getText(R.string.toolong_notas));
             return false;
-        }
-
-        else {
-            sexo_cliente.setError(null);
+        } else {
+            notas_cliente.setError(null);
             //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u9) {
-                if (u9.equals(sexo_clienteS)) {
+                if (u9.equals(notas_clienteS)) {
                     //Do nothing.
                 } else {
-                    file_content.replace("sexo_cliente_separador_" + sexo_clienteS, "sexo_cliente_separador_" + u9);
+                    file_content.replace("notas_cliente_separador_" + notas_clienteS, "notas_cliente_separador_" + u9);
                 }
-                sexo_clienteS = u9;
+                notas_clienteS = u9;
                 return true;
             } else {
-                String linea = "sexo_cliente_separador_" + u9;
+                String linea = "notas_cliente_separador_" + u9;
                 file_content = file_content + linea + "\n";
                 flag_u9 = true;
                 return true;
@@ -695,7 +690,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             return false;
         }
 
-        else if (u10.length() < 20) {
+        else if (u10.length() < 15) {
 
             direccion_cliente.setError(getText(R.string.toolow_direccion));
             return false;
@@ -1075,8 +1070,8 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         apellido1_cliente.setVisibility(View.VISIBLE);
         apellido2_cliente.setVisibility(View.VISIBLE);
         apodo_cliente.setVisibility(View.VISIBLE);
-        edad_cliente.setVisibility(View.VISIBLE);
-        sexo_cliente.setVisibility(View.VISIBLE);
+        //edad_cliente.setVisibility(View.VISIBLE);
+        notas_cliente.setVisibility(View.VISIBLE);
         direccion_cliente.setVisibility(View.VISIBLE);
         //puntuacion_cliente.setVisibility(View.VISIBLE);
         //tasa_cliente.setVisibility(View.VISIBLE);
@@ -1098,8 +1093,8 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         apellido1_cliente.setVisibility(View.INVISIBLE);
         apellido2_cliente.setVisibility(View.INVISIBLE);
         apodo_cliente.setVisibility(View.INVISIBLE);
-        edad_cliente.setVisibility(View.INVISIBLE);
-        sexo_cliente.setVisibility(View.INVISIBLE);
+        //edad_cliente.setVisibility(View.INVISIBLE);
+        notas_cliente.setVisibility(View.INVISIBLE);
         direccion_cliente.setVisibility(View.INVISIBLE);
         //puntuacion_cliente.setVisibility(View.INVISIBLE);
         //tasa_cliente.setVisibility(View.INVISIBLE);

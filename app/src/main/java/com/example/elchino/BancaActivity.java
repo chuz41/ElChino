@@ -54,6 +54,7 @@ public class BancaActivity extends AppCompatActivity {
 
     private EditText et_ID;
     private TextView tv_esperar;
+    private String monto_nuevo_end = "";
     private Map<String, Integer> meses = new HashMap<String, Integer>();private String dia;
     private String mes;
     private String anio;
@@ -138,7 +139,165 @@ public class BancaActivity extends AppCompatActivity {
             borrar_archivo(caja);
             crear_archivo(caja);
             guardar(linea, caja);
-            esperar("Operacion bancaria realizada con exito.\nMonto en caja: " + monto_nuevo, "Pendiente de confirmacion por parte de la Banca!!!");
+            crear_archivo("cajax.txt");
+            borrar_archivo("cajax.txt");
+            crear_archivo("cajax.txt");
+            linea = linea.replace(" ", "_separador_");
+            guardar(linea, "cajax.txt");
+            subir_caja(String.valueOf(monto_nuevo));
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void subir_caja (String monto_nuevo) throws JSONException, IOException {
+        String sp_creditos = "";
+        String cobrador_ID_S = "";
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String[] splitr = linea.split(" ");
+            cobrador_ID_S = splitr[0];
+            while (linea != null) {
+                String[] split = linea.split(" ");
+                if (split[0].equals("Screditos")) {
+                    sp_creditos = split[1];
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String archivos[] = fileList();
+        Log.v("subir_caja1", ".\n\nAbonar. \n\nTotal de archivos: " + archivos.length + "\n\n.");
+        Log.v("subir_caja2", "Abonar.\n\ncobrador_ID_S: " + cobrador_ID_S + "\n\n");
+
+        subir_caja2(sp_creditos, monto_nuevo);
+    }
+
+    private void subir_caja2 (String sp_creditos, String monto_nuevo) throws JSONException {
+        String spid = sp_creditos;
+        String json_string = "";
+        JSONObject jsonObject = new JSONObject();
+        String sheet = "caja";
+        String id_caja = "";
+        Log.v("subir_caja20", "Abonar.\n\nfile: " + "cajax.txt" + "\n\ncontenido del archivo:\n\n" + imprimir_archivo("cajax.txt"));
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput("cajax.txt"));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            while (linea != null && !linea.equals("")) {
+                String[] split = linea.split("_separador_");
+                Log.v("subir_caja21", "Abonar.\n\nLinea:\n\n" + linea + "\n\n.");
+                json_string = json_string + split[1] + "_n_";
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.v("subir_caja22", "Abonar.\n\njson_string: " + "\n\n" + json_string + "\n\n.");
+        jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_caja);
+        subir_nuevo_caj(jsonObject, "cajax.txt", monto_nuevo);
+    }
+
+    private void subir_nuevo_caj (JSONObject jsonObject, String file, String monto_nuevo) {
+        if (verificar_internet()) {
+            agregar_linea_archivo("abajo " + file, onlines);
+            RequestQueue queue;
+            queue = Volley.newRequestQueue(this);
+            //Llamada POST usando Volley:
+            RequestQueue requestQueue;
+
+            // Instantiate the cache
+            Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+
+            // Set up the network to use HttpURLConnection as the HTTP client.
+            Network network = new BasicNetwork(new HurlStack());
+
+            // Instantiate the RequestQueue with the cache and network.
+            requestQueue = new RequestQueue(cache, network);
+
+            // Start the queue
+            requestQueue.start();
+
+            //Toast.makeText(this, "Debug:\nConsecutivo: " + Consecutivo + "\nconsecutivo: " + consecutivo + "\nDeben ser iguales.", Toast.LENGTH_LONG).show();
+
+            String url = addRowURL;
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            String[] split = response.toString().split("\"");
+                            int length_split = split.length;
+                            Log.v("subir_nuevo_caj0", "Abonar.\n\nresponse:\n\n" + response + "\n\n.");
+                            if (length_split > 3) {//
+                                for (int i = 0; i < length_split; i++) {
+                                    Log.v("subir_nuevo_caj1" + i, "split[" + i + "]: " + split[i]);
+                                }
+                                cambiar_bandera2(file);
+                                esperar("Operacion bancaria realizada con exito.\nMonto en caja: " + monto_nuevo, "Pendiente de confirmacion por parte de la Banca!!!");
+                            } else {
+                                //No se subio correctamente!
+                            }
+
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // TODO: Handle error
+                            //mensaje_error_en_subida();
+
+                        }
+                    });
+
+            // Add the request to the RequestQueue.
+            requestQueue.add(jsonObjectRequest);
+        } else {//No hay internet!!!
+            agregar_linea_archivo("abajo " + file, onlines);
+            //msg("Para registrar al vendedor en el servidor, debe estar conectado a internet.");
+        }
+    }
+
+    private void cambiar_bandera2 (String file) {
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String contenido = "";
+            while (linea != null) {
+                Log.v("cambiar_bandera_file", "  Linea: " + linea + "\n\n");
+                String[] split = linea.split(" ");
+                if (split[0].equals("arriba")) {
+                    //Dejar perder la linea
+                } else if (split[0].equals("abajo")) {
+                    if (split[1].equals(file)) {
+                        linea = linea.replace(split[0], "arriba");
+                        contenido = contenido + linea + "\n";
+                    } else {
+                        contenido = contenido + linea + "\n";
+                    }
+                } else {
+                    //Do nothing. Nunca llega aqui.
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+            borrar_archivo(onlines);
+            guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
+            //mostrar_todito();
+            Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
+            //presentar_cuadratura();
+            Log.v("camb_band_nuev_cred", "\"Credito generado y registrado correctamente en el servidor.\"");
         } catch (IOException e) {
             e.printStackTrace();
         }

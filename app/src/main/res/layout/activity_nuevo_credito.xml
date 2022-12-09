@@ -84,4 +84,52 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_saludo"
         app:layout_constraintVertical_bias="0.51" />
 
+    <Spinner
+        android:id="@+id/sp_tipo_cobro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="52dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/sp_cuotas"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_consultar" />
+
+    <Spinner
+        android:id="@+id/sp_cuotas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/sp_interes"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/bt_personalizar" />
+
+    <Spinner
+        android:id="@+id/sp_interes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bt_personalizar"
+        app:layout_constraintVertical_bias="0.764" />
+
+    <Button
+        android:id="@+id/bt_personalizar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="personalizar"
+        android:text="@string/bt_personalizar"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_saludo"
+        app:layout_constraintVertical_bias="0.605" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

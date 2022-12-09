@@ -158,37 +158,11 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/edad_cliente"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:onClick="select_fecha_nacimiento"
-            app:counterEnabled="true"
-            app:counterMaxLength="10"
-            app:counterOverflowTextColor="@color/red"
-            app:counterTextColor="@color/green"
-            app:errorEnabled="true"
-            app:errorIconDrawable="@android:drawable/ic_dialog_alert"
-            app:errorTextColor="@color/red">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/tiet_fecha_nacimiento"
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:hint="@string/fecha_nacimiento"
-                android:inputType="date"
-                android:onClick="select_fecha_nacimiento" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/sexo_cliente"
+            android:id="@+id/notas_cliente"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:counterEnabled="true"
-            app:counterMaxLength="6"
+            app:counterMaxLength="100"
             app:counterOverflowTextColor="@color/red"
             app:counterTextColor="@color/green"
             app:errorEnabled="true"
@@ -199,7 +173,7 @@
                 style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/sexo"
+                android:hint="@string/notas"
                 android:inputType="text" />
 
         </com.google.android.material.textfield.TextInputLayout>

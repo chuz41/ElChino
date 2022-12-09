@@ -37,7 +37,7 @@ public class EditarActivity extends AppCompatActivity {
     private TextView tv_apellido1_cliente;
     private TextView tv_apellido2_cliente;
     private TextView tv_apodo_cliente;
-    private TextView tv_sexo_cliente;
+    private TextView tv_notas_cliente;
     private TextView tv_direccion_cliente;
     private TextView tv_puntuacion_cliente;
     private TextView tv_monto_disponible;
@@ -49,19 +49,19 @@ public class EditarActivity extends AppCompatActivity {
     private EditText et_apellido1_cliente;
     private EditText et_apellido2_cliente;
     private EditText et_apodo_cliente;
-    private EditText et_sexo_cliente;
+    private EditText et_notas_cliente;
     private EditText et_direccion_cliente;
     private EditText et_puntuacion_cliente;
     private EditText et_monto_disponible;
     private EditText et_telefono1_cliente;
     private EditText et_telefono2_cliente;
-
+    //private String activity_volver;
     private String ID_cliente;
     private String nombre_cliente;
     private String apellido1_cliente;
     private String apellido2_cliente;
     private String apodo_cliente;
-    private String sexo_cliente;
+    private String notas_cliente;
     private String direccion_cliente;
     private String puntuacion_cliente;
     private String monto_disponible;
@@ -76,6 +76,7 @@ public class EditarActivity extends AppCompatActivity {
         archivo_cliente = getIntent().getStringExtra("archivo_cliente");
         cliente_ID = getIntent().getStringExtra("cliente_id");
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
+        //activity_volver = getIntent().getStringExtra("activity_devolver");
         tv_esperar.setText("Seleccione la opcion que desea editar...");
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
         tv_saludo.setText("Editar");
@@ -89,7 +90,7 @@ public class EditarActivity extends AppCompatActivity {
         tv_apellido1_cliente = (TextView) findViewById(R.id.tv_apellido1_cliente);
         tv_apellido2_cliente = (TextView) findViewById(R.id.tv_apellido2_cliente);
         tv_apodo_cliente = (TextView) findViewById(R.id.tv_apodo_cliente);
-        tv_sexo_cliente = (TextView) findViewById(R.id.tv_sexo_cliente);
+        tv_notas_cliente = (TextView) findViewById(R.id.tv_notas_cliente);
         tv_direccion_cliente = (TextView) findViewById(R.id.tv_direccion_cliente);
         tv_puntuacion_cliente = (TextView) findViewById(R.id.tv_puntuacion_cliente);
         tv_monto_disponible = (TextView) findViewById(R.id.tv_monto_disponible);
@@ -100,7 +101,7 @@ public class EditarActivity extends AppCompatActivity {
         tv_apellido1_cliente.setVisibility(View.INVISIBLE);
         tv_apellido2_cliente.setVisibility(View.INVISIBLE);
         tv_apodo_cliente.setVisibility(View.INVISIBLE);
-        tv_sexo_cliente.setVisibility(View.INVISIBLE);
+        tv_notas_cliente.setVisibility(View.INVISIBLE);
         tv_direccion_cliente.setVisibility(View.INVISIBLE);
         tv_puntuacion_cliente.setVisibility(View.INVISIBLE);
         tv_monto_disponible.setVisibility(View.INVISIBLE);
@@ -112,7 +113,7 @@ public class EditarActivity extends AppCompatActivity {
         et_apellido1_cliente = (EditText) findViewById(R.id.et_apellido1_cliente);
         et_apellido2_cliente = (EditText) findViewById(R.id.et_apellido2_cliente);
         et_apodo_cliente = (EditText) findViewById(R.id.et_apodo_cliente);
-        et_sexo_cliente = (EditText) findViewById(R.id.et_sexo_cliente);
+        et_notas_cliente = (EditText) findViewById(R.id.et_notas_cliente);
         et_direccion_cliente = (EditText) findViewById(R.id.et_direccion_cliente);
         et_puntuacion_cliente = (EditText) findViewById(R.id.et_puntuacion_cliente);
         et_monto_disponible = (EditText) findViewById(R.id.et_monto_disponible);
@@ -123,7 +124,7 @@ public class EditarActivity extends AppCompatActivity {
         et_apellido1_cliente.setVisibility(View.INVISIBLE);
         et_apellido2_cliente.setVisibility(View.INVISIBLE);
         et_apodo_cliente.setVisibility(View.INVISIBLE);
-        et_sexo_cliente.setVisibility(View.INVISIBLE);
+        et_notas_cliente.setVisibility(View.INVISIBLE);
         et_direccion_cliente.setVisibility(View.INVISIBLE);
         et_puntuacion_cliente.setVisibility(View.INVISIBLE);
         et_monto_disponible.setVisibility(View.INVISIBLE);
@@ -155,8 +156,8 @@ public class EditarActivity extends AppCompatActivity {
         et_apellido2_cliente.setEnabled(true);
         tv_apodo_cliente.setEnabled(true);
         et_apodo_cliente.setEnabled(true);
-        tv_sexo_cliente.setEnabled(true);
-        et_sexo_cliente.setEnabled(true);
+        tv_notas_cliente.setEnabled(true);
+        et_notas_cliente.setEnabled(true);
         tv_direccion_cliente.setEnabled(true);
         et_direccion_cliente.setEnabled(true);
         tv_monto_disponible.setEnabled(true);
@@ -200,10 +201,10 @@ public class EditarActivity extends AppCompatActivity {
                     tv_apodo_cliente.setText("Apodo");
                     et_apodo_cliente.setText(apodo_cliente);
                 }
-                if (split[0].equals("sexo_cliente")) {
-                    sexo_cliente = split[1];
-                    tv_sexo_cliente.setText("Sexo");
-                    et_sexo_cliente.setText(sexo_cliente);
+                if (split[0].equals("notas_cliente")) {
+                    notas_cliente = split[1];
+                    tv_notas_cliente.setText("notas");
+                    et_notas_cliente.setText(notas_cliente);
                 }
                 if (split[0].equals("direccion_cliente")) {
                     direccion_cliente = split[1];
@@ -243,7 +244,7 @@ public class EditarActivity extends AppCompatActivity {
         et_apellido1_cliente.setHint("Primer apellido...");
         et_apellido2_cliente.setHint("Segundo apellido...");
         et_apodo_cliente.setHint("Apodo...");
-        et_sexo_cliente.setHint("Sexo...");
+        et_notas_cliente.setHint("notas...");
         et_direccion_cliente.setHint("Direccion...");
         et_puntuacion_cliente.setHint("Puntuacione...");
         et_monto_disponible.setHint("Monto disponible...");
@@ -351,21 +352,20 @@ public class EditarActivity extends AppCompatActivity {
                                 linea = linea.replace(split[1], apodo_cliente);
                             }
                         }
-                    } else if (split[0].equals("sexo_cliente")) {
-                        sexo_cliente = et_sexo_cliente.getText().toString();
-                        if (sexo_cliente.equals("")) {
+                    } else if (split[0].equals("notas_cliente")) {
+                        notas_cliente = et_notas_cliente.getText().toString();
+                        if (notas_cliente.equals("")) {
+                            notas_cliente = "Sin notas...";
+                        }
+
+                        if (notas_cliente.contains("\n")) {
                             flag = false;
-                            msg("Sexo vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
+                            msg("Error en notas del cliente.");
                         } else {
-                            if (sexo_cliente.contains("\n")) {
-                                flag = false;
-                                msg("Error en sexo del cliente.");
-                            } else {
-                                sexo_cliente.replace("\n", "");
-                                tv_sexo_cliente.setEnabled(false);
-                                et_sexo_cliente.setEnabled(false);
-                                linea = linea.replace(split[1], sexo_cliente);
-                            }
+                            notas_cliente.replace("\n", "");
+                            tv_notas_cliente.setEnabled(false);
+                            et_notas_cliente.setEnabled(false);
+                            linea = linea.replace(split[1], notas_cliente);
                         }
                     } else if (split[0].equals("direccion_cliente")) {
                         direccion_cliente = et_direccion_cliente.getText().toString();
@@ -514,7 +514,7 @@ public class EditarActivity extends AppCompatActivity {
         tv_apellido1_cliente.setVisibility(View.INVISIBLE);
         tv_apellido2_cliente.setVisibility(View.INVISIBLE);
         tv_apodo_cliente.setVisibility(View.INVISIBLE);
-        tv_sexo_cliente.setVisibility(View.INVISIBLE);
+        tv_notas_cliente.setVisibility(View.INVISIBLE);
         tv_direccion_cliente.setVisibility(View.INVISIBLE);
         tv_puntuacion_cliente.setVisibility(View.INVISIBLE);
         tv_monto_disponible.setVisibility(View.INVISIBLE);
@@ -525,7 +525,7 @@ public class EditarActivity extends AppCompatActivity {
         et_apellido1_cliente.setVisibility(View.INVISIBLE);
         et_apellido2_cliente.setVisibility(View.INVISIBLE);
         et_apodo_cliente.setVisibility(View.INVISIBLE);
-        et_sexo_cliente.setVisibility(View.INVISIBLE);
+        et_notas_cliente.setVisibility(View.INVISIBLE);
         et_direccion_cliente.setVisibility(View.INVISIBLE);
         et_puntuacion_cliente.setVisibility(View.INVISIBLE);
         et_monto_disponible.setVisibility(View.INVISIBLE);
@@ -544,7 +544,7 @@ public class EditarActivity extends AppCompatActivity {
         tv_apellido1_cliente.setVisibility(View.VISIBLE);
         tv_apellido2_cliente.setVisibility(View.VISIBLE);
         tv_apodo_cliente.setVisibility(View.VISIBLE);
-        tv_sexo_cliente.setVisibility(View.VISIBLE);
+        tv_notas_cliente.setVisibility(View.VISIBLE);
         tv_direccion_cliente.setVisibility(View.VISIBLE);
         tv_puntuacion_cliente.setVisibility(View.VISIBLE);
         tv_monto_disponible.setVisibility(View.VISIBLE);
@@ -555,7 +555,7 @@ public class EditarActivity extends AppCompatActivity {
         et_apellido1_cliente.setVisibility(View.VISIBLE);
         et_apellido2_cliente.setVisibility(View.VISIBLE);
         et_apodo_cliente.setVisibility(View.VISIBLE);
-        et_sexo_cliente.setVisibility(View.VISIBLE);
+        et_notas_cliente.setVisibility(View.VISIBLE);
         et_direccion_cliente.setVisibility(View.VISIBLE);
         et_puntuacion_cliente.setVisibility(View.VISIBLE);
         et_monto_disponible.setVisibility(View.VISIBLE);
@@ -611,9 +611,10 @@ public class EditarActivity extends AppCompatActivity {
     }
 
     private void boton_atras() {
-        Intent menu_principal = new Intent(this, MenuPrincipal.class);
-        menu_principal.putExtra("mensaje", "");
-        startActivity(menu_principal);
+        Intent activity_volver = new Intent(this, Estado_clienteActivity.class);
+        activity_volver.putExtra("mensaje", "");
+        activity_volver.putExtra("cliente_ID", cliente_ID);
+        startActivity(activity_volver);
         finish();
         System.exit(0);
     }
