@@ -248,12 +248,10 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     public void consultar (View view) throws JSONException, IOException, ParseException {
         bt_consultar.setClickable(false);
         bt_consultar.setEnabled(false);
-
         if (tv_esperar.getText().toString().equals("Escoja el plazo del credito")) {
             restar_disponible();
             generar_credito();
         } else if (tv_esperar.getText().toString().equals("Digite el monto del credito")) {//TODO: Rechazar si supera el monto disponible del cliente.
-
             monto_credito = Integer.parseInt(et_ID.getText().toString());
             Log.v("monto_credito", ".\n\nmonto_credito: " + monto_credito + "\n\n.");
             et_ID.setText("");
@@ -264,9 +262,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             tv_esperar.setText("");
             tv_esperar.setVisibility(View.INVISIBLE);
             sp_plazos.setVisibility(View.VISIBLE);
-            //tv_esperar.setText("Escoja el plazo del credito");
-            //restar_disponible();
-            //llenar_spinner();
             obtener_plazo();
         } else if (tv_esperar.getText().toString().equals("Digite la identificacion del cliente")) {
             String archivos[] = fileList();
@@ -623,8 +618,30 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         crear_archivo(file_name);
         guardar(file_content, file_name);
         actualizar_caja();
+        actualizar_cierre(monto_credito, obtener_caja(), credit_ID);
         Log.v("antes_de_subir", ".\n\nArchivo a subir: " + file_name + "\n\nContenido de " + file_name + ":\n\n" + imprimir_archivo(file_name) + "\n\n.");
         subir_archivo(file_name);
+    }
+
+    private void actualizar_cierre (Integer monto_credito, Integer saldo_caja, String credit_ID) {
+        String linea_cierre = "credito " + String.valueOf(monto_credito) + " " + saldo_caja + " " + credit_ID;
+        agregar_linea_archivo(linea_cierre, "cierre.txt");
+    }
+
+    private Integer obtener_caja() {
+        int monto_caja = 0;
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(caja));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String[] split = linea.split(" ");
+            monto_caja = Integer.parseInt(split[1]);
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return monto_caja;
     }
 
     private void actualizar_caja () {
@@ -640,11 +657,11 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             borrar_archivo(caja);
             crear_archivo(caja);
             guardar(linea, caja);
-            crear_archivo("cajax.txt");
-            borrar_archivo("cajax.txt");
-            crear_archivo("cajax.txt");
+            crear_archivo("cajax_caja_.txt");
+            borrar_archivo("cajax_caja_.txt");
+            crear_archivo("cajax_caja_.txt");
             linea = linea.replace(" ", "_separador_");
-            guardar(linea, "cajax.txt");
+            guardar(linea, "cajax_caja_.txt");
             subir_caja();
         } catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -686,9 +703,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         JSONObject jsonObject = new JSONObject();
         String sheet = "caja";
         String id_caja = "";
-        Log.v("subir_caja20", "Abonar.\n\nfile: " + "cajax.txt" + "\n\ncontenido del archivo:\n\n" + imprimir_archivo("cajax.txt"));
+        Log.v("subir_caja20", "Abonar.\n\nfile: " + "cajax_caja_.txt" + "\n\ncontenido del archivo:\n\n" + imprimir_archivo("cajax_caja_.txt"));
         try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput("cajax.txt"));
+            InputStreamReader archivo = new InputStreamReader(openFileInput("cajax_caja_.txt"));
             BufferedReader br = new BufferedReader(archivo);
             String linea = br.readLine();
             while (linea != null && !linea.equals("")) {
@@ -704,7 +721,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         }
         Log.v("subir_caja22", "Abonar.\n\njson_string: " + "\n\n" + json_string + "\n\n.");
         jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_caja);
-        subir_nuevo_caj(jsonObject, "cajax.txt");
+        subir_nuevo_caj(jsonObject, "cajax_caja_.txt");
     }
 
     private void subir_nuevo_caj (JSONObject jsonObject, String file) {

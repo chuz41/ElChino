@@ -175,9 +175,10 @@ public class MenuPrincipal extends AppCompatActivity {
     }
 
     public void cierre(View view){
-
-
-
+        Intent cierre = new Intent(this, CierreActivity.class);
+        startActivity(cierre);
+        finish();
+        System.exit(0);
     }
 
     public void refinanciar(View view){
@@ -487,13 +488,20 @@ public class MenuPrincipal extends AppCompatActivity {
         for (String key : abajos.keySet()) {
             String json_string = "";
             JSONObject jsonObject = new JSONObject();
+            Log.v("Abajiar", "MenuPrincipal.\n\nKey: " + key + "\n\nValue: " + abajos.get(key) + "\n\n.");
             String[] split_pre = abajos.get(key).split("_");
             if (split_pre[1].equals("C")) {
                 spid = sp_clientes;
                 sheet = "clientes";
-            } else {
+            } else if (split_pre[1].equals("P")) {
                 spid = sp_creditos;
                 sheet = "creditos";
+            } else if (split_pre[1].equals("caja")) {
+                spid = sp_creditos;
+                sheet = "caja";
+            } else if (split_pre[1].equals("S")) {
+                spid = sp_creditos;
+                sheet = "solicitudes";
             }
             try {
                 InputStreamReader archivo = new InputStreamReader(openFileInput(abajos.get(key)));

@@ -2467,7 +2467,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             }
     }
 
-    private String get_impresora() {
+    private String get_impresora () {
         String impresora = "00:11:22:33:44:55";
         return impresora;
     }

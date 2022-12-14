@@ -119,11 +119,15 @@ public class MainActivity extends AppCompatActivity {
         checkedTextView.setText("Mostrar password");
         checkedTextView.setVisibility(View.INVISIBLE);
         separar_fechaYhora();
-        corregir_archivos();
+        try {
+            corregir_archivos();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //abonar();
         //nuevo_credito();
-        estado_cliente();
-        //menu_principal("Hola Chuz");
+        //estado_cliente();
+        menu_principal("Problema con la nube,\nfavor esperar unos minutos\ndespues de cada transaccion!!!");
         //verificar_clientes();
         try {
             check_activation();
@@ -132,7 +136,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void corregir_archivos () {
+    private void corregir_archivos () throws IOException {
+
+        //borrar_archivo(onlines);
+        //crear_archivo(onlines);
 
         //////////  ARCHIVOS CREDITOS  /////////////////////////////////////////////////////////
         String archivos[] = fileList();
@@ -174,9 +181,38 @@ public class MainActivity extends AppCompatActivity {
         }
         /////////////////////////////////////////////////////////////////////////////////////
 
+        //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
 
-
-        //////// ARCHIVO cobrador  ////////////////////////////////////////////////////////
+        boolean flag_borrar = false;
+        if (archivo_existe(archivos, "cierre.txt")) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput("cierre.txt"));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                String[] split = linea.split(" ");
+                int fecha_file = Integer.parseInt(split[1]);
+                int hoy_fecha = Integer.parseInt(fecha);
+                Log.v("corregir_archivos0", "Main.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
+                if (fecha_file != hoy_fecha) {
+                    flag_borrar = true;
+                } else {
+                    //Do nothing.
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+            }
+        } else {
+            crear_archivo("cierre.txt");
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+        }
+        if (flag_borrar) {
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+        }
 
         /////////////////////////////////////////////////////////////////////////////////////
 
@@ -416,7 +452,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < codigo.length(); i++){
             if (i == 0) {
                 String valor = String.valueOf(codigo.charAt(i));
-                Log.v("verificar_codigo " + String.valueOf(i), "Valor a evaluar: " + valor);
+                Log.v("verificar_codigo" + String.valueOf(i), "Valor a evaluar: " + valor);
                 if (valor.equals("C")) {
                     //Do nothing. todo bien!
                 } else {
@@ -531,19 +567,19 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response) {
                             // Do something with the response
-                            Log.v("check_activ config 0", ".\nResponse:\n" + response);
+                            Log.v("check_activ_online1", "Main.\n\nResponse:\n" + response + "\n\n.");
                             if (response != null) {
                                 String[] split = response.split("estado");
                                 for (int i = 1; i < split.length; i++) {
                                     String[] split2 = split[i].split("\"");
-                                    Log.v("check_activ config 1", ".\nSplit:\nSplit22: " + split2[22] + ", Split2: " + split2[2] + "\net_ID.getText().toString(): " + et_ID.getText().toString() + "\n");
+                                    Log.v("check_activ_online1", "Main.\n\nSplit22: " + split2[22] + ", Split2: " + split2[2] + "\net_ID.getText().toString(): " + et_ID.getText().toString() + "\n");
                                     if (split2[22].equals(codigo)) {
                                         if (split2[2].equals("TRUE")) {
                                             try {
                                                 InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
                                                 BufferedReader br = new BufferedReader(archivo);
                                                 String linea = br.readLine();
-                                                Log.v("Linea_active_online", ".\n\nLinea: " + linea + "\n\n.");
+                                                Log.v("check_activ_online2", ".\n\nLinea: " + linea + "\n\n.");
                                                 String[] split_linea_1 = linea.split(" ");
                                                 linea = linea.replace(split_linea_1[0], codigo);
                                                 linea = linea.replace(split_linea_1[1], split2[2]);
@@ -561,7 +597,7 @@ public class MainActivity extends AppCompatActivity {
                                                 contenido = contenido + "telefono " + split2[30];
                                                 borrar_archivo(cobrador);
                                                 guardar(contenido, cobrador);
-                                                Log.v("Debug_file_cobra", ".\n\nArchivo cobrador.txt:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
+                                                Log.v("check_activ_online3", ".Main\n\nArchivo cobrador.txt:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
                                             } catch (IOException e) {
                                                 e.printStackTrace();
                                             }
@@ -579,8 +615,8 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     } else {
                                         tv_esperar.setText("Debe ingresar un codigo valido!");
-                                        msg("Codigo invalido!");
-                                        msg("Debe ingresar un codigo valido!");
+                                        //msg("Codigo invalido!");
+                                        //msg("Debe ingresar un codigo valido!");
                                         text_listener();
                                     }
                                 }
@@ -1132,9 +1168,15 @@ public class MainActivity extends AppCompatActivity {
             if (split_pre[1].equals("C")) {
                 spid = sp_clientes;
                 sheet = "clientes";
-            } else {
+            } else if (split_pre[1].equals("P")) {
                 spid = sp_creditos;
                 sheet = "creditos";
+            } else if (split_pre[1].equals("caja")) {
+                spid = sp_creditos;
+                sheet = "caja";
+            } else if (split_pre[1].equals("S")) {
+                spid = sp_creditos;
+                sheet = "solicitudes";
             }
             try {
                 InputStreamReader archivo = new InputStreamReader(openFileInput(abajos.get(key)));

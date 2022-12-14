@@ -120,6 +120,7 @@ public class BancaActivity extends AppCompatActivity {
 
     private void actualizar_disponible (String operador) {
         int monto_abono = Integer.parseInt(et_ID.getText().toString());
+        int monto_caja_mostrar = 0;
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput(caja));
             BufferedReader br = new BufferedReader(archivo);
@@ -128,8 +129,10 @@ public class BancaActivity extends AppCompatActivity {
             long monto_nuevo = 0;
             if (operador.equals("sumar")) {
                 monto_nuevo = Integer.parseInt(split[1]) + monto_abono;
+                monto_caja_mostrar = monto_abono;
             } else if (operador.equals("restar")) {
                 monto_nuevo = Integer.parseInt(split[1]) - monto_abono;
+                monto_caja_mostrar = monto_abono * -1;
             } else {
                 //Do nothing.
             }
@@ -139,15 +142,37 @@ public class BancaActivity extends AppCompatActivity {
             borrar_archivo(caja);
             crear_archivo(caja);
             guardar(linea, caja);
-            crear_archivo("cajax.txt");
-            borrar_archivo("cajax.txt");
-            crear_archivo("cajax.txt");
+            crear_archivo("cajax_caja_.txt");
+            borrar_archivo("cajax_caja_.txt");
+            crear_archivo("cajax_caja_.txt");
             linea = linea.replace(" ", "_separador_");
-            guardar(linea, "cajax.txt");
+            guardar(linea, "cajax_caja_.txt");
+            actualizar_cierre(monto_caja_mostrar, obtener_caja(), credit_ID);
             subir_caja(String.valueOf(monto_nuevo));
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void actualizar_cierre (Integer monto_abono, Integer saldo_caja, String credit_ID) {
+        String linea_cierre = "banca " + String.valueOf(monto_abono) + " " + saldo_caja + " " + credit_ID;
+        agregar_linea_archivo(linea_cierre, "cierre.txt");
+    }
+
+    private Integer obtener_caja() {
+        int monto_caja = 0;
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput(caja));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            String[] split = linea.split(" ");
+            monto_caja = Integer.parseInt(split[1]);
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return monto_caja;
     }
 
     private void subir_caja (String monto_nuevo) throws JSONException, IOException {
@@ -185,9 +210,9 @@ public class BancaActivity extends AppCompatActivity {
         JSONObject jsonObject = new JSONObject();
         String sheet = "caja";
         String id_caja = "";
-        Log.v("subir_caja20", "Abonar.\n\nfile: " + "cajax.txt" + "\n\ncontenido del archivo:\n\n" + imprimir_archivo("cajax.txt"));
+        Log.v("subir_caja20", "Abonar.\n\nfile: " + "cajax_caja_.txt" + "\n\ncontenido del archivo:\n\n" + imprimir_archivo("cajax_caja_.txt"));
         try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput("cajax.txt"));
+            InputStreamReader archivo = new InputStreamReader(openFileInput("cajax_caja_.txt"));
             BufferedReader br = new BufferedReader(archivo);
             String linea = br.readLine();
             while (linea != null && !linea.equals("")) {
@@ -203,7 +228,7 @@ public class BancaActivity extends AppCompatActivity {
         }
         Log.v("subir_caja22", "Abonar.\n\njson_string: " + "\n\n" + json_string + "\n\n.");
         jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, id_caja);
-        subir_nuevo_caj(jsonObject, "cajax.txt", monto_nuevo);
+        subir_nuevo_caj(jsonObject, "cajax_caja_.txt", monto_nuevo);
     }
 
     private void subir_nuevo_caj (JSONObject jsonObject, String file, String monto_nuevo) {
@@ -590,6 +615,7 @@ public class BancaActivity extends AppCompatActivity {
             return true;
         }
     }
+
     /*
     private void check_onlines () throws JSONException {
         if (verificar_internet()) {
@@ -796,6 +822,7 @@ public class BancaActivity extends AppCompatActivity {
         }
     }
     */
+
     private void subir_archivo (String file) throws JSONException {
         ocultar_todito();
         String sp_creditos = "";
