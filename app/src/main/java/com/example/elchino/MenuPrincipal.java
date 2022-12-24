@@ -41,10 +41,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MenuPrincipal extends AppCompatActivity {
 
-    private Map<String, Integer> meses = new HashMap<String, Integer>();private String dia;
+    private Map<String, Integer> meses = new HashMap<String, Integer>();
+    private String dia;
     private String mes;
     private String anio;
     private String fecha;
@@ -135,6 +138,46 @@ public class MenuPrincipal extends AppCompatActivity {
         }
     }
 
+    private void corregir_archivos () throws IOException {
+
+        //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
+
+        String archivos[] = fileList();
+        boolean flag_borrar = false;
+        if (archivo_existe(archivos, "cierre.txt")) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput("cierre.txt"));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                String[] split = linea.split(" ");
+                int fecha_file = Integer.parseInt(split[1]);
+                int hoy_fecha = Integer.parseInt(fecha);
+                Log.v("corregir_archivos0", "Main.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
+                if (fecha_file != hoy_fecha) {
+                    flag_borrar = true;
+                } else {
+                    //Do nothing.
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+            }
+        } else {
+            crear_archivo("cierre.txt");
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+        }
+        if (flag_borrar) {
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////
+
+    }
+
     private void mostrar_caja() {
         tv_caja.setText(imprimir_archivo(caja));
     }
@@ -218,7 +261,7 @@ public class MenuPrincipal extends AppCompatActivity {
         //salir();
     }
 
-    private void salir() {
+    private void salir () {
         Intent menu_principal = new Intent(this, MenuPrincipal.class);
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(menu_principal);
@@ -226,7 +269,7 @@ public class MenuPrincipal extends AppCompatActivity {
         System.exit(0);
     }
 
-    public  void borrar_archivo(String file) throws IOException {
+    public  void borrar_archivo (String file) throws IOException {
         File archivo = new File(file);
         String empty_string = "";
         guardar(empty_string, file);
@@ -245,7 +288,7 @@ public class MenuPrincipal extends AppCompatActivity {
         }
     }
 
-    private void separar_fechaYhora(){
+    private void separar_fechaYhora () {
         llenar_mapa_meses();
         Date now = Calendar.getInstance().getTime();
         String ahora = now.toString();
@@ -261,7 +304,7 @@ public class MenuPrincipal extends AppCompatActivity {
         hora = split[0];
     }
 
-    private void llenar_mapa_meses() {
+    private void llenar_mapa_meses () {
         meses.put("Jan",1);
         meses.put("Feb",2);
         meses.put("Mar",3);
@@ -327,7 +370,7 @@ public class MenuPrincipal extends AppCompatActivity {
         return false;
     }
 
-    private void crear_archivo(String nombre_archivo) {
+    private void crear_archivo (String nombre_archivo) {
         try{
             OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(nombre_archivo, Activity.MODE_PRIVATE));
             archivo.flush();

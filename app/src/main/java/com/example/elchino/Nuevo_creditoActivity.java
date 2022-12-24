@@ -119,6 +119,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private String  fecha_credito = "";
     private boolean flag_fecha = false;
     private Date hoy_LD = new Date();
+    private String fecha_hoy_hoy = "";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -165,6 +166,12 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         tv_caja.setHint("Caja...");
         mostrar_caja();
         separar_fechaYhora();
+        fecha_hoy_hoy = fecha;
+        try {
+            corregir_archivos();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (cliente_recibido.equals("")) {
             //Do nothing.
         } else {
@@ -179,6 +186,46 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             }
         }
         text_listener();
+    }
+
+    private void corregir_archivos () throws IOException {
+
+        //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
+
+        String archivos[] = fileList();
+        boolean flag_borrar = false;
+        if (archivo_existe(archivos, "cierre.txt")) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput("cierre.txt"));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                String[] split = linea.split(" ");
+                int fecha_file = Integer.parseInt(split[1]);
+                int hoy_fecha = Integer.parseInt(fecha_hoy_hoy);
+                Log.v("corregir_archivos0", "Nuevo_credito.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
+                if (fecha_file != hoy_fecha) {
+                    flag_borrar = true;
+                } else {
+                    //Do nothing.
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+            }
+        } else {
+            crear_archivo("cierre.txt");
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha_hoy_hoy, "cierre.txt");
+        }
+        if (flag_borrar) {
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha_hoy_hoy, "cierre.txt");
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////
+
     }
 
     public void cambiar_fecha (View view) {
@@ -886,6 +933,11 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                try {
+                    corregir_archivos();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 if (tv_esperar.getText().toString().equals("Digite el monto del credito")) {
                     et_ID.setVisibility(View.VISIBLE);
                     et_ID.setEnabled(true);

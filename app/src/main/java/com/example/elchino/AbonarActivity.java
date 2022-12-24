@@ -172,7 +172,11 @@ public class AbonarActivity extends AppCompatActivity {
         Log.v("OnCreate1", "Abonar.\n\nFecha hoy: " + fecha_hoy_string + "\n\n.");
         Log.v("OnCreate2", "Abonar.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
         separar_fechaYhora();
-
+        try {
+            corregir_archivos();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         try {
             hoy_LD = DateUtilities.stringToDate(fecha_hoy_string);
         } catch (ParseException e) {
@@ -196,6 +200,46 @@ public class AbonarActivity extends AppCompatActivity {
             }
         }
         text_listener();
+    }
+
+    private void corregir_archivos () throws IOException {
+
+        //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
+
+        String archivos[] = fileList();
+        boolean flag_borrar = false;
+        if (archivo_existe(archivos, "cierre.txt")) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput("cierre.txt"));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                String[] split = linea.split(" ");
+                int fecha_file = Integer.parseInt(split[1]);
+                int hoy_fecha = Integer.parseInt(fecha);
+                Log.v("corregir_archivos0", "Abonar.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
+                if (fecha_file != hoy_fecha) {
+                    flag_borrar = true;
+                } else {
+                    //Do nothing.
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+            }
+        } else {
+            crear_archivo("cierre.txt");
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+        }
+        if (flag_borrar) {
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////
+
     }
 
     public void imprimir_archivos_todos (View view) {
@@ -1986,6 +2030,11 @@ public class AbonarActivity extends AppCompatActivity {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                try {
+                    corregir_archivos();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 if (tv_esperar.getText().toString().equals("Digite el monto del abono")) {
 
                     bt_consultar.setClickable(false);

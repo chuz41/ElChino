@@ -2,6 +2,7 @@ package com.example.elchino;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -19,17 +20,22 @@ import android.widget.Toast;
 import com.example.elchino.Util.DateUtilities;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Estado_clienteActivity extends AppCompatActivity {//Esta activity va a funcionar unicamente offline.
 
     private EditText et_ID;
+    private Map<String, Integer> meses = new HashMap<String, Integer>();
     private TextView tv_esperar;
     private TextView saludo_estado;
     private Button bt_consultar;
@@ -55,6 +61,14 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     private String archivo_cliente = "";
     private Button bt_editar;
     private String mensaje;
+    private String mes;
+    private String anio;
+    private String fecha;
+    private String hora;
+    private String minuto;
+    private String dia;
+    private TextView tv_fecha;
+    private String nombre_dia;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +81,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         if (mensaje != null) {
             msg(mensaje);
         }
+        tv_fecha = (TextView) findViewById(R.id.tv_fecha);
         saludo_estado.setText(" Estado del cliente");
         et_ID = (EditText) findViewById(R.id.et_ID);
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
@@ -92,12 +107,62 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         tv_caja = (TextView) findViewById(R.id.tv_caja);
         tv_caja.setHint("Caja...");
 
+        separar_fechaYhora();
+        tv_fecha.setText(fecha + "/" + mes + "/" + anio);
+        try {
+            corregir_archivos();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         mostrar_caja();
         if (cliente_ID.equals("")) {
             text_listener();
         } else {
             consultar(null);
         }
+    }
+
+    private void llenar_mapa_meses () {
+        meses.put("Jan",1);
+        meses.put("Feb",2);
+        meses.put("Mar",3);
+        meses.put("Apr",4);
+        meses.put("May",5);
+        meses.put("Jun",6);
+        meses.put("Jul",7);
+        meses.put("Aug",8);
+        meses.put("Sep",9);
+        meses.put("Oct",10);
+        meses.put("Nov",11);
+        meses.put("Dec",12);
+        meses.put("1",1);
+        meses.put("2",2);
+        meses.put("3",3);
+        meses.put("4",4);
+        meses.put("5",5);
+        meses.put("6",6);
+        meses.put("7",7);
+        meses.put("8",8);
+        meses.put("9",9);
+        meses.put("10",10);
+        meses.put("11",11);
+        meses.put("12",12);
+    }
+
+    private void separar_fechaYhora (){
+        llenar_mapa_meses();
+        Date now = Calendar.getInstance().getTime();
+        String ahora = now.toString();
+        String[] split = ahora.split(" ");
+        nombre_dia = split[0];
+        dia = split[2];
+        mes = String.valueOf(meses.get(split[1]));
+        anio = split[5];
+        String hora_completa = split[3];
+        fecha = split[2];
+        split = hora_completa.split(":");
+        minuto = split[1];
+        hora = split[0];
     }
 
     public void editar_archivo (View view) {
@@ -107,6 +172,104 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         startActivity(editar_ac);
         finish();
         System.exit(0);
+    }
+
+    private void corregir_archivos () throws IOException {
+
+        //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
+
+        String archivos[] = fileList();
+        boolean flag_borrar = false;
+        if (archivo_existe(archivos, "cierre.txt")) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput("cierre.txt"));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                String[] split = linea.split(" ");
+                int fecha_file = Integer.parseInt(split[1]);
+                int hoy_fecha = Integer.parseInt(fecha);
+                Log.v("corregir_archivos0", "Estado_cliente.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
+                if (fecha_file != hoy_fecha) {
+                    flag_borrar = true;
+                } else {
+                    //Do nothing.
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+            }
+        } else {
+            crear_archivo("cierre.txt");
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+        }
+        if (flag_borrar) {
+            borrar_archivo("cierre.txt");
+            crear_archivo("cierre.txt");
+            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////
+
+    }
+
+    public  void agregar_linea_archivo (String new_line, String file_name) {
+        String archivos[] = fileList();
+        String ArchivoCompleto = "";//Aqui se lee el contenido del archivo guardado.
+        if (archivo_existe(archivos, file_name)) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                while (linea != null) {
+                    ArchivoCompleto = ArchivoCompleto + linea + "\n";
+                    linea = br.readLine();
+                }
+                ArchivoCompleto = ArchivoCompleto + new_line + "\n";
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+            }
+        } else {
+            crear_archivo(file_name);
+            agregar_linea_archivo(file_name, new_line);
+            return;
+        }
+        try {
+            OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(file_name, Activity.MODE_PRIVATE));
+            archivo.write(ArchivoCompleto);
+            archivo.flush();
+        } catch (IOException e) {
+        }
+    }
+
+    public  void borrar_archivo (String file) throws IOException {
+        File archivo = new File(file);
+        String empty_string = "";
+        guardar(empty_string, file);
+        archivo.delete();
+    }
+
+    public  void guardar (String contenido, String file_name) throws IOException {
+        try {
+            //borrar_archivo(file_name);
+            //crear_archivo(file_name);
+            OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(file_name, Activity.MODE_PRIVATE));
+            archivo.write(contenido);
+            archivo.flush();
+            archivo.close();
+        } catch (IOException e) {
+        }
+    }
+
+    private void crear_archivo (String nombre_archivo) {
+        try{
+            OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(nombre_archivo, Activity.MODE_PRIVATE));
+            archivo.flush();
+            archivo.close();
+        }catch (IOException e) {
+        }
     }
 
     private void mostrar_caja () {
