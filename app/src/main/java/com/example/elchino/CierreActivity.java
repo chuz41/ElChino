@@ -238,10 +238,10 @@ public class CierreActivity extends AppCompatActivity {
                     if (valor_monto < 0) {
                         pre_mensaje = "Se entrega a banca:";
                         valor_monto = valor_monto * -1;
-                        balance_general_banca_entrega = balance_general_banca_entrega + valor_monto;
+                        balance_general_banca_recibe = balance_general_banca_recibe + valor_monto;
                     } else {
                         pre_mensaje = "Se recibe de banca:";
-                        balance_general_banca_recibe = balance_general_banca_recibe + valor_monto;
+                        balance_general_banca_entrega = balance_general_banca_entrega + valor_monto;
                     }
                     contenido_cierre = contenido_cierre + pre_mensaje + ":\nMonto: " +
                             String.valueOf(valor_monto) + " colones.\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
