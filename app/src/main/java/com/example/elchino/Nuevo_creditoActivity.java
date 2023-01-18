@@ -1527,7 +1527,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         CuadraturaAc.putExtra("monto_creditito", String.valueOf(monto_credito));
         CuadraturaAc.putExtra("activity_devolver", "MenuPrincipal");
         CuadraturaAc.putExtra("mensaje_imprimir_pre", "");
-        CuadraturaAc.putExtra("nombre_cliente", nombre_cliente + " " + apellido_cliente);
+        CuadraturaAc.putExtra("nombreCliente", nombre_cliente + " " + apellido_cliente);
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(CuadraturaAc);
         finish();

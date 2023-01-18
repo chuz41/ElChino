@@ -133,66 +133,31 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         separar_fechaYhora();
     }
 
- /*   public void select_fecha_nacimiento (View view) {
-        //tiet_fecha_nacimiento.setClickable(false);
-        //tiet_fecha_nacimiento.setEnabled(false);
-        final Calendar c = Calendar.getInstance();
-        final boolean[] edad_permitida = {true};
-        mes_selected = (c.get(Calendar.MONTH));
-        //Toast.makeText(this, "mes selected: " + mes_selected, Toast.LENGTH_LONG).show();
-        anio_selected = c.get(Calendar.YEAR);
-        fecha_selected = c.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                String i_s = String.valueOf(i);
-                String i1_s = String.valueOf(i1 + 1);
-                String i2_s = String.valueOf(i2);
-                if (i_s.length() == 1) {
-                    i_s = "0" + i_s;
-                }
-                if (i1_s.length() == 1) {
-                    i1_s = "0" + i1_s;
-                }
-                if (i2_s.length() == 1) {
-                    i2_s = "0" + i2_s;
-                }
-                tiet_fecha_nacimiento.setText(i2_s + "/" + i1_s + "/" + i_s);
-                //edad_cliente.autofill(AutofillValue.forText(String.valueOf(i2) + "/" + String.valueOf(i1+1) + "/" + String.valueOf(i)));
-                mes_selected = i1+1;
-                anio_selected = i;
-                fecha_selected = i2;
-                //Generamos numero comparador:
-                int comparador_selected = anio_selected;
-                comparador_selected = comparador_selected * 100;
-                comparador_selected = comparador_selected + mes_selected;
-                comparador_selected = comparador_selected * 100;
-                comparador_selected = comparador_selected + fecha_selected;
-                int comparador = Integer.parseInt(anio);
-                comparador = comparador * 100;
-                comparador = comparador + meses.get(mes);
-                comparador = comparador * 100;
-                comparador = comparador + Integer.parseInt(fecha);
-                if (comparador_selected > (comparador - 16)) {
-                    edad_permitida[0] = false;
-                } else {
-                    mes_selected = (c.get(Calendar.MONTH));
-                    anio_selected = c.get(Calendar.YEAR);
-                    fecha_selected = c.get(Calendar.DAY_OF_MONTH);
-                    Log.v("select_fecha", String.valueOf(fecha_selected) + "/" + String.valueOf(mes_selected + 1) + "/" + String.valueOf(anio_selected));
-                }
-            }
-        },anio_selected,mes_selected,fecha_selected);
-        datePickerDialog.show();
-    }*/
-
     public void confirm(View view) throws IOException, JSONException {
         confirmar.setClickable(false);
         confirmar.setEnabled(false);
-        if (!ID_cliente() | !nombre_cliente() | !apellido1_cliente() | !apellido2_cliente() | !apodo_cliente() |
-                !notas_cliente() | !direccion_cliente() | !puntuacion_cliente() | !tasa_cliente() | !monto_disponible() |
-                !interes_mora() | !telefono1_cliente() | !telefono2_cliente() | !fecha_registro()){
+        boolean asdf0 = ID_cliente();
+        boolean asdf1 = nombre_cliente();
+        boolean asdf2 = apellido1_cliente();
+        boolean asdf3 = apellido2_cliente();
+        boolean asdf4 = apodo_cliente();
+        boolean asdf5 = notas_cliente();
+        boolean asdf6 = direccion_cliente();
+        boolean asdf7 = puntuacion_cliente();
+        boolean asdf9 = tasa_cliente();
+        boolean asdf10 = monto_disponible();
+        boolean asdf11 = interes_mora();
+        boolean asdf12 = telefono1_cliente();
+        boolean asdf13 = telefono2_cliente();
+        boolean asdf14 = fecha_registro();
+        Log.v("confirm1", "Registrar_cliente_nuevo.\n\n" + !asdf0 + ", " + !asdf1 + ", " + !asdf2 + ", " + !asdf3 + ", " + !asdf4 + ", " +
+                !asdf5 + ", " + !asdf6 + ", " + !asdf7 + ", " + !asdf9 + ", " + !asdf10 + ", " +
+                !asdf11 + ", " + !asdf12 + ", " + !asdf13 + ", " + !asdf14 + "\n\n.");
+        if (!asdf0 | !asdf1 | !asdf2 | !asdf3 | !asdf4 |
+                !asdf5 | !asdf6 | !asdf7 | !asdf9 | !asdf10 |
+                !asdf11 | !asdf12 | !asdf13 | !asdf14) {
+            Log.v("confirm0", "Registrar_cliente_nuevo.\n\n" + u0 + ", " + u1 + ", " + u2 + ", " + u3 + ", " + u4 + ", "
+                    + u5 + ", " + u6 + ", " + u7 + ", " + u9 + ", " + u10 + ", " + u11 + ", " + u12 + ", " + u13 + ", " + u14 + ".\n\n.");
             Toast.makeText(this, "Debe llenar todos los campos! ", Toast.LENGTH_LONG).show();
             confirmar.setClickable(true);
             confirmar.setEnabled(true);
@@ -510,92 +475,20 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
     }
 
-    /*public boolean edad_cliente () {//Se llena con un onClick listener!!!\
-
-        int anio_selected_n = 0;
-        int mes_selected_n = 0;
-        int fecha_selected_n = 0;
-        String[] split;
-
-        if (edad_cliente.getEditText()!=null){
-
-            u8 = edad_cliente.getEditText().getText().toString().trim();
-
-        }
-
-        //Generamos numero comparador:
-
-        int comparador_selected = anio_selected_n;
-        comparador_selected = comparador_selected * 100;
-        comparador_selected = comparador_selected + mes_selected_n;
-        comparador_selected = comparador_selected * 100;
-        comparador_selected = comparador_selected + fecha_selected_n;
-        int comparador = Integer.parseInt(anio);
-        comparador = comparador * 100;
-        comparador = comparador + meses.get(mes);
-        comparador = comparador * 100;
-        comparador = comparador + Integer.parseInt(fecha);
-
-        if (u8.isEmpty()) {
-
-            edad_cliente.setError(getText(R.string.cantempty_edad));
-            return false;
-
-        } else if (comparador_selected > (comparador - 16)) {
-
-            edad_cliente.setError(getText(R.string.muy_joven));
-            return false;
-
-        } else if (u8.length() > 10) {
-
-            edad_cliente.setError(getText(R.string.toolong_edad));
-            return false;
-
-        } else if (u8.length() < 10) {
-
-            edad_cliente.setError(getText(R.string.toolow_edad));
-            return false;
-
-        } else {
-
-            edad_cliente.setError(null);
-            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
-            if (flag_u8) {
-
-                if (u8.equals(edad_clienteS)) {
-
-                    //Do nothing.
-
-                } else {
-
-                    file_content.replace("edad_cliente_separador_" + edad_clienteS, "edad_cliente_separador_" + u8);
-
-                }
-
-                edad_clienteS = u8;
-                return true;
-
-            } else {
-
-                String linea = "edad_cliente_separador_" + u8;
-                file_content = file_content + linea + "\n";
-                flag_u8 = true;
-                return true;
-
-            }
-
-        }
-
-    }*/
-
     public boolean fecha_registro () {//Se llena con un onClick listener!!!
 
         Date fecha_hoy = Calendar.getInstance().getTime();
         String fecha_hoy_S = DateUtilities.dateToString(fecha_hoy);
         String[] split = fecha_hoy_S.split("-");
-        fecha_hoy_S = split[2] + "/" + split[1] + "/" + split[0];
-
+        String diarr = split[2];
+        String mesrr = split[1];
+        String aniorr = split[0];
+        if (mesrr.length() == 1) {
+            mesrr = "0" + mesrr;
+        }
+        fecha_hoy_S = diarr + "/" + mesrr + "/" + aniorr;
         u14 = fecha_hoy_S;
+        Log.v("fecha_registro0", "Registrar_cliente_nuevo.\n\nFecha hoy: " + u14 + "\n\nFecha hoy string: " + fecha_hoy_S + "\n\nmesrr.length(): " + mesrr.length() + " mesrr: " + mesrr + "\n\n.");
 
         if (u14.isEmpty()) {
 
@@ -684,13 +577,13 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
         }
 
-        else if (u10.length() > 100) {
+        else if (u10.length() > 150) {
 
             direccion_cliente.setError(getText(R.string.toolong_direccion));
             return false;
         }
 
-        else if (u10.length() < 15) {
+        else if (u10.length() < 8) {
 
             direccion_cliente.setError(getText(R.string.toolow_direccion));
             return false;

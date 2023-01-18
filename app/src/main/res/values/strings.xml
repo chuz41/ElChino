@@ -77,5 +77,6 @@
     <string name="bt_abonar">ABONAR</string>
     <string name="bt_reFinanciar">RE-FINANCIAR</string>
     <string name="nuevo_credito">NUEVO CREDITO</string>
+    <string name="no_hay_movimientos">Sin movimientos...</string>
 
 </resources>

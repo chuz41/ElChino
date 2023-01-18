@@ -146,6 +146,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     private String telefono_s = "";
     private Date hoy_LD;
     private String fecha_hoy_string;
+    private String nombreCliente;
 
     
     @Override
@@ -155,7 +156,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         String mensaje_recibido = getIntent().getStringExtra( "msg");
         abonar = getIntent().getStringExtra("abonar");
         cuadratura = getIntent().getStringExtra( "cuadratura");
-        nombre_cliente = getIntent().getStringExtra("nombre_cliente");
+        nombreCliente = getIntent().getStringExtra("nombreCliente");
         cambio = getIntent().getStringExtra("cambio");
         activity_devolver = getIntent().getStringExtra("activity_devolver");
         monto_creditito = getIntent().getStringExtra("monto_creditito");
@@ -991,7 +992,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
 
         mensaje_imprimir = "\n\nFecha: " + dia + "/" + mes + "/" + anio + "\n\n\n***** Prestamos El Chino *****\n\nCliente: " +
-                nombre_cliente + " " + apellido_cliente + "\nCedula: " + cliente_ID + "\n\n\n******************************\n\n" + mensaje_imprimir_pre + "\n******************************\n\n" +
+                nombreCliente + "\nCedula: " + cliente_ID + "\n\n\n******************************\n\n" + mensaje_imprimir_pre + "\n******************************\n\n" +
                 cuadratura_print + "Estimado cliente, no olvide\nrevisar su tiquete antes de\nque se retire el cobrador.\n\nSi necesita dinero,\nllame a " + cobrador_s + "\nTelefono: " + telefono_s + "\n\n\n\n\n";
 
         bt_consultar.setEnabled(false);

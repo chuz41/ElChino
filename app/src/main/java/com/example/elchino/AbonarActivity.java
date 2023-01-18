@@ -727,9 +727,6 @@ public class AbonarActivity extends AppCompatActivity {
             Log.v("proc_abo_22", "Abonar.\n\nsaldo mas intereses: " + saldo_mas_intereses + "\n\n.");
             cuotas = obtener_cuotas_nuevas(cuadratura);
             //saldo_mas_intereses = Integer.parseInt(obtener_saldo_plus(cuadratura));
-
-
-
             actualizar_archivo_credito();
         } catch (IOException | ParseException e) {
         }
@@ -805,6 +802,48 @@ public class AbonarActivity extends AppCompatActivity {
         return monto_caja;
     }
 
+    private String getNombreCliente (String ID_buscado) {
+        String nombreCliente = "";
+        String archivos[] = fileList();
+        for (int i = 0; i < archivos.length; i++) {
+            Pattern pattern = Pattern.compile(ID_buscado + "_C_.txt", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(archivos[i]);
+            boolean matchFound = matcher.find();
+            if (matchFound) {
+                try {
+                    InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                    BufferedReader br = new BufferedReader(archivo);
+                    String linea = br.readLine();
+                    while (linea != null) {
+                        Log.v("getNombreCliente", "Nuevo_credito.\n\nlinea:\n\n" + linea + "\n\n.");
+                        String[] split = linea.split("_separador_");
+                        if (split[0].equals("nombre_cliente")) {
+                            if (nombreCliente.equals("")) {
+                                nombreCliente = split[1];
+                            } else {
+                                nombreCliente = nombreCliente + " " + split[1];
+                            }
+                        }
+                        if (split[0].equals("apellido1_cliente")) {
+                            if (nombreCliente.equals("")) {
+                                nombreCliente = split[1];
+                            } else {
+                                nombreCliente = nombreCliente + " " + split[1];
+                            }
+                        }
+                        linea = br.readLine();
+                    }
+                    br.close();
+                    archivo.close();
+                } catch (IOException e) {
+                }
+                break;
+            } else {
+                //Continue with the execution.
+            }
+        }
+        return nombreCliente;
+    }
 
     private void actualizar_cierre (Integer monto_abono, Integer saldo_caja, String credit_ID) {
         String linea_cierre = "abono " + String.valueOf(monto_abono) + " " + saldo_caja + " " + credit_ID;
@@ -822,7 +861,7 @@ public class AbonarActivity extends AppCompatActivity {
         CuadraturaAc.putExtra("monto_creditito", "0");
         CuadraturaAc.putExtra("activity_devolver", "Estado_cliente");
         CuadraturaAc.putExtra("mensaje_imprimir_pre", mensaje_imprimir);
-        CuadraturaAc.putExtra("nombre_cliente", nombre_cliente + " " + apellido_cliente);
+        CuadraturaAc.putExtra("nombreCliente", nombre_cliente + " " + apellido_cliente);
         CuadraturaAc.putExtra("abonar", "abonar" + " " + "abonar");
         //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(CuadraturaAc);
@@ -1468,7 +1507,6 @@ public class AbonarActivity extends AppCompatActivity {
     }
 
     private void presentar_monto_a_pagar (int monto_a_pagar, int interes_mora_total, int montoAPagar) {
-
         et_ID.setEnabled(true);
         //tv_indicador.setVisibility(View.INVISIBLE);
         et_ID.setText(String.valueOf(monto_a_pagar));
@@ -1485,60 +1523,9 @@ public class AbonarActivity extends AppCompatActivity {
         tv_indicador.setVisibility(View.VISIBLE);
         tv_indicador.setText("Intereses moratorios: " + interes_mora_total + "\nAbono al capital: " + montoAPagar);
         bt_perdon.setVisibility(View.VISIBLE);
-
-
     }
 
     public void cambiar_fecha (View view) {
-
-        /*final Calendar c = Calendar.getInstance();
-        final boolean[] edad_permitida = {true};
-        mes_selected = (c.get(Calendar.MONTH));
-        //Toast.makeText(this, "mes selected: " + mes_selected, Toast.LENGTH_LONG).show();
-        anio_selected = c.get(Calendar.YEAR);
-        fecha_selected = c.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                String i_s = String.valueOf(i);
-                String i1_s = String.valueOf(i1 + 1);
-                String i2_s = String.valueOf(i2);
-                if (i_s.length() == 1) {
-                    i_s = "0" + i_s;
-                }
-                if (i1_s.length() == 1) {
-                    i1_s = "0" + i1_s;
-                }
-                if (i2_s.length() == 1) {
-                    i2_s = "0" + i2_s;
-                }
-                fecha_abono = (i2_s + "/" + i1_s + "/" + i_s);
-                //edad_cliente.autofill(AutofillValue.forText(String.valueOf(i2) + "/" + String.valueOf(i1+1) + "/" + String.valueOf(i)));
-                mes_selected = i1+1;
-                anio_selected = i;
-                fecha_selected = i2;
-                anio = String.valueOf(anio_selected);
-                mes = String.valueOf(mes_selected);
-                dia = String.valueOf(fecha_selected);
-                flag_fecha = true;
-                if (mes.length() == 1) {
-                    mes = "0" + mes;
-                }
-                if (dia.length() == 1) {
-                    dia = "0" + dia;
-                }
-                String fecha_nueva = anio + "-" + mes + "-" + dia;
-                Date fecha_nueva_D = null;
-                try {
-                    fecha_nueva_D = DateUtilities.stringToDate(fecha_nueva);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                hoy_LD = fecha_nueva_D;
-                Log.v("select_fecha", String.valueOf(fecha_selected) + "/" + String.valueOf(mes_selected + 1) + "/" + String.valueOf(anio_selected));
-            }
-        },anio_selected,mes_selected,fecha_selected);
-        datePickerDialog.show();*/
     }
 
     private Integer obtener_monto_cuota (String s) {

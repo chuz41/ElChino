@@ -15,13 +15,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <EditText
         android:id="@+id/tv_multiline"
         android:layout_width="336dp"
         android:layout_height="471dp"
+        android:clickable="false"
+        android:editable="false"
         android:ems="10"
         android:gravity="start|top"
+        android:hint="@string/no_hay_movimientos"
         android:inputType="textMultiLine"
+        android:linksClickable="false"
+        android:longClickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -11,6 +11,7 @@ import android.service.voice.VoiceInteractionService;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CierreActivity extends AppCompatActivity {
 
@@ -44,7 +47,7 @@ public class CierreActivity extends AppCompatActivity {
     private Date hoy_LD;
     private String fecha_hoy_string;
     private TextView tv_fecha;
-    private TextView tv_multiline;
+    private EditText tv_multiline;
     private String cobrador_ID = "";
     private String apodo_cobrador = "";
     private Map<Integer, String> abonos = new HashMap<Integer, String>();
@@ -65,7 +68,7 @@ public class CierreActivity extends AppCompatActivity {
         bt_imprimir.setVisibility(View.INVISIBLE);
         tv_caja = (TextView) findViewById(R.id.tv_caja);
         tv_fecha = (TextView) findViewById(R.id.tv_fecha);
-        tv_multiline = (TextView) findViewById(R.id.tv_multiline);
+        tv_multiline = (EditText) findViewById(R.id.tv_multiline);
         datos_vendedor();
         mostrar_caja();
         hoy_LD = Calendar.getInstance().getTime();
@@ -74,7 +77,6 @@ public class CierreActivity extends AppCompatActivity {
         Log.v("OnCreate1", "Abonar.\n\nFecha hoy: " + fecha_hoy_string + "\n\n.");
         Log.v("OnCreate2", "Abonar.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
         separar_fechaYhora();
-
         try {
             hoy_LD = DateUtilities.stringToDate(fecha_hoy_string);
         } catch (ParseException e) {
@@ -107,27 +109,49 @@ public class CierreActivity extends AppCompatActivity {
         }
     }
 
-    /*
-
-    Log.v("Linea_active_online", ".\n\nLinea: " + linea + "\n\n.");
-    String[] split_linea_1 = linea.split(" ");
-    linea = linea.replace(split_linea_1[0], codigo);
-    linea = linea.replace(split_linea_1[1], split2[2]);
-    linea = linea.replace(split_linea_1[2], fecha);
-    String contenido = linea + "\n";
-    br.close();
-    archivo.close();
-    nombre_cobra = split2[6];
-    contenido = contenido + "nombre " + split2[6] + "\n";
-    contenido = contenido + "usuario " + split2[26] + "\n";
-    contenido = contenido + "password " + split2[10] + "\n";
-    contenido = contenido + "Screditos " + split2[14] + "\n";
-    contenido = contenido + "Sclientes " + split2[18] + "\n";
-    contenido = contenido + "apodo " + split2[34] + "\n";
-    contenido = contenido + "telefono " + split2[30];
-
-     */
-
+    private String getNombreCliente (String ID_buscado) {
+        String nombreCliente = "";
+        String archivos[] = fileList();
+        for (int i = 0; i < archivos.length; i++) {
+            Pattern pattern = Pattern.compile(ID_buscado + "_C_.txt", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(archivos[i]);
+            boolean matchFound = matcher.find();
+            if (matchFound) {
+                try {
+                    InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
+                    BufferedReader br = new BufferedReader(archivo);
+                    String linea = br.readLine();
+                    while (linea != null) {
+                        Log.v("getNombreCliente0", "Cierre.\n\nlinea:\n\n" + linea + "\n\n.");
+                        String[] split = linea.split("_separador_");
+                        if (split[0].equals("nombre_cliente")) {
+                            if (nombreCliente.equals("")) {
+                                nombreCliente = split[1];
+                            } else {
+                                nombreCliente = nombreCliente + " " + split[1];
+                            }
+                        }
+                        if (split[0].equals("apellido1_cliente")) {
+                            if (nombreCliente.equals("")) {
+                                nombreCliente = split[1];
+                            } else {
+                                nombreCliente = nombreCliente + " " + split[1];
+                            }
+                        }
+                        linea = br.readLine();
+                    }
+                    Log.v("getNombreCliente1", "Cierre.\n\nnombreCliente: " + nombreCliente + "\n\n.");
+                    br.close();
+                    archivo.close();
+                } catch (IOException e) {
+                }
+                break;
+            } else {
+                //Continue with the execution.
+            }
+        }
+        return nombreCliente;
+    }
 
     private void generar_cierre() {
         boolean flag_null = false;
@@ -163,6 +187,9 @@ public class CierreActivity extends AppCompatActivity {
                         persona = "cobrador";
                     } else if (lalrgo == 4) {
                         persona = split[3];
+                        String splitPersona[] = persona.split("_P_");
+                        String nombreCliente = getNombreCliente(splitPersona[0]);
+                        persona = nombreCliente;
                     }
                     String tipo = split[0];
                     String monto = split[1];
@@ -183,7 +210,6 @@ public class CierreActivity extends AppCompatActivity {
                     } else {
                         //Do nothing.
                     }
-
                     linea = br.readLine();
                 }
                 br.close();
@@ -207,11 +233,18 @@ public class CierreActivity extends AppCompatActivity {
                     String[] split_value = value.split(" ");
                     int monto_tempo = Integer.parseInt(split_value[1]);
                     balance_general_abonos = balance_general_abonos + monto_tempo;
-                    contenido_cierre = contenido_cierre + "Abono de\n" + split_value[3] + ":\nMonto: " +
+                    Log.v("generar_cierre4", "Cierre.\n\nsplit_value.lenght: " + split_value.length + "\nsplit_value[" + 3 + "]: " + split_value[3] + "\nsplit_value[" + 4 + "]: " + split_value[4] + "\n\n.");
+                    String nameCliente = "";
+                    if (split_value.length == 4) {
+                        nameCliente = split_value[3];
+                    } else if (split_value.length >= 5) {
+                        nameCliente = split_value[3] + " " + split_value[4];
+                    }
+                    Log.v("generar_cierre5", "Cierre.\n\nnameCliente: " + nameCliente + "\n\n.");
+                    contenido_cierre = contenido_cierre + "Abono de\n" + nameCliente + ":\nMonto: " +
                             split_value[1] + " colones.\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
                 }
             }
-
             if (creditos.isEmpty()) {
                 //Do nothing. Continue...
             } else {
@@ -221,11 +254,17 @@ public class CierreActivity extends AppCompatActivity {
                     String[] split_value = value.split(" ");
                     int monto_tempo = Integer.parseInt(split_value[1]);
                     balance_general_creditos = balance_general_creditos + monto_tempo;
-                    contenido_cierre = contenido_cierre + "Credito aprobado a:\n" + split_value[3] + ":\nMonto: " +
+                    Log.v("generar_cierre4", "Cierre.\n\nsplit_value.lenght: " + split_value.length + "\nsplit_value[" + 3 + "]: " + split_value[3] + "\nsplit_value[" + 4 + "]: " + split_value[4] + "\n\n.");
+                    String nameCliente = "";
+                    if (split_value.length == 4) {
+                        nameCliente = split_value[3];
+                    } else if (split_value.length >= 5) {
+                        nameCliente = split_value[3] + " " + split_value[4];
+                    }
+                    contenido_cierre = contenido_cierre + "Credito aprobado a:\n" + nameCliente + ":\nMonto: " +
                             split_value[1] + " colones.\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
                 }
             }
-
             if (bancas.isEmpty()) {
                 //Do nothing. Continue...
             } else {
@@ -247,7 +286,6 @@ public class CierreActivity extends AppCompatActivity {
                             String.valueOf(valor_monto) + " colones.\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
                 }
             }
-
             contenido_cierre = contenido_cierre + "\nFirma cobrador:\n\n__________________\nNombre: " + apodo_cobrador + ".\n\n" +
                    "T. cobrado: " + balance_general_abonos + " colones.\n\nT. prestado: " + balance_general_creditos +
                     " colones.\n\nAbonos banca: " + balance_general_banca_recibe + " colones.\n\nB. entrega: " +
@@ -257,17 +295,13 @@ public class CierreActivity extends AppCompatActivity {
             tv_multiline.setText(contenido_cierre);
             mensaje_imprimir = contenido_cierre;
             bt_imprimir.setVisibility(View.VISIBLE);
-
         }
-
     }
 
     public void printIt (View view) {
-
         BluetoothSocket socket;
         socket = null;
         byte[] data = mensaje_imprimir.getBytes();
-
         //Get BluetoothAdapter
         BluetoothAdapter btAdapter = BluetoothUtil.getBTAdapter();
         if (btAdapter == null) {
