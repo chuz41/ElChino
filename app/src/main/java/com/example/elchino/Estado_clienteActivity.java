@@ -1,8 +1,6 @@
 package com.example.elchino;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,26 +14,22 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.example.elchino.Util.AgregarLinea;
+import com.example.elchino.Util.BorrarArchivo;
 import com.example.elchino.Util.DateUtilities;
-
+import com.example.elchino.Util.SepararFechaYhora;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Estado_clienteActivity extends AppCompatActivity {//Esta activity va a funcionar unicamente offline.
 
     private EditText et_ID;
-    private Map<String, Integer> meses = new HashMap<String, Integer>();
     private TextView tv_esperar;
     private TextView saludo_estado;
     private Button bt_consultar;
@@ -52,7 +46,6 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     private int contador_de_opciones = 1;
     private Spinner sp_opciones;
     private String buscar_por = "";
-    private String clientes = "clientes_cred.txt";
     private HashMap<String, String> sp_helper = new HashMap<String, String>();
     private String nombre_cliente = "";
     private String apellido1_cliente = "";
@@ -68,13 +61,11 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     private String minuto;
     private String dia;
     private TextView tv_fecha;
-    private String nombre_dia;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_estado_cliente);
-
         saludo_estado = (TextView) findViewById(R.id.tv_saludoEstado);
         cliente_ID = getIntent().getStringExtra("cliente_ID");
         mensaje = getIntent().getStringExtra("mensaje");
@@ -103,11 +94,10 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         sp_opciones = (Spinner) findViewById(R.id.sp_opciones);
         sp_opciones.setEnabled(false);
         sp_opciones.setVisibility(View.INVISIBLE);
-        //bt_find_name.setVisibility(View.INVISIBLE);
         tv_caja = (TextView) findViewById(R.id.tv_caja);
         tv_caja.setHint("Caja...");
 
-        separar_fechaYhora();
+        separarFecha();
         tv_fecha.setText(fecha + "/" + mes + "/" + anio);
         try {
             corregir_archivos();
@@ -122,47 +112,14 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         }
     }
 
-    private void llenar_mapa_meses () {
-        meses.put("Jan",1);
-        meses.put("Feb",2);
-        meses.put("Mar",3);
-        meses.put("Apr",4);
-        meses.put("May",5);
-        meses.put("Jun",6);
-        meses.put("Jul",7);
-        meses.put("Aug",8);
-        meses.put("Sep",9);
-        meses.put("Oct",10);
-        meses.put("Nov",11);
-        meses.put("Dec",12);
-        meses.put("1",1);
-        meses.put("2",2);
-        meses.put("3",3);
-        meses.put("4",4);
-        meses.put("5",5);
-        meses.put("6",6);
-        meses.put("7",7);
-        meses.put("8",8);
-        meses.put("9",9);
-        meses.put("10",10);
-        meses.put("11",11);
-        meses.put("12",12);
-    }
-
-    private void separar_fechaYhora (){
-        llenar_mapa_meses();
-        Date now = Calendar.getInstance().getTime();
-        String ahora = now.toString();
-        String[] split = ahora.split(" ");
-        nombre_dia = split[0];
-        dia = split[2];
-        mes = String.valueOf(meses.get(split[1]));
-        anio = split[5];
-        String hora_completa = split[3];
-        fecha = split[2];
-        split = hora_completa.split(":");
-        minuto = split[1];
-        hora = split[0];
+    private void separarFecha () {
+        SepararFechaYhora datosFecha = new SepararFechaYhora(null);
+        hora = datosFecha.getHora();
+        minuto = datosFecha.getMinuto();
+        anio = datosFecha.getAnio();
+        mes = datosFecha.getMes();
+        dia = datosFecha.getDia();
+        fecha = dia;
     }
 
     public void editar_archivo (View view) {
@@ -199,77 +156,15 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
             } catch (IOException e) {
             }
         } else {
-            crear_archivo("cierre.txt");
-            borrar_archivo("cierre.txt");
-            crear_archivo("cierre.txt");
-            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+            new AgregarLinea("fecha " + fecha, "cierre.txt", getApplicationContext());
         }
         if (flag_borrar) {
-            borrar_archivo("cierre.txt");
-            crear_archivo("cierre.txt");
-            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+            new BorrarArchivo("cierre.txt", getApplicationContext());
+            new AgregarLinea("fecha " + fecha, "cierre.txt", getApplicationContext());
         }
 
         /////////////////////////////////////////////////////////////////////////////////////
 
-    }
-
-    public  void agregar_linea_archivo (String new_line, String file_name) {
-        String archivos[] = fileList();
-        String ArchivoCompleto = "";//Aqui se lee el contenido del archivo guardado.
-        if (archivo_existe(archivos, file_name)) {
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                while (linea != null) {
-                    ArchivoCompleto = ArchivoCompleto + linea + "\n";
-                    linea = br.readLine();
-                }
-                ArchivoCompleto = ArchivoCompleto + new_line + "\n";
-                br.close();
-                archivo.close();
-            } catch (IOException e) {
-            }
-        } else {
-            crear_archivo(file_name);
-            agregar_linea_archivo(file_name, new_line);
-            return;
-        }
-        try {
-            OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(file_name, Activity.MODE_PRIVATE));
-            archivo.write(ArchivoCompleto);
-            archivo.flush();
-        } catch (IOException e) {
-        }
-    }
-
-    public  void borrar_archivo (String file) throws IOException {
-        File archivo = new File(file);
-        String empty_string = "";
-        guardar(empty_string, file);
-        archivo.delete();
-    }
-
-    public  void guardar (String contenido, String file_name) throws IOException {
-        try {
-            //borrar_archivo(file_name);
-            //crear_archivo(file_name);
-            OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(file_name, Activity.MODE_PRIVATE));
-            archivo.write(contenido);
-            archivo.flush();
-            archivo.close();
-        } catch (IOException e) {
-        }
-    }
-
-    private void crear_archivo (String nombre_archivo) {
-        try{
-            OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(nombre_archivo, Activity.MODE_PRIVATE));
-            archivo.flush();
-            archivo.close();
-        }catch (IOException e) {
-        }
     }
 
     private void mostrar_caja () {
@@ -392,17 +287,13 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-
                 if (tv_esperar.getText().toString().equals("Digite la identificacion del cliente")) {
                     bt_consultar.setClickable(false);
                     bt_consultar.setEnabled(false);
                     sp_opciones.setVisibility(View.INVISIBLE);
                     String archivos[] = fileList();
-                    boolean crear_lot = true;
                     if (et_ID.getText().toString().contains("*") || et_ID.getText().toString().contains(" ")) {
-                        Log.v("TextListener0.1", "Estado_cliente.\n\nClienteID: " + cliente_ID + "\n\n");
-                        //Do nothing.
+                        Log.v("TextListener0.1", "******EERROR************Estado_cliente.\n\nClienteID: " + cliente_ID + "\n\n");
                     } else {
                         for (int i = 0; i < archivos.length; i++) {
                             Pattern pattern = Pattern.compile(et_ID.getText().toString(), Pattern.CASE_INSENSITIVE);
@@ -412,51 +303,40 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                                 if (s.length() >= 9) {
                                     bt_consultar.setEnabled(true);
                                     bt_consultar.setClickable(true);
-
-                                    //String texto = et_ID.getText().toString();
-                                    //et_ID.setBackgroundResource(R.drawable.);
                                 }
                             }
                         }
                     }
                     //Poner letras verdes o algo asi cuando se encuentre un cliente!!!
                 } else if (tv_esperar.getText().toString().equals("Ingrese el nombre del cliente") || tv_esperar.getText().toString().equals("Ingrese el apellido del cliente") || tv_esperar.getText().toString().equals("Ingrese el apodo del cliente")) {
-
-
                     String parametro = "";
                     String archivos[] = fileList();
                     if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
-                        Log.v("Consultarxxx", "Estado_cliente.\n\nClienteID: " + cliente_ID + "\n\n");
-                        //Do nothing.
+                        Log.v("Consultarxxx", "*******ERRPR***********Estado_cliente.\n\nClienteID: " + cliente_ID + "\n\n");
                     } else {
                         for (int i = 0; i < archivos.length; i++) {
                             if (archivos[i].contains(" ") || archivos[i].contains("*")) {
-                                // Do nothing. Es un archivo con error.
+                                Log.v("Consultarxxx", "*******ERRPR***********Estado_cliente.\n\nClienteID: " + cliente_ID + "\n\n");
                             } else {
                                 String cliente_ID_s = "";
                                 Pattern pattern = Pattern.compile("_C_", Pattern.CASE_INSENSITIVE);
                                 Matcher matcher = pattern.matcher(archivos[i]);
                                 boolean matchFound = true;
                                 if (matchFound) {
-                                    //TODO: Abrir archivo y leerlo.
                                     try {
                                         InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
                                         BufferedReader br = new BufferedReader(archivo);
                                         String linea = br.readLine();
-
                                         boolean param_encontrado = false;
                                         while (linea != null) {
-
                                             if (linea.contains("_separador_")) {
                                                 String[] split = linea.split("_separador_");
-                                                //Log.v("no_cedula", "Estado_cliente.\n\nLinea:\n\n" + linea + "\n\n.");
                                                 if (split[0].equals(buscar_por)) {
                                                     if (split[1].contains(s)) {
                                                         param_encontrado = true;
                                                         Log.v("param_encontrado", "Estado_cliente.\n\nParam: " + split[0] + "\n\nContenido del parametro: " + split[1] + "\n\n.");
                                                     }
                                                 }
-
                                                 if (split[0].equals("nombre_cliente")) {
                                                     nombre_cliente = split[1];
                                                 } else if (split[0].equals("apellido1_cliente")) {
@@ -478,13 +358,11 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                                             }
                                             linea = br.readLine();
                                         }
-
                                         if (param_encontrado) {
                                             Log.v("param_encontrado0", "Estrado_cliente.\n\nNombre cliente: " + nombre_cliente + "\n\napellido1 cliente: " + apellido1_cliente +
                                                     "\n\napellido2 cliente: " + apellido2_cliente + "\n\nApodo cliente: " + apodo_cliente + "\n\n.");
                                             parametro = parametro + nombre_cliente + "_sep_" + apellido1_cliente + "_sep_" + apellido2_cliente + "_sep_(" + apodo_cliente + ")" + "_sep_" + archivos[i] + "_sep_" + "_sop_";
                                             Log.v("param_encontrado1", "Estado_cliente.\n\nparametro:\n\n" + parametro + "\n\n.");
-                                            //param_encontrado = false;
                                         }
 
                                         br.close();
@@ -497,12 +375,9 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                             }
                         }
                     }
-
                     llenar_spinner(parametro);
 
                 } else if (tv_esperar.getText().toString().equals("Ingrese el dia de la semana")) {
-                    //TODO
-
                     String parametro = "";
                     String archivos[] = fileList();
                     String dia_encontrado = "";
@@ -522,18 +397,13 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                                 String cliente_ID_s = "";
                                 Pattern pattern = Pattern.compile("_P_", Pattern.CASE_INSENSITIVE);
                                 Matcher matcher = pattern.matcher(archivos[i]);
-
                                 boolean matchFound = matcher.find();
                                 if (matchFound) {
-                                    //TODO: Abrir archivo y leerlo.
                                     try {
                                         InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
                                         BufferedReader br = new BufferedReader(archivo);
                                         String linea = br.readLine();
-
-
                                         while (linea != null) {
-
                                             if (linea.contains("_separador_")) {
                                                 String[] split = linea.split("_separador_");
                                                 Log.v("por_fecha1", "Estado_cliente.\n\nLinea:\n\n" + linea + "\n\n.");
@@ -543,20 +413,13 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                                                     fecha_creditico = split_fecha_creditico[2] + "-" + split_fecha_creditico[1] + "-" + split_fecha_creditico[0];
                                                     Date fecha_creditico_D = DateUtilities.stringToDate(fecha_creditico);
                                                     String[] split_fecha_creditico_D = fecha_creditico_D.toString().split(" ");
-
                                                     dia_encontrado = obtener_dia_espaniol(split_fecha_creditico_D[0]);
                                                     Log.v("por_fecha1", "Estado_cliente.\n\nDia encontrado: " + dia_encontrado + "\n\n.");
-
-                                                    /*for (int o = 0; o < split_fecha_creditico_D.length; o++) {
-                                                        Log.v("por_fecha0", "Estado_cliente. Split[" + o + "]: " + split_fecha_creditico_D[o]);
-                                                    }*/
-
                                                     if (dia_encontrado.contains(s)) {
                                                         param_encontrado2 = true;
                                                         Log.v("param_encontrado", "Estado_cliente.\n\nParam: " + split[0] + "\n\nContenido del parametro: " + split[1] + "\n\n.");
                                                     }
                                                 }
-
                                                 if (split[0].equals("saldo_mas_intereses")) {
 
                                                     if (Integer.parseInt(split[1]) < 100) {
@@ -579,18 +442,11 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                                             }
                                             linea = br.readLine();
                                         }
-
                                         br.close();
                                         archivo.close();
                                     } catch (IOException | ParseException e) {
                                     }
-
                                     if (param_encontrado2) {
-
-                                        /////////////trtrtrtrt///////////////////
-
-
-
                                         if (cliente_ID_obtenido.contains("*") || cliente_ID_obtenido.contains(" ")) {
                                             Log.v("Consultarxxx", "Estado_cliente.\n\nClienteID: " + cliente_ID_obtenido + "\n\n");
                                             //Do nothing.
@@ -654,22 +510,14 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                                                 //Continue with the execution.
                                             }
                                         }
-
-
-                                        //////////////////rererererr//////////////////
-
-
                                     }
-
                                 } else {
                                     //Continue with the execution.
                                 }
                             }
                         }
                     }
-
                     llenar_spinner(parametro);
-
                 } else {
                     //Do nothing.
                 }
@@ -723,7 +571,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
                     String helperS = split[i].replace(splitw[4], "");
                     helperS = helperS.replace("_sep_", " ");
                     spinner_llenar = spinner_llenar + helperS + "_sip_";
-                    Log.v("llenando_spinner2", "Estado_cliente.\n\nhelperS: \n\n" + helperS + "\n\nArchivo credito: " + splitw[4] + "\n\n.");
+                    Log.v("llenando_spinner2", "Estado_cliente.\n\nhelperS: \n\n" + helperS + "\n\nArchivo cliente: " + splitw[4] + "\n\n.");
                     sp_helper.put(helperS, splitw[4]);
                 } else {
                     //Do nothing.
@@ -754,7 +602,6 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         bt_consultar.setVisibility(View.INVISIBLE);
         sp_opciones.setEnabled(false);
         sp_opciones.setVisibility(View.INVISIBLE);
-        //bt_consultar.setVisibility(View.INVISIBLE);
         sp_opciones.setVisibility(View.INVISIBLE);
         bt_find_name.setVisibility(View.INVISIBLE);
         bt_find_name.setEnabled(false);
@@ -872,7 +719,7 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
         }
     }
 
-    public void refinanciar(View view){
+    public void refinanciar (View view){
         //Intent refinanciar = new Intent(this, Re_financiarActivity.class);
         //refinanciar.putExtra("msg", "");
         //refinanciar.putExtra("cliente_recivido", cliente_ID);
@@ -896,9 +743,9 @@ public class Estado_clienteActivity extends AppCompatActivity {//Esta activity v
     public void estado_cuenta (View view) {
         Intent cuadra_tura = new Intent(this, CuadraturaActivity.class);
         cuadra_tura.putExtra("msg", "");
-        cuadra_tura.putExtra("cuadratura", "");
+        cuadra_tura.putExtra("cuadratura", "null");
         cuadra_tura.putExtra("cliente_recivido", cliente_ID);
-        Log.v("estado_cuenta0", "Estado_cliente.\n\nCliente recibido: " + cliente_ID + "\n\n.");
+        Log.v("estado_cuenta_0", "Estado_cliente.\n\nCliente recibido: " + cliente_ID + "\n\n.");
         //msg("Estado_cliente.\n\nCliente recibido: " + cliente_ID + "\n\n.");
         cuadra_tura.putExtra("cambio", "0");
         cuadra_tura.putExtra("monto_creditito", "0");

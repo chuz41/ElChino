@@ -3,7 +3,6 @@ package com.example.elchino.Util;
 //Realiza tareas referentes a calculos con fechas. Equivale a la clase LocalDate del api 26
 
 import android.util.Log;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -20,7 +19,7 @@ public class DateUtilities {
     private static String fecha;
     private static Map<String, Integer> meses = new HashMap<String, Integer>();
 
-    public static int daysBetween(Date fecha_inicio, Date fecha_final) {
+    public static int daysBetween (Date fecha_inicio, Date fecha_final) {
         int diferencia = 0;
         long tiempo_transcurrido = fecha_inicio.getTime() - fecha_final.getTime();
         TimeUnit unidad = TimeUnit.DAYS;
@@ -29,14 +28,14 @@ public class DateUtilities {
         return diferencia;
     }
 
-    public static Date stringToDate(String fechaS) throws ParseException {
+    public static Date stringToDate (String fechaS) throws ParseException {
         Date date;
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         date = formato.parse(fechaS);
         return date;
     }
 
-    public static Date addDays(Date fecha_inicio, int days) throws ParseException {
+    public static Date addDays (Date fecha_inicio, int days) {
         Date date;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(fecha_inicio);
@@ -45,7 +44,7 @@ public class DateUtilities {
         return date;
     }
 
-    public static Date addQuincenas(Date fecha, int quincenas, Date fecha_credito) throws ParseException {
+    public static Date addQuincenas (Date fecha, int quincenas, Date fecha_credito) {
         String[] split = fecha_credito.toString().split(" ");
         int fecha_init = Integer.parseInt(split[2]);
         int suma = quincenas * 2;
@@ -56,7 +55,6 @@ public class DateUtilities {
         date = calendar.getTime();
         Date fecha_backUp = date;
         split = date.toString().split(" ");
-        boolean flag = false;
         int fecha_end = Integer.parseInt(split[2]);
         if (fecha_init != fecha_end) {
             calendar.add(Calendar.DAY_OF_YEAR, 1);
@@ -110,7 +108,7 @@ public class DateUtilities {
         return date;
     }
 
-    public static Date addMonths(Date fecha, int months) throws ParseException {
+    public static Date addMonths (Date fecha, int months){
 
         String[] split = fecha.toString().split(" ");
         int fecha_init = Integer.parseInt(split[2]);
@@ -145,7 +143,7 @@ public class DateUtilities {
         return date;
     }
 
-    public static Date addWeeks(Date fechaS, int weeks) throws ParseException {
+    public static Date addWeeks (Date fechaS, int weeks) {
         Date date;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(fechaS);
@@ -154,7 +152,7 @@ public class DateUtilities {
         return date;
     }
 
-    public static String dateToString(Date fechaLd) {
+    public static String dateToString (Date fechaLd) {
         String date;
         llenar_mapa_meses();
         separar_fechaYhora(fechaLd);
@@ -162,7 +160,7 @@ public class DateUtilities {
         return date;
     }
 
-    private static void separar_fechaYhora(Date fechaLd){
+    private static void separar_fechaYhora (Date fechaLd){
         String fechaS = fechaLd.toString();
         String[] split = fechaS.split(" ");
         dia = split[2];
@@ -173,7 +171,7 @@ public class DateUtilities {
         split = hora_completa.split(":");
     }
 
-    private static void llenar_mapa_meses() {
+    private static void llenar_mapa_meses () {
         meses.put("Jan",1);
         meses.put("Feb",2);
         meses.put("Mar",3);

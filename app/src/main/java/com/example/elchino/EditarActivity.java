@@ -5,22 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class EditarActivity extends AppCompatActivity {
 
@@ -43,7 +37,6 @@ public class EditarActivity extends AppCompatActivity {
     private TextView tv_monto_disponible;
     private TextView tv_telefono1_cliente;
     private TextView tv_telefono2_cliente;
-
     private EditText et_ID_cliente;
     private EditText et_nombre_cliente;
     private EditText et_apellido1_cliente;
@@ -55,7 +48,6 @@ public class EditarActivity extends AppCompatActivity {
     private EditText et_monto_disponible;
     private EditText et_telefono1_cliente;
     private EditText et_telefono2_cliente;
-    //private String activity_volver;
     private String ID_cliente;
     private String nombre_cliente;
     private String apellido1_cliente;
@@ -68,7 +60,6 @@ public class EditarActivity extends AppCompatActivity {
     private String telefono1_cliente;
     private String telefono2_cliente;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +67,6 @@ public class EditarActivity extends AppCompatActivity {
         archivo_cliente = getIntent().getStringExtra("archivo_cliente");
         cliente_ID = getIntent().getStringExtra("cliente_id");
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
-        //activity_volver = getIntent().getStringExtra("activity_devolver");
         tv_esperar.setText("Seleccione la opcion que desea editar...");
         tv_saludo = (TextView) findViewById(R.id.tv_saludo);
         tv_saludo.setText("Editar");
@@ -107,7 +97,6 @@ public class EditarActivity extends AppCompatActivity {
         tv_monto_disponible.setVisibility(View.INVISIBLE);
         tv_telefono1_cliente.setVisibility(View.INVISIBLE);
         tv_telefono2_cliente.setVisibility(View.INVISIBLE);
-
         et_ID_cliente = (EditText) findViewById(R.id.et_ID_cliente);
         et_nombre_cliente = (EditText) findViewById(R.id.et_nombre_cliente);
         et_apellido1_cliente = (EditText) findViewById(R.id.et_apellido1_cliente);
@@ -233,7 +222,6 @@ public class EditarActivity extends AppCompatActivity {
                 }
                 linea = br.readLine();
             }
-            //archivoCompleto = archivoCompleto + linea + "\n";
             br.close();
             archivo.close();
         } catch (IOException e) {

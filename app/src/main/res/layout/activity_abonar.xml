@@ -45,10 +45,10 @@
         android:text="@string/consultar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.487"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_ID"
-        app:layout_constraintVertical_bias="0.136" />
+        app:layout_constraintVertical_bias="0.18" />
 
     <TextView
         android:id="@+id/tv_saludo"
@@ -93,24 +93,34 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.486"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_consultar_ab"
-        app:layout_constraintVertical_bias="0.801"
+        app:layout_constraintTop_toBottomOf="@+id/et_mensaje"
+        app:layout_constraintVertical_bias="0.052"
         app:strokeColor="#EA1F39DA" />
 
     <EditText
         android:id="@+id/et_mensaje"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="88dp"
         android:ems="10"
         android:gravity="start|top"
         android:inputType="textMultiLine"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/bt_perdon"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_consultar_ab" />
+        app:layout_constraintTop_toBottomOf="@+id/et_ID" />
+
+    <CheckBox
+        android:id="@+id/chb_adelantarIntereses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:onClick="chb_adelantarIntereses_Listener"
+        android:text="@string/adelantarIntereses"
+        app:layout_constraintStart_toStartOf="@+id/tv_indicador"
+        app:layout_constraintTop_toBottomOf="@+id/tv_indicador" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

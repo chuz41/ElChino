@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 public class TranslateUtil {
 
-    public static JSONObject string_to_Json(String s, String spreadSheetId, String sheet, String id_file) throws JSONException {
+    public static JSONObject string_to_Json(String s, String spreadSheetId, String sheet) throws JSONException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("spreadsheet_id", spreadSheetId);
         jsonObject.put("sheet", sheet);
@@ -18,7 +18,6 @@ public class TranslateUtil {
         for (int i = 0; i < split.length; i++) {
             row.put(split[i]);
         }
-        row.put(id_file);
         rowsArray.put(row);
         jsonObject.put("rows", rowsArray);
         return jsonObject;

@@ -25,6 +25,8 @@ public class BluetoothUtil {
         return BluetoothAdapter.getDefaultAdapter();
     }
 
+
+
     public static BluetoothDevice getDevice(BluetoothAdapter bluetoothAdapter, String impresora) {
         BluetoothDevice innerprinter_device = null;
         @SuppressLint("MissingPermission") Set<BluetoothDevice> devices = bluetoothAdapter.getBondedDevices();

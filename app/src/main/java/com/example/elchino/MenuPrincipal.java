@@ -1,67 +1,33 @@
 package com.example.elchino;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
-import android.content.Context;
+import android.app.ActivityManager;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.volley.Cache;
-import com.android.volley.Network;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.example.elchino.Util.TranslateUtil;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import com.example.elchino.Util.AgregarLinea;
+import com.example.elchino.Util.BorrarArchivo;
+import com.example.elchino.Util.GuardarArchivo;
+import com.example.elchino.Util.SepararFechaYhora;
+import com.example.elchino.Util.SubirArchivo;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MenuPrincipal extends AppCompatActivity {
 
-    private Map<String, Integer> meses = new HashMap<String, Integer>();
     private String dia;
     private String mes;
     private String anio;
-    private String fecha;
     private String hora;
+    private String fecha;
     private String minuto;
-    private String nombre_dia;
-    private String cobrador = "a_sfile_cobrador_sfile_a.txt";
-    private String spreadsheet_cobradores = "1y5wRGgrkH48EWgd2OWwon_Um42mxN94CdmJSi_XCwvM";
-    private String readRowURL = "https://script.google.com/macros/s/AKfycbxJNCrEPYSw8CceTwPliCscUtggtQ2l_otieFmE/exec?spreadsheetId=";
-    private String addRowURL = "https://script.google.com/macros/s/AKfycbweyYb-DHVgyEdCWpKoTmvOxDGXleawjAN8Uw9AeJYbZ24t9arB/exec";
-    private HashMap<String, String> abajos = new HashMap<String, String>();
-    private String sheet_cobradores = "cobradores";
-    private Button confirmar;
-    private String onlines = "onlines.txt";
     private Button bt_nuevo_cliente;
     private Button bt_estado_cliente;
     private Button bt_cierre;
@@ -74,36 +40,6 @@ public class MenuPrincipal extends AppCompatActivity {
     private String mensaje_recibido = "";
     private TextView tv_caja;
     private String caja = "caja.txt";
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        try {
-            check_onlines();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        try {
-            check_onlines();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        try {
-            check_onlines();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,26 +58,47 @@ public class MenuPrincipal extends AppCompatActivity {
         tv_caja = (TextView) findViewById(R.id.tv_caja);
         tv_caja.setHint("Caja...");
         mostrar_caja();
-        separar_fechaYhora();
-        tv_fecha.setText(fecha + "/" + mes + "/" + anio);
+        separarFecha();
+        //verArchivos();//debug function!
+        try {
+            corregirArchivos();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        tv_fecha.setText(dia + "/" + mes + "/" + anio);
         tv_saludo.setText("Menu principal");
         mensaje_recibido = getIntent().getStringExtra( "mensaje");
-        if (mensaje_recibido.equals(null) || (mensaje_recibido == "")) {
+        boolean flagServicio = false;
+        if (mensaje_recibido.equals("null") || (mensaje_recibido == "")) {
             //Do nothing.
         } else {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
         }
-        try {
-            check_onlines();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (SubirArchivo.class.getName().equals(service.service.getClassName())) {
+                flagServicio = true;
+            }
+        }
+        Log.v("onCreate_0", "MenuPrincipal.\n\nflagServicio: " + flagServicio + "\n\n.");
+        if (!flagServicio) {
+            startService(new Intent(getApplicationContext(), SubirArchivo.class));
         }
     }
 
-    private void corregir_archivos () throws IOException {
+    private void separarFecha () {
+        SepararFechaYhora datosFecha = new SepararFechaYhora(null);
+        hora = datosFecha.getHora();
+        minuto = datosFecha.getMinuto();
+        anio = datosFecha.getAnio();
+        mes = datosFecha.getMes();
+        dia = datosFecha.getDia();
+        fecha = dia;
+    }
+
+    private void corregirArchivos () throws IOException {
 
         //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
-
         String archivos[] = fileList();
         boolean flag_borrar = false;
         if (archivo_existe(archivos, "cierre.txt")) {
@@ -151,8 +108,8 @@ public class MenuPrincipal extends AppCompatActivity {
                 String linea = br.readLine();
                 String[] split = linea.split(" ");
                 int fecha_file = Integer.parseInt(split[1]);
-                int hoy_fecha = Integer.parseInt(fecha);
-                Log.v("corregir_archivos0", "Main.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
+                int hoy_fecha = Integer.parseInt(dia);
+                //Log.v("corregir_archivos_0", "MenuPrincipal.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
                 if (fecha_file != hoy_fecha) {
                     flag_borrar = true;
                 } else {
@@ -163,17 +120,58 @@ public class MenuPrincipal extends AppCompatActivity {
             } catch (IOException e) {
             }
         } else {
-            crear_archivo("cierre.txt");
-            borrar_archivo("cierre.txt");
-            crear_archivo("cierre.txt");
-            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+            new AgregarLinea("fecha " + dia, "cierre.txt", getApplicationContext());//La clase AgregarLinea crea el archivo en caso de que este no exista.
         }
         if (flag_borrar) {
-            borrar_archivo("cierre.txt");
-            crear_archivo("cierre.txt");
-            agregar_linea_archivo("fecha " + fecha, "cierre.txt");
+            new BorrarArchivo("cierre.txt", getApplicationContext());
+            new AgregarLinea("fecha " + dia, "cierre.txt", getApplicationContext());
         }
 
+        /////////////////////////////////////////////////////////////////////////////////////
+
+        //////// ARCHIVO prestamo  //////////////////////////////////////////////////////////
+
+
+        for (int i = 0; i < archivos.length; i++) {
+            String fileContent = "";
+            String file = archivos[i];
+            Pattern pattern = Pattern.compile("_P_", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(file);
+            boolean flag = true;
+            boolean matchFound = matcher.find();
+            if (matchFound) {
+                try {
+                    InputStreamReader archivo = new InputStreamReader(openFileInput(file));
+                    BufferedReader br = new BufferedReader(archivo);
+                    String linea = br.readLine();
+
+                    while (linea != null) {
+                        if (linea.equals("Saldo pendiente: 0 colones")) {
+                            flag = true;
+                            //Do nothing.
+                        } else {
+                            fileContent = fileContent + linea + "\n";
+                        }
+                        linea = br.readLine();
+                    }
+                    br.close();
+                    archivo.close();
+                    if (flag) {
+                        new BorrarArchivo(file, getApplicationContext());
+                        if (new GuardarArchivo(file, fileContent, getApplicationContext()).guardarFile()) {
+                        } else {
+                            Toast.makeText(this, "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } catch (IOException e) {
+                }
+            } else {
+                //Do nothing.
+            }
+        }
         /////////////////////////////////////////////////////////////////////////////////////
 
     }
@@ -196,7 +194,6 @@ public class MenuPrincipal extends AppCompatActivity {
         Intent banca = new Intent(this, BancaActivity.class);
         banca.putExtra("msg", "");
         banca.putExtra("cliente_recivido", "");
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(banca);
         finish();
         System.exit(0);
@@ -239,127 +236,12 @@ public class MenuPrincipal extends AppCompatActivity {
         nuevo_credito.putExtra("msg", "");
         nuevo_credito.putExtra("cliente_recivido", "");
         nuevo_credito.putExtra("activity_devolver", "MenuPrincipal");
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
         startActivity(nuevo_credito);
         finish();
         System.exit(0);
     }
 
     //Metodos comunes//
-
-    private void esperar (String s) {
-        ocultar_todito();
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-        //tv_esperar.setText(s);
-        for (int i = 0; i > 10; i++) {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        //salir();
-    }
-
-    private void salir () {
-        Intent menu_principal = new Intent(this, MenuPrincipal.class);
-        //abonar.putExtra("sid_vendidas", sid_vendidas);
-        startActivity(menu_principal);
-        finish();
-        System.exit(0);
-    }
-
-    public  void borrar_archivo (String file) throws IOException {
-        File archivo = new File(file);
-        String empty_string = "";
-        guardar(empty_string, file);
-        archivo.delete();
-    }
-
-    public  void guardar (String contenido, String file_name) throws IOException {
-        try {
-            //borrar_archivo(file_name);
-            //crear_archivo(file_name);
-            OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(file_name, Activity.MODE_PRIVATE));
-            archivo.write(contenido);
-            archivo.flush();
-            archivo.close();
-        } catch (IOException e) {
-        }
-    }
-
-    private void separar_fechaYhora () {
-        llenar_mapa_meses();
-        Date now = Calendar.getInstance().getTime();
-        String ahora = now.toString();
-        String[] split = ahora.split(" ");
-        nombre_dia = split[0];
-        dia = split[2];
-        mes = String.valueOf(meses.get(split[1]));
-        anio = split[5];
-        String hora_completa = split[3];
-        fecha = split[2];
-        split = hora_completa.split(":");
-        minuto = split[1];
-        hora = split[0];
-    }
-
-    private void llenar_mapa_meses () {
-        meses.put("Jan",1);
-        meses.put("Feb",2);
-        meses.put("Mar",3);
-        meses.put("Apr",4);
-        meses.put("May",5);
-        meses.put("Jun",6);
-        meses.put("Jul",7);
-        meses.put("Aug",8);
-        meses.put("Sep",9);
-        meses.put("Oct",10);
-        meses.put("Nov",11);
-        meses.put("Dec",12);
-        meses.put("1",1);
-        meses.put("2",2);
-        meses.put("3",3);
-        meses.put("4",4);
-        meses.put("5",5);
-        meses.put("6",6);
-        meses.put("7",7);
-        meses.put("8",8);
-        meses.put("9",9);
-        meses.put("10",10);
-        meses.put("11",11);
-        meses.put("12",12);
-    }
-
-    public  void agregar_linea_archivo (String new_line, String file_name) {
-        String archivos[] = fileList();
-        String ArchivoCompleto = "";//Aqui se lee el contenido del archivo guardado.
-        if (archivo_existe(archivos, file_name)) {
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                while (linea != null) {
-                    ArchivoCompleto = ArchivoCompleto + linea + "\n";
-                    linea = br.readLine();
-                }
-                ArchivoCompleto = ArchivoCompleto + new_line + "\n";
-                br.close();
-                archivo.close();
-            } catch (IOException e) {
-            }
-        } else {
-            crear_archivo(file_name);
-            agregar_linea_archivo(file_name, new_line);
-            return;
-        }
-        try {
-            OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(file_name, Activity.MODE_PRIVATE));
-            archivo.write(ArchivoCompleto);
-            archivo.flush();
-        } catch (IOException e) {
-        }
-    }
 
     private boolean archivo_existe (String[] archivos, String file_name){
         for (int i = 0; i < archivos.length; i++) {
@@ -370,15 +252,6 @@ public class MenuPrincipal extends AppCompatActivity {
         return false;
     }
 
-    private void crear_archivo (String nombre_archivo) {
-        try{
-            OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(nombre_archivo, Activity.MODE_PRIVATE));
-            archivo.flush();
-            archivo.close();
-        }catch (IOException e) {
-        }
-    }
-
     @Override
     public void onBackPressed(){
         msg("Presione atras nuevamente para salir...");
@@ -386,26 +259,23 @@ public class MenuPrincipal extends AppCompatActivity {
     }
 
     private void boton_atras() {
-        //ocultar_teclado();
         if (flag_salir) {
+            Log.v("onDestroy_0", "MenuPrincipal.\n\nContext de la aplicacion:\n\n" +
+                    getApplicationContext().toString() + "\n\n.");
+            stopService (new Intent(getApplicationContext(), SubirArchivo.class));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             finish();
             System.exit(0);
         } else {
             flag_salir = true;
         }
-
-    }
-
-    private void mostrar_todito() {
-
-    }
-
-    private void ocultar_todito() {
-
     }
 
     private String imprimir_archivo (String file_name){
-
         String archivos[] = fileList();
         String contenido = "";//Aqui se lee el contenido del archivo guardado.
         if (archivo_existe(archivos, file_name)) {//Archivo nombre_archivo es el archivo que vamos a imprimir
@@ -427,240 +297,6 @@ public class MenuPrincipal extends AppCompatActivity {
 
     private void msg(String s) {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-    }
-
-    private void ocultar_teclado(){
-        View view = this.getCurrentFocus();
-        InputMethodManager imn = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        imn.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    //Metodos comunes online//
-
-    private boolean verificar_internet() {
-        ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        if (!isConnected) {
-            Toast.makeText(this, "Debe estar conectado a una red WiFi o datos mobiles.", Toast.LENGTH_LONG).show();
-            return false;
-        } else {
-            //Si esta conectado a internet.
-            //Toast.makeText(this, "Conectado a internet!", Toast.LENGTH_LONG).show();
-            return true;
-        }
-    }
-
-    private void check_onlines () throws JSONException {
-        if (verificar_internet()) {
-            boolean flag = true;
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
-                //imprimir_archivo("facturas_online.txt");
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                //String contenido = "";
-                abajos.clear();
-                Integer countercito = 0;
-                while (linea != null) {
-                    countercito++;
-                    String count = String.valueOf(countercito);
-                    String[] split = linea.split(" ");
-                    if (split[0].equals("abajo")) {
-                        Log.v("OJOF_abajo: ", "\n\nLinea: " + linea + " Fin de linea!!!");
-                        abajos.put(count, split[1]);
-                        flag = false;
-                    } else if (split[0].equals("arriba")) {
-                        Log.v("OJOF_arriba: ", "\n\nLinea: " + linea + " Fin de linea!!!");
-                        //TODO: Pensar que hacer!!!
-                    } else {
-                        Log.v("OJOF_(error): ", "\n\n(No deberia llegar aqui!!!\n\nLinea: " + linea + " Fin de linea!!!");
-                        //Do nothing.
-                    }
-                    linea = br.readLine();
-                }
-                archivo.close();
-                br.close();
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            if (flag) {
-                return;
-            } else {
-                //Do nothing. Continue with the work
-            }
-
-            abajiar();
-            //return objeto_json;
-        } else {
-
-        }
-    }
-
-    private void abajiar() throws JSONException {
-        String sp_clientes = "";
-        String sp_creditos = "";
-        try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
-            //imprimir_archivo("facturas_online.txt");
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            int cont = 0;
-            while (linea != null) {
-                String[] split = linea.split(" ");
-                if (split[0].equals("Screditos")) {
-                    sp_creditos = split[1];
-                }
-                if (split[0].equals("Sclientes")) {
-                    sp_clientes = split[1];
-                }
-                linea = br.readLine();
-                cont++;
-            }
-            br.close();
-            archivo.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String spid = "";
-        String sheet = "";
-        for (String key : abajos.keySet()) {
-            String json_string = "";
-            JSONObject jsonObject = new JSONObject();
-            Log.v("Abajiar", "MenuPrincipal.\n\nKey: " + key + "\n\nValue: " + abajos.get(key) + "\n\n.");
-            String[] split_pre = abajos.get(key).split("_");
-            if (split_pre[1].equals("C")) {
-                spid = sp_clientes;
-                sheet = "clientes";
-            } else if (split_pre[1].equals("P")) {
-                spid = sp_creditos;
-                sheet = "creditos";
-            } else if (split_pre[1].equals("caja")) {
-                spid = sp_creditos;
-                sheet = "caja";
-            } else if (split_pre[1].equals("S")) {
-                spid = sp_creditos;
-                sheet = "solicitudes";
-            }
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput(abajos.get(key)));
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                while (linea != null && !linea.isEmpty()) {
-                    String[] split = linea.split("_separador_");
-                    json_string = json_string + split[1] + "_n_";
-                    linea = br.readLine();
-                }
-                br.close();
-                archivo.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet, split_pre[0]);
-            subir_archivo_resagado(jsonObject, abajos.get(key), key);
-            break;
-        }
-    }
-
-    private void subir_archivo_resagado (JSONObject jsonObject, String file, String key) {
-        RequestQueue queue;
-        queue = Volley.newRequestQueue(this);
-        //Llamada POST usando Volley:
-        RequestQueue requestQueue;
-
-        // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
-
-        // Set up the network to use HttpURLConnection as the HTTP client.
-        Network network = new BasicNetwork(new HurlStack());
-
-        // Instantiate the RequestQueue with the cache and network.
-        requestQueue = new RequestQueue(cache, network);
-
-        // Start the queue
-        requestQueue.start();
-
-        //Toast.makeText(this, "Debug:\nConsecutivo: " + Consecutivo + "\nconsecutivo: " + consecutivo + "\nDeben ser iguales.", Toast.LENGTH_LONG).show();
-
-        String url = addRowURL;
-
-        //ocultar_todo();
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, url, jsonObject, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        String[] split = response.toString().split("\"");
-                        int length_split = split.length;
-                        Log.v("info_sub_file_resag: ", "\n\n" + response + "\n\n");
-                        if (length_split > 3) {//TODO: Corregir este if. Debe ser mas especifico y detectar si la respuesta no es correcta.
-                            for (int i = 0; i < length_split; i++) {
-                                Log.v("split[" + i + "]", split[i]);
-                            }
-                            if (split[2].equals(":")) {//TODO: Todo de arriba tiene que ver tambien con este.
-                                cambiar_bandera (file, key);
-                                try {
-                                    abajiar();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            } else {
-                                String factura_num = split[15];
-                            }
-                        } else {
-                            //No se subio correctamente!
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                    }
-                });
-
-        // Add the request to the RequestQueue.
-        requestQueue.add(jsonObjectRequest);
-
-    }
-
-    private void cambiar_bandera (String file, String key) {
-        try {
-            InputStreamReader archivo = new InputStreamReader(openFileInput(onlines));
-            BufferedReader br = new BufferedReader(archivo);
-            String linea = br.readLine();
-            String contenido = "";
-            while (linea != null) {
-                Log.v("cambiar_bandera_file", "  Linea: " + linea + "\n\n");
-                String[] split = linea.split(" ");
-                if (split[0].equals("arriba")) {
-                    //Dejar perder la linea
-                } else if (split[0].equals("abajo")) {
-                    if (split[1].equals(file)) {
-                        linea = linea.replace(split[0], "arriba");
-                        abajos.remove(key);
-                        contenido = contenido + linea + "\n";
-                    } else {
-                        contenido = contenido + linea + "\n";
-                    }
-                } else {
-                    //Do nothing. Nunca llega aqui.
-                }
-                linea = br.readLine();
-            }
-            br.close();
-            archivo.close();
-            borrar_archivo(onlines);
-            guardar(contenido, onlines);//Aqui se eliminan las lineas que corresponden a archivos que ya se han subido.
-            Log.v("cambiar_band_result", "\n\nArchivo \"onlines.txt\":\n\n" + imprimir_archivo(onlines));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 }

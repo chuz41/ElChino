@@ -1,22 +1,20 @@
 package com.example.elchino;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
-import android.service.voice.VoiceInteractionService;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.elchino.Util.BluetoothUtil;
 import com.example.elchino.Util.DateUtilities;
+import com.example.elchino.Util.SepararFechaYhora;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,7 +28,6 @@ import java.util.regex.Pattern;
 
 public class CierreActivity extends AppCompatActivity {
 
-    private Map<String, Integer> meses = new HashMap<String, Integer>();
     private Button bt_imprimir;
     private String dia;
     private String mensaje_imprimir = "";
@@ -39,7 +36,6 @@ public class CierreActivity extends AppCompatActivity {
     private String fecha;
     private String hora;
     private String minuto;
-    private String nombre_dia;
     private TextView tv_saludo;
     private String caja = "caja.txt";
     private String cobrador = "a_sfile_cobrador_sfile_a.txt";
@@ -76,7 +72,7 @@ public class CierreActivity extends AppCompatActivity {
         fecha_hoy_string = DateUtilities.dateToString(hoy_LD);
         Log.v("OnCreate1", "Abonar.\n\nFecha hoy: " + fecha_hoy_string + "\n\n.");
         Log.v("OnCreate2", "Abonar.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
-        separar_fechaYhora();
+        separarFecha();
         try {
             hoy_LD = DateUtilities.stringToDate(fecha_hoy_string);
         } catch (ParseException e) {
@@ -88,6 +84,16 @@ public class CierreActivity extends AppCompatActivity {
         generar_cierre();
     }
 
+    private void separarFecha () {
+        SepararFechaYhora datosFecha = new SepararFechaYhora(hoy_LD);
+        hora = datosFecha.getHora();
+        minuto = datosFecha.getMinuto();
+        anio = datosFecha.getAnio();
+        mes = datosFecha.getMes();
+        dia = datosFecha.getDia();
+        fecha = dia;
+    }
+
     private void datos_vendedor() {
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
@@ -95,13 +101,16 @@ public class CierreActivity extends AppCompatActivity {
             String linea = br.readLine();
             String[] splitr = linea.split(" ");
             cobrador_ID = splitr[0];
+            Log.v("datos_vendedor_0", "Cierre.\n\nlinea: " + linea + "\n\n.");
             while (linea != null) {
                 String[] split = linea.split(" ");
                 if (split[0].equals("apodo")) {
                     apodo_cobrador = split[1];
+                    break;
                 }
                 linea = br.readLine();
             }
+            Log.v("datos_vendedor_1", "Cierre.\n\nApodo cobrador: " + apodo_cobrador + "\n\n.");
             br.close();
             archivo.close();
         } catch (IOException e) {
@@ -122,7 +131,7 @@ public class CierreActivity extends AppCompatActivity {
                     BufferedReader br = new BufferedReader(archivo);
                     String linea = br.readLine();
                     while (linea != null) {
-                        Log.v("getNombreCliente0", "Cierre.\n\nlinea:\n\n" + linea + "\n\n.");
+                        //Log.v("getNombreCliente0", "Cierre.\n\nlinea:\n\n" + linea + "\n\n.");
                         String[] split = linea.split("_separador_");
                         if (split[0].equals("nombre_cliente")) {
                             if (nombreCliente.equals("")) {
@@ -240,7 +249,7 @@ public class CierreActivity extends AppCompatActivity {
                     } else if (split_value.length >= 5) {
                         nameCliente = split_value[3] + " " + split_value[4];
                     }
-                    Log.v("generar_cierre5", "Cierre.\n\nnameCliente: " + nameCliente + "\n\n.");
+                    //Log.v("generar_cierre5", "Cierre.\n\nnameCliente: " + nameCliente + "\n\n.");
                     contenido_cierre = contenido_cierre + "Abono de\n" + nameCliente + ":\nMonto: " +
                             split_value[1] + " colones.\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
                 }
@@ -254,7 +263,7 @@ public class CierreActivity extends AppCompatActivity {
                     String[] split_value = value.split(" ");
                     int monto_tempo = Integer.parseInt(split_value[1]);
                     balance_general_creditos = balance_general_creditos + monto_tempo;
-                    Log.v("generar_cierre4", "Cierre.\n\nsplit_value.lenght: " + split_value.length + "\nsplit_value[" + 3 + "]: " + split_value[3] + "\nsplit_value[" + 4 + "]: " + split_value[4] + "\n\n.");
+                    //Log.v("generar_cierre4", "Cierre.\n\nsplit_value.lenght: " + split_value.length + "\nsplit_value[" + 3 + "]: " + split_value[3] + "\nsplit_value[" + 4 + "]: " + split_value[4] + "\n\n.");
                     String nameCliente = "";
                     if (split_value.length == 4) {
                         nameCliente = split_value[3];
@@ -344,48 +353,6 @@ public class CierreActivity extends AppCompatActivity {
         startActivity(activity_volver);
         finish();
         System.exit(0);
-    }
-
-    private void separar_fechaYhora (){
-        llenar_mapa_meses();
-        String ahora = hoy_LD.toString();
-        String[] split = ahora.split(" ");
-        nombre_dia = split[0];
-        dia = split[2];
-        mes = String.valueOf(meses.get(split[1]));
-        anio = split[5];
-        String hora_completa = split[3];
-        fecha = split[2];
-        split = hora_completa.split(":");
-        minuto = split[1];
-        hora = split[0];
-    }
-
-    private void llenar_mapa_meses () {
-        meses.put("Jan",1);
-        meses.put("Feb",2);
-        meses.put("Mar",3);
-        meses.put("Apr",4);
-        meses.put("May",5);
-        meses.put("Jun",6);
-        meses.put("Jul",7);
-        meses.put("Aug",8);
-        meses.put("Sep",9);
-        meses.put("Oct",10);
-        meses.put("Nov",11);
-        meses.put("Dec",12);
-        meses.put("1",1);
-        meses.put("2",2);
-        meses.put("3",3);
-        meses.put("4",4);
-        meses.put("5",5);
-        meses.put("6",6);
-        meses.put("7",7);
-        meses.put("8",8);
-        meses.put("9",9);
-        meses.put("10",10);
-        meses.put("11",11);
-        meses.put("12",12);
     }
 
     private String imprimir_archivo (String file_name){
