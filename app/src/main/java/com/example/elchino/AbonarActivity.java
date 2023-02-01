@@ -1393,7 +1393,7 @@ public class AbonarActivity extends AppCompatActivity {
                                 split_1[0] + "_" + split_1[1] + "_0_" + split_1[3]);//TODO: Hacer que if (i == split_length) {retornar_cambio}
                         Log.v("obtener_cuadra4", "Abonar.\n\ncuadratura:\n\n" + cuadratura + "\n\n.");
                         if (i == (largo_split - 1)) {
-                            proximo_abono = "Prestamo cancelado.\nSaldo pendiente: 0 colones";
+                            //proximo_abono = "Prestamo cancelado. Saldo pendiente: 0 colones";
                             cambio = monto_temporal;//TODO: CORREGIR MONTO DISPONIBLE CUANDO SOBRA CAMBIO
                             actualizar_caja((0-cambio));
                             monto_disponible = String.valueOf(Integer.parseInt(monto_disponible) - cambio);
