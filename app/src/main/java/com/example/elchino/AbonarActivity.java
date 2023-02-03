@@ -973,6 +973,8 @@ public class AbonarActivity extends AppCompatActivity {
                     int intereses_mor_archivo = Integer.parseInt(split[1]);
                     intereses_mor_archivo = intereses_mor_archivo - montoIngresado;
                     linea = linea.replace("intereses_moratorios_separador_" + split[1], "intereses_moratorios_separador_" + String.valueOf(intereses_mor_archivo));
+                } else if (split[0].equals("ID_credito")) {
+                    credit_ID = split[1];
                 } else if (split[0].equals("estado_archivo")) {
                     if (split[1].equals("abajo")) {
                         //Do nothing. Dejar la linea igual!
@@ -1001,6 +1003,7 @@ public class AbonarActivity extends AppCompatActivity {
         if (new GuardarArchivo(archivoCredito, contenido, getApplicationContext()).guardarFile()) {
             Log.v("actualizarClienteAde_4", "Abonar.\n\nContenido del archivo:\n\n" + imprimir_archivo(archivoCreado) + "\n\n.");
             actualizarCaja(montoIngresado);
+            actualizar_cierre(montoIngresado, obtener_caja(), credit_ID);
             mensaje_imprimir = mensaje_imprimir + "Monto abonado: " + montoIngresado + " colones.\n";
             mensaje_imprimir = mensaje_imprimir + "Correspondiente a intereses.\n\n";
             mensaje_imprimir = mensaje_imprimir + "******************************\n";
