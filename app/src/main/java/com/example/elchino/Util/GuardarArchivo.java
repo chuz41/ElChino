@@ -12,14 +12,16 @@ public class GuardarArchivo {
     private Cliente ClientE;
     private String Content;
     private Context ContexT;
+    private String Estado;
 
     public GuardarArchivo () {
     }
 
-    public GuardarArchivo(Cliente cliente, String file, Context context) {
+    public GuardarArchivo(Cliente cliente, String file, String estado, Context context) {
         this.ClientE = cliente;
         this.File = file;
         this.ContexT = context;
+        this.Estado = estado;
     }
 
     public GuardarArchivo(String file, String content, Context context) {
@@ -35,7 +37,7 @@ public class GuardarArchivo {
                 ClientE.getApellido2() + "\napodo_cliente_separador_" + ClientE.getApodo() + "\ntelefono1_cliente_separador_" +
                 ClientE.getTelefono1() + "\ntelefono2_cliente_separador_" + ClientE.getTelefono2() + "\nnotas_cliente_separador_" +
                 ClientE.getNotas() + "\ndireccion_cliente_separador_" + ClientE.getDireccion() + "\nmonto_disponible_separador_" +
-                String.valueOf(ClientE.getMontoAprobado()) + "\npuntuacion_cliente_separador_9\nestado_archivo_separador_abajo";
+                ClientE.getMontoAprobado() + "\npuntuacion_cliente_separador_" + ClientE.getPuntuacion() + "\nestado_archivo_separador_" + Estado;
         Log.v("guardarCliente_0", "GuardarArchivo.\n\nContenido:\n\n" + contenido + "\n\n.");
         try {
             OutputStreamWriter archivo = new OutputStreamWriter(ContexT.getApplicationContext().openFileOutput(File, ContexT.getApplicationContext().MODE_PRIVATE));

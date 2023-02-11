@@ -1,7 +1,5 @@
 package com.example.elchino;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Build;
@@ -19,12 +17,17 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.elchino.Util.AgregarLinea;
 import com.example.elchino.Util.BorrarArchivo;
 import com.example.elchino.Util.CrearArchivo;
 import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.GuardarArchivo;
 import com.example.elchino.Util.SepararFechaYhora;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -743,7 +746,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     }
 
     private void nuevo_credito () {
-        //Algoritmo principal
         tv_esperar.setVisibility(View.VISIBLE);
         tv_esperar.setText("Digite el monto del credito");
         bt_cambiar_fecha.setVisibility(View.VISIBLE);
@@ -909,7 +911,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     }
 
     private void llenar_spinner1 () {
-        String cuotass = "Cuotas_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18_19_20_21";
+        String cuotass = "Cuotas_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16_17_18_19_20_21";
         String[] split = cuotass.split("_");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.custom_spinner, split);
         sp_cuotas.setAdapter(adapter);

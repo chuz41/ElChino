@@ -112,8 +112,8 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             String file = u0 + "_C_.txt";
             String archivoCreado = new CrearArchivo(file, getApplicationContext()).getFile();
             Log.v("Confirm_2", "Registrar_cliente_nuevo.\n\nResultado de la creacin del archivo:\n" + archivoCreado + "\n\n.");
-            Cliente cliente = new Cliente(u0, u1, u2, u3, u4, u12, u13, u9, u10, Integer.parseInt(u6), "abajo");
-            if (new GuardarArchivo(cliente, file, getApplicationContext()).guardarCliente()) {
+            Cliente cliente = new Cliente(u0, u1, u2, u3, u4, u12, u13, u9, u10, Integer.parseInt(u6), "9", "abajo");
+            if (new GuardarArchivo(cliente, file, "abajo", getApplicationContext()).guardarCliente()) {
                 Toast.makeText(this, "Cliente " + u1 + " " + u2 + " se ha registrado correctamente!!!", Toast.LENGTH_SHORT).show();
                 Log.v("Confirm_3", "Registrar_cliente_nuevo.\n\nContenido del archivo:\n\n" + imprimir_archivo(file) + "\n\n.");
                 esperar(u1 + " " + u2 + " se ha registrado correctamente.");

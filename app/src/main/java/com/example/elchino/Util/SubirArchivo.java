@@ -111,8 +111,6 @@ public class SubirArchivo extends Service {
                 if (matarFor) {
                     subirArchivo(archivos[i]);
                     break;
-                } else {
-                    //Do nothing. Continue...
                 }
             }
         }
@@ -130,8 +128,6 @@ public class SubirArchivo extends Service {
                         if (Integer.parseInt(split[1]) > 0) {
                             flag = true;
                         }
-                    } else {
-                        //Do nothing. Continue...
                     }
                     linea = br.readLine();
                 }
@@ -154,7 +150,6 @@ public class SubirArchivo extends Service {
                 Log.v("SubirArchivo_-0", "SubirArchivo.\n\nFile: " + file + "\n\nlinea: " + linea + "\n\n.");
                 while (linea != null) {
                     String[] split = linea.split(" ");
-                    //Log.v("SubirArchivo_0", "SubirArchivo.\n\nFile: " + file + "\n\nsheet: " + sheet + "\n\n.");
                     if (sheet.equals("clientes")) {
                         if (split[0].equals("Sclientes")) {
                             spreadSheet = split[1];
@@ -181,16 +176,13 @@ public class SubirArchivo extends Service {
             }
             String spid = spreadSheet;
             String json_string = "";
-            JSONObject jsonObject = new JSONObject();
             Log.v("subirArchivo_1", "SubirArchivo.\n\nSpreadSheetId: " + spid + "\n\nSheet: " + sheet + "\n\nfile: " + file + "\n\n.");
             try {
                 InputStreamReader archivo = new InputStreamReader(thisContext.getApplicationContext().openFileInput(file));
                 BufferedReader br = new BufferedReader(archivo);
                 String linea = br.readLine();
                 while (linea != null && !linea.isEmpty()) {
-                    //Log.v("subirArchivo_2", "SubirArchivo.\n\nLinea:\n\n" + linea + "\n\n.");
                     String[] split = linea.split("_separador_");
-                    //Log.v("subirArchivo_3", "SubirArchivo.\n\nsplit[1]: " + split[1] + "\n\n.");
                     json_string = json_string + split[1] + "_n_";
                     linea = br.readLine();
                 }
@@ -200,8 +192,8 @@ public class SubirArchivo extends Service {
                 e.printStackTrace();
             }
             Log.v("subirArchivo_4", "SubirArchivo.\n\njsonString:\n" + json_string + "\n\n.");
-            jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet);
-            Log.v("subirArchivo_5", "SubirArchivo.\n\njsonObject.toString():\n\n" + jsonObject.toString() + "\n\n.");
+            JSONObject jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet);
+            Log.v("subirArchivo_5", "SubirArchivo.\n\njsonObject.toString():\n\n" + jsonObject + "\n\n.");
             subirNuevo(jsonObject, file);
         }
 
@@ -241,11 +233,7 @@ public class SubirArchivo extends Service {
                                     }
                                     if (split[2].equals(":")) {//TODO: Todo de arriba tiene que ver tambien con este.
                                         cambiarBandera(file);
-                                    } else {
-                                        //Nunca debe llegar aqui!!!
                                     }
-                                } else {
-                                    //No se subio correctamente!
                                 }
                             }
                         }, new Response.ErrorListener() {
@@ -254,8 +242,7 @@ public class SubirArchivo extends Service {
                                 // TODO: Handle error
                             }
                         });
-                // Add the request to the RequestQueue.
-                requestQueue.add(jsonObjectRequest);
+                requestQueue.add(jsonObjectRequest);// Add the request to the RequestQueue.
             } else {//No hay internet!!!
                 Log.v("SubirNuevo_2","SubirArchivo.\n\nPara registrar al vendedor en el servidor, debe estar conectado a internet.\n\n.");
                 esperar(1);

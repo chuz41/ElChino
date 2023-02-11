@@ -12,13 +12,14 @@ public class Cliente {
     protected String Notas;
     protected String Direccion;
     protected String Estado;
-    protected int MontoAprobado;
+    protected Integer MontoAprobado;
+    protected String Puntuacion;
 
     public Cliente() {
 
     }
 
-    public Cliente(String id, String nombre, String apellido1, String apellido2, String apodo, String telefono1, String telefono2, String notas, String direccion, int montoAprobado, String estado) {
+    public Cliente(String id, String nombre, String apellido1, String apellido2, String apodo, String telefono1, String telefono2, String notas, String direccion, int montoAprobado, String puntuacion, String estado) {
         this.id = id;
         this.Nombre = nombre;
         this.Apellido1 = apellido1;
@@ -30,6 +31,7 @@ public class Cliente {
         this.Direccion = direccion;
         this.MontoAprobado = montoAprobado;
         this.Estado = estado;
+        this.Puntuacion = puntuacion;
     }
 
     public String getId() {
@@ -70,6 +72,10 @@ public class Cliente {
 
     public String getDireccion () {
         return Direccion;
+    }
+
+    public String getPuntuacion () {
+        return Puntuacion;
     }
 
     public void editarCliente () {

@@ -10,7 +10,6 @@
         android:id="@+id/tv_fecha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -19,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="TextView"
+        android:text="@string/saludo_estado"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -121,7 +120,6 @@
         android:id="@+id/bt_represtar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="refinanciar"
         android:text="@string/bt_reFinanciar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -97,7 +97,6 @@ public class MenuPrincipal extends AppCompatActivity {
     }
 
     private void corregirArchivos () throws IOException {
-
         //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
         String archivos[] = fileList();
         boolean flag_borrar = false;
@@ -109,15 +108,13 @@ public class MenuPrincipal extends AppCompatActivity {
                 String[] split = linea.split(" ");
                 int fecha_file = Integer.parseInt(split[1]);
                 int hoy_fecha = Integer.parseInt(dia);
-                //Log.v("corregir_archivos_0", "MenuPrincipal.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
                 if (fecha_file != hoy_fecha) {
                     flag_borrar = true;
-                } else {
-                    //Do nothing.
                 }
                 br.close();
                 archivo.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         } else {
             new AgregarLinea("fecha " + dia, "cierre.txt", getApplicationContext());//La clase AgregarLinea crea el archivo en caso de que este no exista.
@@ -127,51 +124,6 @@ public class MenuPrincipal extends AppCompatActivity {
             new AgregarLinea("fecha " + dia, "cierre.txt", getApplicationContext());
         }
 
-        /////////////////////////////////////////////////////////////////////////////////////
-
-        //////// ARCHIVO prestamo  //////////////////////////////////////////////////////////
-
-
-        for (int i = 0; i < archivos.length; i++) {
-            String fileContent = "";
-            String file = archivos[i];
-            Pattern pattern = Pattern.compile("_P_", Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(file);
-            boolean flag = true;
-            boolean matchFound = matcher.find();
-            if (matchFound) {
-                try {
-                    InputStreamReader archivo = new InputStreamReader(openFileInput(file));
-                    BufferedReader br = new BufferedReader(archivo);
-                    String linea = br.readLine();
-
-                    while (linea != null) {
-                        if (linea.equals("Saldo pendiente: 0 colones")) {
-                            flag = true;
-                            //Do nothing.
-                        } else {
-                            fileContent = fileContent + linea + "\n";
-                        }
-                        linea = br.readLine();
-                    }
-                    br.close();
-                    archivo.close();
-                    if (flag) {
-                        new BorrarArchivo(file, getApplicationContext());
-                        if (new GuardarArchivo(file, fileContent, getApplicationContext()).guardarFile()) {
-                        } else {
-                            Toast.makeText(this, "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
-                            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                } catch (IOException e) {
-                }
-            } else {
-                //Do nothing.
-            }
-        }
         /////////////////////////////////////////////////////////////////////////////////////
 
     }
