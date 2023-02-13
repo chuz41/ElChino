@@ -13,14 +13,13 @@ import java.util.concurrent.TimeUnit;
 
 public class DateUtilities {
 
-    private static String dia;
     private static String mes;
     private static String anio;
     private static String fecha;
     private static Map<String, Integer> meses = new HashMap<String, Integer>();
 
     public static int daysBetween (Date fecha_inicio, Date fecha_final) {
-        int diferencia = 0;
+        int diferencia;
         long tiempo_transcurrido = fecha_inicio.getTime() - fecha_final.getTime();
         TimeUnit unidad = TimeUnit.DAYS;
         long dias = unidad.convert(tiempo_transcurrido, TimeUnit.MILLISECONDS);
@@ -163,7 +162,6 @@ public class DateUtilities {
     private static void separar_fechaYhora (Date fechaLd){
         String fechaS = fechaLd.toString();
         String[] split = fechaS.split(" ");
-        dia = split[2];
         mes = String.valueOf(meses.get(split[1]));
         anio = split[5];
         String hora_completa = split[3];

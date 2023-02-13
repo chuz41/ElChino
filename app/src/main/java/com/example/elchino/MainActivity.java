@@ -1,5 +1,6 @@
 package com.example.elchino;
 
+import static com.example.elchino.Util.DateUtilities.*;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -37,11 +38,11 @@ import com.example.elchino.Util.SepararFechaYhora;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -425,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else if (responsE.contains("\"caja\"")) {//Es caja
                 String[] splitCaja = responsE.split("\"caja\":\"");
-                //Log.v("llenarMapas_1", "Main.\n\ncantidad: " + splitCaja.length + "\n\n.");
+                Log.v("llenarMapas_1", "Main.\n\ncantidad: " + splitCaja.length + "\n\n.");
                 int indice = (splitCaja.length-1);
                 String montoString = splitCaja[indice];
                 montoString = montoString.replace("\"", "");
@@ -434,10 +435,10 @@ public class MainActivity extends AppCompatActivity {
                 montoString = montoString.replace("}", "");
                 montoString = montoString.replace("]", "");
                 montoString = montoString.replace("abajo", "");
-                montoString = montoString.replace("estado", "");
+                montoString = montoString.replace("estado_archivo", "");
                 montoString = montoString.replace("arriba", "");
+                Log.v("llenarMapas_2", "Main.\n\ndato: " + splitCaja[indice] + "\n\nmontoCaja: " + montoString + "\n\n.");
                 int montoCaja = Integer.parseInt(montoString);
-                //Log.v("llenarMapas_2", "Main.\n\ndato: " + splitCaja[indice] + "\n\nmontoCaja: " + montoCaja + "\n\n.");
                 cajita = montoCaja;
             }
             if (contadorBarra <= contSheets) {
@@ -456,7 +457,10 @@ public class MainActivity extends AppCompatActivity {
         //Naming convention. Key = ->
         //fileName + "_separ_" + cuadratura + "_separ_" + montoAbon;
         key1 = key2 = fileName = fileContent = cuadratura = "";
+        int datosPendientes = abonosLeidos.size();
+        Log.v("crearArchivosCreditos_0", "Main.\n\ndatosPendientes: " + datosPendientes + "\n\n.");
         for (String key : abonosLeidos.keySet()) {//Se escoge algun abono que se encuentre en el map abonosLeidos.
+            //Log.v("crearArchivosCreditos_" + datosPendientes, "Main.\n\ndatosPendientes: " + datosPendientes + "\n\n.");
             String[] split = key.split("_separ_");
             fileName = split[0];
             fileContent = abonosLeidos.get(key);
@@ -485,8 +489,13 @@ public class MainActivity extends AppCompatActivity {
                         key1 = key2;
                         flagBorrar = true;
                         break;
-                    } else {//Control de errores...
-                        Log.v("CrearArchCredERROR_0", "Main.\n\nERROR ERROR ERROR ERROR ERROR ERROR\n\nsaldo(fileContent): " + saldo(fileContent, cuadratura) + "\nsaldo(fileContenido): " + saldo(fileContenido, cuadraturA) + "\nkey1:\n" + key1 + "\nkey2:\n" + key2 + "\n\n.");
+                    } else {
+                        //Se borra la key que tenga mas intereses moratorios.
+                        Log.v("crearArchivosCreditos_1", "Main.\n\nKey elejida: " + elejirAdelantoInteres(abonosLeidos.get(key1), abonosLeidos.get(key2), key1, key2) +
+                                "\nKey1: " + key1 + "\nkey2: " + key2 + "\n\n.");
+                        key1 = elejirAdelantoInteres(abonosLeidos.get(key1), abonosLeidos.get(key2), key1, key2);
+                        key2 = key1;
+                        flagBorrar = true;
                         break;
                     }
                 }
@@ -522,6 +531,62 @@ public class MainActivity extends AppCompatActivity {
         } else {
             crearArchivosCreditos();
         }
+    }
+
+    private String elejirAdelantoInteres (String s1, String s2, String key1, String key2) {
+        String key = new String();
+        String[] split = s1.split("\n");
+        String[] split11 = split[11].split("_separador_");
+        int InteresesMoratorios1 = Integer.parseInt(split11[1]);
+        String[] splitDos = s2.split("\n");
+        String[] splitDos11 = splitDos[11].split("_separador_");
+        Log.v("elejirAdelantoIntereses_0", "split11[0]: " + split11[0] + "\nsplitDos11[0]: " + splitDos11[0]);
+        int InteresesMoratorios2 = Integer.parseInt(splitDos11[1]);
+        if (InteresesMoratorios1 > InteresesMoratorios2) {
+            Log.v("elejirAdelantoInteres_0", "Main.\n\n" + "Intereses moratorios 1: " + InteresesMoratorios1 + "\nIntereses moratorios 2: " + InteresesMoratorios2 + "\n\n.");
+            key = key2;
+        } else if (InteresesMoratorios1 < InteresesMoratorios2) {
+            Log.v("elejirAdelantoInteres_2", "Main.\n\nIntereses moratorios 1: " + InteresesMoratorios1 + "\nIntereses moratorios 2: " + InteresesMoratorios2 + "\n\n.");
+            key = key1;
+        } else {
+            key = revisarNextAbono(s1, s2, key1, key2);
+            Log.v("elejirAdelantoInteres_3", "Main.\n\nIntereses moratorios 1: " + InteresesMoratorios1 + "\nIntereses moratorios 2: " + InteresesMoratorios2 + "\n\n.");
+        }
+        return key;
+    }
+
+    private String revisarNextAbono (String s1, String s2, String key1, String key2) {
+        String key = new String();
+        String[] split = s1.split("\n");
+        String[] split4 = split[4].split("_separador_");
+        String[] splitFecha1 = split4[1].split("/");
+        String fecha1 = splitFecha1[2] + "-" + splitFecha1[1] + "-" + splitFecha1[0];
+        Date fechaNext1;
+        try {
+            fechaNext1 = stringToDate(fecha1);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        String[] splitDos = s2.split("\n");
+        String[] splitDos4 = splitDos[4].split("_separador_");
+        String[] splitFecha2 = splitDos4[1].split("/");
+        String fecha2 = splitFecha2[2] + "-" + splitFecha2[1] + "-" + splitFecha2[0];
+        Date fechaNext2;
+        try {
+            fechaNext2 = stringToDate(fecha2);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        int daysBetween = daysBetween(fechaNext1, fechaNext2);
+        Log.v("revisarNextAbono_0", "Main.\n\ndaysBetween: " + daysBetween + "\nsplit4[0]: " + split4[0] + "\nsplitDos4[0]: " + splitDos4[0] + "\nsplit[1]: " + split4[1] + "\nsplitDos[1]: " + splitDos4[1] + "\n\n.");
+        if (daysBetween < 0) {
+            key = key1;
+        } else if (daysBetween > 0) {
+            key = key2;
+        } else {
+            Log.v("revisarNextAbonoERROR_0", "Main.\n\nERROR ERROR ERROR ERROR ERROR ERROR\n\nFecha next 1: " + fechaNext1 + "\nFecha next 2: " + fechaNext2 + "\n\n.");
+        }
+        return key;
     }
 
     private int saldo(String content, String cuadratura) {
@@ -572,7 +637,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void concretarGuardado () {
 
+        int contDebug = 0;
+        Log.v("concretarGuardDEBUG_0", "Main.\n\nInicio del ciclo...\n\n.");
         for (String key : abonosGuardar.keySet()) {
+            Log.v("concretarGuardDEBUG_" + contDebug, "Main.\n\nCuenta: " + contDebug + "\n\n.");
+            contDebug++;
             String[] split = key.split("_separ_");
             if (!archivosGuardar.containsKey(split[0])) {
                 archivosGuardar.put(split[0], abonosGuardar.get(key));//Llenamos a archivosGuardar.
@@ -1313,8 +1382,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void boton_atras() {
         //ocultar_teclado();
-        finish();
-        System.exit(0);
+        //finish();
+        //System.exit(0);
+        Toast.makeText(this, "Espere a que termine la operacion...", Toast.LENGTH_LONG).show();
     }
 
     private void mostrar_todito() {

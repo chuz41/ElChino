@@ -1,6 +1,5 @@
 package com.example.elchino;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +16,16 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.elchino.Util.*;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.elchino.Util.AgregarLinea;
+import com.example.elchino.Util.BorrarArchivo;
+import com.example.elchino.Util.CrearArchivo;
+import com.example.elchino.Util.DateUtilities;
+import com.example.elchino.Util.GuardarArchivo;
+import com.example.elchino.Util.SepararFechaYhora;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -367,16 +375,17 @@ public class AbonarActivity extends AppCompatActivity {
     }
 
     private boolean revisar_creditos () {
-        Log.v("revisando_creditos0", ".\n\nAbonar. Revisando creditos.");
+        Log.v("revisando_creditos_0", "Abonar.\n\nCliente_ID: " + cliente_ID + "\n\n.");
         boolean flasg = false;
         String flag = "";
         lista_archivos = "";
         String archivos[] = fileList();
-        Log.v("revisando_creditos1", ".\n\nAbonar. \n\nTotal de archivos: " + archivos.length + "\n\n.");
+        Log.v("revisando_creditos_1", ".\n\nAbonar. \n\nTotal de archivos: " + archivos.length + "\n\n.");
         if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
-            Log.v("revisando_creditos2", "Abonar.\n\n****ERROR********\n\nClienteID: " + cliente_ID + "\n\n");
+            Log.v("revisando_creditos_2", "Abonar.\n\n****ERROR********\n\nClienteID: " + cliente_ID + "\n\n");
         } else {
             for (int i = 0; i < archivos.length; i++) {
+                Log.v("revisando_creditos_3", "Abonar.\n\nArchivo: " + archivos[i] + "\n\n.");
                 String cuadratura_tempo = "";
                 Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(archivos[i]);
@@ -505,7 +514,7 @@ public class AbonarActivity extends AppCompatActivity {
                 Toast.makeText(this, "Cliente no encontrado", Toast.LENGTH_SHORT).show();
                 text_listener();
             } else {
-                Log.v("consultar_digite_ced", ".\n\nLlamando a llenar spinner." + "\n\n.");
+                Log.v("consultar_digite_ced", "Abonar.\n\nLlamando a llenar spinner." + "\n\n.");
                 boolean credits = revisar_creditos();
                 if (credits) {
                     llenar_spinner();//Aqui se debe llamar a presentar_info_credito().

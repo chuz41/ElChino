@@ -1,6 +1,5 @@
 package com.example.elchino;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -14,10 +13,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.elchino.Util.AgregarLinea;
 import com.example.elchino.Util.BorrarArchivo;
 import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.SepararFechaYhora;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -181,7 +184,7 @@ public class Estado_clienteActivity extends AppCompatActivity {
                         String seleccion = sp_opciones.getSelectedItem().toString();
                         if (tv_esperar.getText().toString().equals("Ingrese el nombre del cliente") || tv_esperar.getText().toString().equals("Ingrese el dia de la semana") || tv_esperar.getText().toString().equals("Ingrese el apodo del cliente") || tv_esperar.getText().toString().equals("Ingrese el apellido del cliente")) {
                             for (String key : sp_helper.keySet()) {
-                                Log.v("Sp_listener0", "Estado_cliente.\n\nKey:\n\n" + key + "\n\nDato: " + sp_helper.get(key) + "\n\nseleccion: " + seleccion + "\n\n.");
+                                //Log.v("Sp_listener0", "Estado_cliente.\n\nKey:\n\n" + key + "\n\nDato: " + sp_helper.get(key) + "\n\nseleccion: " + seleccion + "\n\n.");
                                 if (seleccion.equals(key)) {
                                     archivo_cliente = sp_helper.get(key);
                                     assert archivo_cliente != null;
