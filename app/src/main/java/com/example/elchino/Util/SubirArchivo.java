@@ -97,6 +97,8 @@ public class SubirArchivo extends Service {
                                 sheet = "clientes";
                             } else if (archivos[i].contains("_S_")) {
                                 sheet = "solicitudes";
+                            } else if (archivos[i].contains("_cierre_")) {
+                                sheet = "cierre";
                             } else {
                                 sheet = "error";
                             }
@@ -163,6 +165,10 @@ public class SubirArchivo extends Service {
                             spreadSheet = split[1];
                         }
                     } else if (sheet.equals("caja")) {
+                        if (split[0].equals("Screditos")) {
+                            spreadSheet = split[1];
+                        }
+                    } else if (sheet.equals("cierre")) {
                         if (split[0].equals("Screditos")) {
                             spreadSheet = split[1];
                         }
@@ -244,6 +250,7 @@ public class SubirArchivo extends Service {
                         });
                 requestQueue.add(jsonObjectRequest);// Add the request to the RequestQueue.
             } else {//No hay internet!!!
+                Toast.makeText(thisContext.getApplicationContext(),  "Conectese a Intenet...", Toast.LENGTH_LONG).show();
                 Log.v("SubirNuevo_2","SubirArchivo.\n\nPara registrar al vendedor en el servidor, debe estar conectado a internet.\n\n.");
                 esperar(1);
             }
@@ -339,8 +346,8 @@ public class SubirArchivo extends Service {
         ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        if (!isConnected) {
-            //No hay internet
+        if (!isConnected) {//No hay internet...
+            Toast.makeText(thisContext.getApplicationContext(),  "Conectese a Intenet...", Toast.LENGTH_LONG).show();
             return false;
         } else {
             //Si esta conectado a internet.

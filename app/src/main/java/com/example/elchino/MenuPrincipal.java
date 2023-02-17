@@ -1,6 +1,5 @@
 package com.example.elchino;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,16 +8,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.elchino.Util.AgregarLinea;
 import com.example.elchino.Util.BorrarArchivo;
-import com.example.elchino.Util.GuardarArchivo;
 import com.example.elchino.Util.SepararFechaYhora;
 import com.example.elchino.Util.SubirArchivo;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MenuPrincipal extends AppCompatActivity {
 
@@ -118,10 +118,13 @@ public class MenuPrincipal extends AppCompatActivity {
             }
         } else {
             new AgregarLinea("fecha " + dia, "cierre.txt", getApplicationContext());//La clase AgregarLinea crea el archivo en caso de que este no exista.
+            new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
         }
         if (flag_borrar) {
             new BorrarArchivo("cierre.txt", getApplicationContext());
             new AgregarLinea("fecha " + dia, "cierre.txt", getApplicationContext());
+            new BorrarArchivo("cierre_cierre_.txt", getApplicationContext());
+            new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
         }
 
         /////////////////////////////////////////////////////////////////////////////////////

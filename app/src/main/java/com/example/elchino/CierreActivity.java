@@ -1,6 +1,5 @@
 package com.example.elchino;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -12,9 +11,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.elchino.Util.BluetoothUtil;
 import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.SepararFechaYhora;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -155,8 +158,6 @@ public class CierreActivity extends AppCompatActivity {
                 } catch (IOException e) {
                 }
                 break;
-            } else {
-                //Continue with the execution.
             }
         }
         return nombreCliente;
@@ -216,8 +217,6 @@ public class CierreActivity extends AppCompatActivity {
                         Log.v("generar_cierre3", "Cierre.\n\ncont: " + cont_bancas + "\n\nvalue: " + frase + "\n\n.");
                         bancas.put(cont_bancas, frase);
                         cont_bancas++;
-                    } else {
-                        //Do nothing.
                     }
                     linea = br.readLine();
                 }
@@ -233,9 +232,7 @@ public class CierreActivity extends AppCompatActivity {
                     "Sin movimientos el dia de hoy!!!\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n\n\n";
             boton_atras("Sin movimientos el dia de hoy!!!");
         } else {
-            if (abonos.isEmpty()) {
-                //Do nothing. Continue...
-            } else {
+            if (!abonos.isEmpty()) {
                 contenido_cierre = contenido_cierre + "#*#*#* ABONOS RECIBIDOS *#*#*#\n\n";
                 for (Integer key : abonos.keySet()) {
                     String value = abonos.get(key);
@@ -254,9 +251,7 @@ public class CierreActivity extends AppCompatActivity {
                             split_value[1] + " colones.\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
                 }
             }
-            if (creditos.isEmpty()) {
-                //Do nothing. Continue...
-            } else {
+            if (!creditos.isEmpty()) {
                 contenido_cierre = contenido_cierre + "*#*#* CREDITOS APROBADOS *#*#*\n\n";
                 for (Integer key : creditos.keySet()) {
                     String value = creditos.get(key);
@@ -274,9 +269,7 @@ public class CierreActivity extends AppCompatActivity {
                             split_value[1] + " colones.\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
                 }
             }
-            if (bancas.isEmpty()) {
-                //Do nothing. Continue...
-            } else {
+            if (!bancas.isEmpty()) {
                 contenido_cierre = contenido_cierre + "*#*#* MOVIMIENTOS BANCA *#*#*\n\n";
                 for (Integer key : bancas.keySet()) {
                     String value = bancas.get(key);

@@ -801,6 +801,8 @@ public class AbonarActivity extends AppCompatActivity {
     private void actualizar_cierre (Integer monto_abono, Integer saldo_caja, String credit_ID) {
         String linea_cierre = "abono " + String.valueOf(monto_abono) + " " + saldo_caja + " " + credit_ID;
         agregar_linea_archivo(linea_cierre, "cierre.txt");
+        String lineaCierre = "abono_separador_" + String.valueOf(monto_abono) + "_separador_" + saldo_caja + "_separador_" + credit_ID;
+        new AgregarLinea(lineaCierre, "cierre_cierre_.txt", getApplicationContext(), "cierre");
     }
 
     private void presentar_cuadratura () {

@@ -1,6 +1,5 @@
 package com.example.elchino;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,10 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.elchino.Util.AgregarLinea;
 import com.example.elchino.Util.BorrarArchivo;
 import com.example.elchino.Util.GuardarArchivo;
 import com.example.elchino.Util.SepararFechaYhora;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -119,10 +122,13 @@ public class BancaActivity extends AppCompatActivity {
             }
         } else {
             new AgregarLinea("fecha " + fecha, "cierre.txt", getApplicationContext());
+            new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
         }
         if (flag_borrar) {
             new BorrarArchivo("cierre.txt", getApplicationContext());
             new AgregarLinea("fecha " + fecha, "cierre.txt", getApplicationContext());
+            new BorrarArchivo("cierre_cierre_.txt", getApplicationContext());
+            new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
         }
 
         /////////////////////////////////////////////////////////////////////////////////////
@@ -209,6 +215,8 @@ public class BancaActivity extends AppCompatActivity {
     private void actualizar_cierre (Integer monto_abono, Integer saldo_caja, String credit_ID) {
         String linea_cierre = "banca " + String.valueOf(monto_abono) + " " + saldo_caja + " " + credit_ID;
         new AgregarLinea(linea_cierre, "cierre.txt", getApplicationContext());
+        String lineaCierre = "banca_separador_" + String.valueOf(monto_abono) + "_separador_" + saldo_caja + "_separador_" + credit_ID;
+        new AgregarLinea(lineaCierre, "cierre_cierre_.txt", getApplicationContext(), "cierre");
     }
 
     private Integer obtener_caja() {

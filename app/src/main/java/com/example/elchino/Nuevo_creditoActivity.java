@@ -21,12 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.elchino.Util.AgregarLinea;
-import com.example.elchino.Util.BorrarArchivo;
-import com.example.elchino.Util.CrearArchivo;
-import com.example.elchino.Util.DateUtilities;
-import com.example.elchino.Util.GuardarArchivo;
-import com.example.elchino.Util.SepararFechaYhora;
+import com.example.elchino.Util.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -506,8 +501,6 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         } else if (split[1].equals("meses")) {
             sema_quince = "mes";
             factor = 4;
-        } else {
-            //do nothing here!!
         }
         boolean flag_proximo_abono = true;
         if (flag_fecha) {
@@ -608,7 +601,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
 
     private void actualizar_cierre (Integer monto_credito, Integer saldo_caja, String credit_ID) {
         String linea_cierre = "credito " + String.valueOf(monto_credito) + " " + saldo_caja + " " + credit_ID;
-        new AgregarLinea(linea_cierre, "cierre.txt", this);
+        String lineaCierre = "credito_separador_" + String.valueOf(monto_credito) + "_separador_" + saldo_caja + "_separador_" + credit_ID;
+        new AgregarLinea(linea_cierre, "cierre.txt", getApplicationContext());
+        new AgregarLinea(lineaCierre, "cierre_cierre_.txt", getApplicationContext(), "cierre");
     }
 
     private Integer obtener_caja() {
@@ -668,13 +663,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                         linea = linea.replace(split[1], String.valueOf(monto_nuevo));
                     } else if (split[0].equals("estado_archivo")) {
                         flagCajaxCompleta = true;
-                        if (split[1].equals("abajo")) {
-                            //Do nothing. Let the line same.
-                        } else {
+                        if (split[1].equals("arriba")) {
                             linea = linea.replace("arriba", "abajo");
                         }
-                    } else {
-                        //Do nothing. Let the line same.
                     }
                     contenido = contenido + linea + "\n";
                     Log.v("actualizarCaja_2", "Nuevo_credito.\n\nLinea:\n\n" + linea + "\n\n.");
@@ -692,10 +683,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
             Log.v("actualizarCaja_3", "Nuevo_credito.\n\ncontenido de cajax_caja_.txt:\n\n" + imprimir_archivo("cajax_caja_.txt") + "\n\n.");
             flagCajaxNoCreada = true;
         }
-
-        if (flagCajaxNoCreada) {
-            //Do nothing.
-        } else {
+        if (!flagCajaxNoCreada) {
             new BorrarArchivo("cajax_caja_.txt", getApplicationContext());
             if (new GuardarArchivo("cajax_caja_.txt", contenido, getApplicationContext()).guardarFile()) {
                 Log.v("actualizarCaja_4", "Nuevo_credito.\n\nContenido del archivo:\n\n" + imprimir_archivo("cajax_caja_.txt") + "\n\n.");
@@ -706,13 +694,9 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
                 Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
             }
         }
-
-        if (flagCajaxCompleta) {
-            //Do nothing.
-        } else {
+        if (!flagCajaxCompleta) {
             new AgregarLinea("estado_archivo_separador_abajo", "cajax_caja_.txt", getApplicationContext());
         }
-
     }
 
     private String obtener_id () {

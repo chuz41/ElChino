@@ -155,6 +155,14 @@ public class DateUtilities {
         String date;
         llenar_mapa_meses();
         separar_fechaYhora(fechaLd);
+
+        if (mes.length() == 1) {
+            mes = "0" + mes;
+        }
+        if (fecha.length() == 1) {
+            fecha = "0" + fecha;
+        }
+
         date = anio + "-" + mes + "-" + fecha;
         return date;
     }
@@ -166,7 +174,7 @@ public class DateUtilities {
         anio = split[5];
         String hora_completa = split[3];
         fecha = split[2];
-        split = hora_completa.split(":");
+        //split = hora_completa.split(":");
     }
 
     private static void llenar_mapa_meses () {
