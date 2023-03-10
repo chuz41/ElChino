@@ -76,7 +76,8 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Integer contadorBarra = 0;
     private TextView tvProgressBar;
-    //private Integer contadorBarra;
+    private String contenidoCier;
+    private String contenidoCier2 = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +95,7 @@ public class MainActivity extends AppCompatActivity {
         checkedTextView.setVisibility(View.INVISIBLE);
         hoy_LD = Calendar.getInstance().getTime();
         separarFecha();
-        //cargarData();
-        //menu_principal("Se recomienda usar bloqueo de pantalla!!!");
+        contenidoCier = "fecha " + fecha + "\n";
         try {
             check_activation();
         } catch (IOException e) {
@@ -131,10 +131,14 @@ public class MainActivity extends AppCompatActivity {
                 response -> {
                     if (response != null) {
                         //Log.v("cargarData_1", "Main.\n\nresponse:\n\n" + response + "\n\n.");
-                        String[] split = response.split("ID_cliente");
-                        int progresoMedio = ((split.length) / 2);
-                        guardarClientes(split);
-                        progressBar.setProgress(progresoMedio);
+                        if (response.contains("DOCTYPE")) {
+                            cargarData();
+                        } else {
+                            String[] split = response.split("ID_cliente");
+                            int progresoMedio = ((split.length) / 2);
+                            guardarClientes(split);
+                            progressBar.setProgress(progresoMedio);
+                        }
                     }
                 },
                 error -> {
@@ -151,12 +155,11 @@ public class MainActivity extends AppCompatActivity {
         for (String infoToFile : clientesArrary) {
             //Log.v("guardarClientes_0", "info: " + infoToFile + ".\n\nclientesArray.length(): " + clientesArrary.length + "\n\n.");
             String[] split = infoToFile.split("\",\"");
-            String u0,u1,u2,u3,u4,u6,u9,u10,u11,u12,u13,newFile;
+            String u0,u1,u2,u3,u4,u6,u9,u10,u11,u12,u13,newFile;//u0 = clienteID
             u0=u1=u2=u3=u4=u12=u13=u9=u10=u6=u11=newFile=null;
             boolean flagControl = false;
             for (String clienteInfo : split) {
-                cont++;
-                progressBar.setProgress(cont);
+
                 if (split.length > 10) {
                     flagControl = true;
                     //Log.v("guardarClientes_*", "split.length: " + split.length + ", InfoCliente: " + clienteInfo + ".");
@@ -196,20 +199,40 @@ public class MainActivity extends AppCompatActivity {
                         u6 = splitInfo[1];
                         //Log.v("guardarCliente_#", "Main.\n" + splitInfo[0] + ": " + splitInfo[1] + "\n.");
                     }
+                    cont++;
+                    progressBar.setProgress(cont);
                 } else {
                     flagControl = false;
                 }
+
             }
             if (flagControl) {
                 //u0 ID_cliente, u1 nombre_cliente, u2 apellido1_cliente, u3 apellido2_cliente, u4 apodo_cliente, u12 telefono1_cliente, u13 telefono2_cliente, u9 notas_cliente, u10 direccion_cliente, u11 puntuacion_cliente, u6 monto_disponible, "arriba" estado_archivo) {
                 //if (u6 == null) throw new AssertionError();//
                 Cliente cliente = new Cliente(u0, u1, u2, u3, u4, u12, u13, u9, u10, Integer.parseInt(u6), u11, "arriba");
+                String idEncontrado = "ninguno";
                 if (!clientesEncontrados.containsKey(u0)) {
-                    clientesEncontrados.put(u0, cliente);
-                    if (new GuardarArchivo(cliente, newFile, "arriba", getApplicationContext()).guardarCliente()) {
-                        //Log.v("guardarClientes", "Main.\n\nContenido del archivo:\n\n" + imprimir_archivo(newFile) + "\n\n.");
+                    boolean flagEncontrado = false;
+                    for (String key : clientesEncontrados.keySet()) {
+                        if (clientesEncontrados.get(key).getId().contains(u0)) {
+                            flagEncontrado = true;
+                            idEncontrado = clientesEncontrados.get(key).getId();
+                        }
+                        if (u0.contains(clientesEncontrados.get(key).getId())) {
+                            flagEncontrado = true;
+                            idEncontrado = clientesEncontrados.get(key).getId();
+                        }
+                    }
+
+                    if (!flagEncontrado) {
+                        clientesEncontrados.put(u0, cliente);
+                        if (new GuardarArchivo(cliente, newFile, "arriba", getApplicationContext()).guardarCliente()) {
+                            //Log.v("guardarCliente_0", "Main.\n\nContenido del archivo:\n\n" + imprimir_archivo(newFile) + "\n\n.");
+                        } else {
+                            Toast.makeText(this, "*** ERROR ***", Toast.LENGTH_LONG).show();
+                        }
                     } else {
-                        Toast.makeText(this, "*** ERROR ***", Toast.LENGTH_LONG).show();
+                        Log.v("guardarClientes_1", "Main.\n\nCliente ya se ha ingresado:\n\n" + clientesEncontrados.get(idEncontrado) + "\n\n.");
                     }
                 }
             }
@@ -308,10 +331,18 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.start();
 
         String sheetLeer = null;
-        for (String key : sheetsLeidas.keySet()) {//todo aqui puede estar el error de caja
-            sheetLeer = key;
-            //Log.v("bajarInfoCreditos_0", "Main.\n\nsheetLeer: " + sheetLeer + "\n\n.");
-            break;
+        String keyToRemoveCierre = null;
+        for (String key : sheetsLeidas.keySet()) {
+            if (!sheetsLeidas.get(key).contains("-cierre")) {
+                sheetLeer = key;
+                break;
+            } else {
+                keyToRemoveCierre = key;
+            }
+        }
+        Log.v("bajarInfoCreditos_0", "Main.\n\nsheetLeer: " + sheetLeer + "\n\n.");
+        if (keyToRemoveCierre != null) {
+            sheetsLeidas.remove(keyToRemoveCierre);
         }
 
         // Formulate the request and handle the response.
@@ -325,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
                             Log.v("bajarInfoCreditos_1", "Main.\n\nurl: " + url + "\n\n.");
                             Log.v("bajarInfoCreditos_2", "Main.\n\nresponse:\n\n" + response + "\n\n.");
                             if (response.contains("DOCTYPE")) {
-                                Log.v("bajarInfoCreditos_3", "Main.\n\nERROR ERROR ERROR ERROR ERROR\n\nresponse:\n\n" + response + "\n\n.");
+                                Log.v("bajarInfoCreditos_3", "Main.\n\nDOCTYPE ERROR DOCTYPE ERROR DOCTYPE\n\nresponse:\n\n" + response + "\n\n.");
                                 bajarInfoCreditos();
                             } else {
                                 sheetsLeidas.remove(finalSheetLeer);
@@ -334,9 +365,11 @@ public class MainActivity extends AppCompatActivity {
                                         contadorBarra++;
                                         progressBar.setProgress(contadorBarra);
                                     }
-                                    Log.v("bajarInfoCreditos_4", "Main.\n\nresponse:\n\n" + response + "\n\n.");
+                                    //Log.v("bajarInfoCreditos_4", "Main.\n\nresponse:\n\n" + response + "\n\n.");
                                     llenarMapas(response);
                                 } else {
+                                    contadorBarra++;
+                                    progressBar.setProgress(contadorBarra);
                                     bajarInfoCreditos();
                                 }
                             }
@@ -369,6 +402,7 @@ public class MainActivity extends AppCompatActivity {
             }
             crearArchivosCreditos();
         } else {
+            Log.v("llenarMapas_0", "Main.\n\nresponse:\n\n" + response + "\n\nresponsE:\n\n" + responsE + "\n\n.");
             if (responsE.contains("cuadratura")) {//Es el contenido de una sheet de abonos o creditos.
                 String[] splitTransaccion = responsE.split("\"monto_credito\":\"");
                 //boolean flagCredito;
@@ -427,6 +461,7 @@ public class MainActivity extends AppCompatActivity {
                         if (esCredito(cuadratura, montoAbono, montoCuota)) {
                             if (!creditosLeidos.containsKey(fileName)) {
                                 creditosLeidos.put(fileName, fileContent);
+                                tvProgressBar.setText("Leyendo archivo " + fileName + "...");
                                 //Log.v("llenarMapas_CREDITO", "Main.\n\nfileName(key): " + fileName + "\n\nContent:\n\n" + fileContent + "\n\n.");
                             }
                         } else {
@@ -436,6 +471,7 @@ public class MainActivity extends AppCompatActivity {
                             String key = fileName + "_separ_" + cuadratura + "_separ_" + montoAbon;
                             if (!abonosLeidos.containsKey(key)) {
                                 abonosLeidos.put(key, fileContent);
+                                tvProgressBar.setText("Leyendo archivo " + fileName + "...");
                                 //Log.v("llenarMapas_ABONO", "Main.\n\nKey: " + key + "\n\nContent:\n\n" + fileContent + "\n\n.");
                             }
                         }
@@ -457,10 +493,57 @@ public class MainActivity extends AppCompatActivity {
                 //Log.v("llenarMapas_2", "Main.\n\ndato: " + splitCaja[indice] + "\n\nmontoCaja: " + montoString + "\n\n.");
                 int montoCaja = Integer.parseInt(montoString);
                 cajita = montoCaja;
-            } else if (responsE.contains("cierre")) {
-                String[] splitCierre = responsE.split("\"cierre\"");
+                tvProgressBar.setText("Leyendo archivo " + caja + "...");
+            } else if (responsE.contains("tipo")) {
+                contenidoCier = "fecha " + fecha + "\n";
+                contenidoCier2 = "";
+                tvProgressBar.setText("Leyendo archivo " + "cierre.txt" + "...");
+                String[] splitCierre = responsE.split("\"tipo\":\"");
+                String tipo,monto,caja,cliente;
+                tipo = monto = caja = cliente = "";
                 for (String datoCierre : splitCierre) {
-                    Log.v("llenarMapas_3", "Main.\n\nDatoCierre: " + datoCierre + "\n\n.");
+                    if (!datoCierre.equals("[{")) {
+                        //Log.v("llenarMapas_3", "Main.\n\nDatoCierre: " + datoCierre + "\nfecha: " + fecha + "\n\n.");
+                        String[] splitDatos = datoCierre.split("\",\"");
+                        tipo = splitDatos[0];
+                        String[] splitMonto = splitDatos[1].split("\":\"");
+                        monto = splitMonto[1];
+                        String[] splitCaja = splitDatos[2].split("\":\"");
+                        caja = splitCaja[1];
+                        String[] splitCliente = splitDatos[3].split("\":\"");
+                        cliente = splitCliente[1];
+                        cliente = cliente.replace("\"", "");
+                        cliente = cliente.replace("}", "");
+                        cliente = cliente.replace("]", "");
+                        cliente = cliente.replace(",", "");
+                        cliente = cliente.replace("{", "");
+                        contenidoCier = contenidoCier + tipo + " " + monto + " " + caja + " " + cliente + "\n";
+                        contenidoCier2 = contenidoCier2 + tipo + "_separador_" + monto + "_separador_" + caja + "_separador_" + cliente + "\n";
+                        Log.v("llenarMapas_3", "Main.\n\nDatoCierre: " + datoCierre + "\nfecha: " + fecha + "\n\n.");
+                    }
+                }
+                contenidoCier2 = contenidoCier2 + "estado_archivo_separador_arriba";
+
+                Log.v("llenarMapas_4", "Main.\n\ntipo: " + tipo + "\nmonto: " + monto + "\ncaja: " + caja + "\ncliente: " + cliente + "\n\n.");
+                try {
+                    new BorrarArchivo("cierre.txt", getApplicationContext());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    new GuardarArchivo("cierre.txt", contenidoCier, getApplicationContext()).guardarFile();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    new BorrarArchivo("cierre_cierre_.txt", getApplicationContext());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    new GuardarArchivo("cierre_cierre_.txt", contenidoCier2, getApplicationContext()).guardarFile();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -475,11 +558,9 @@ public class MainActivity extends AppCompatActivity {
         //Naming convention. Key = ->
         //fileName + "_separ_" + cuadratura + "_separ_" + montoAbon;
         key1 = key2 = fileName = fileContent = cuadratura = "";
-        int datosPendientes = abonosLeidos.size();
+        //int datosPendientes = abonosLeidos.size();
         //Log.v("crearArchivosCreditos_0", "Main.\n\ndatosPendientes: " + datosPendientes + "\n\n.");
         for (String key : abonosLeidos.keySet()) {//Se escoge algun abono que se encuentre en el map abonosLeidos.
-            contadorBarra++;
-            progressBar.setProgress(contadorBarra);
             //Log.v("crearArchivosCreditos_" + datosPendientes, "Main.\n\ndatosPendientes: " + datosPendientes + "\n\n.");
             String[] split = key.split("_separ_");
             fileName = split[0];
@@ -524,7 +605,7 @@ public class MainActivity extends AppCompatActivity {
             if (key1.equals(key2)) {//To-do bien.
                 abonosLeidos.remove(key1);
             } else {//Control de errores...
-                //Log.v("CrearArchCredERROR_1", "Main.\n\nERROR ERROR ERROR ERROR ERROR ERROR\n\n.");
+                Log.v("CrearArchCredERROR_1", "Main.\n\nERROR ERROR ERROR ERROR ERROR ERROR\n\n.");
             }
         }
         if (!flagGuardar) {
@@ -532,12 +613,12 @@ public class MainActivity extends AppCompatActivity {
                 abonosGuardar.put(key1, abonosLeidos.get(key1));
                 abonosLeidos.remove(key1);
             } else {//Control de errores...
-                //Log.v("CrearArchCredERROR_2", "Main.\n\nERROR ERROR ERROR ERROR ERROR ERROR\n\n.");
+                Log.v("CrearArchCredERROR_2", "Main.\n\nERROR ERROR ERROR ERROR ERROR ERROR\n\n.");
             }
         }
         flagFinish = true;
         for (String key : abonosLeidos.keySet()) {//Se verifica que ya no existen abonos en el map.
-            //Log.v("CrearArchCredDebug_0", "Main.\n\nkey: " + key + "\n\ncontenido:\n\n" + abonosLeidos.get(key) + "\n\n.");
+            Log.v("CrearArchCredDebug_0", "Main.\n\nkey: " + key + "\n\ncontenido:\n\n" + abonosLeidos.get(key) + "\n\n.");
             flagFinish = false;
             break;
         }
@@ -653,6 +734,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void concretarGuardado () {
 
+        mostrarBarra("Guardando creditos...", archivosGuardar.size());
         int contDebug = 0;
         //Log.v("concretarGuardDEBUG_0", "Main.\n\nInicio del ciclo...\n\n.");
         for (String key : abonosGuardar.keySet()) {
@@ -684,7 +766,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
+        contadorBarra = 0;
+
         for (String key : archivosGuardar.keySet()) {
+            contadorBarra++;
+            progressBar.setProgress(contadorBarra);
             try {
                 if (new GuardarArchivo(key, archivosGuardar.get(key), getApplicationContext()).guardarFile()) {
                     //Log.v("concretarGuardado_@--->", "Main.\n\nFile: " + key + "\n\nContenido del archivo:\n\n" + imprimir_archivo(key) + "\n\n.");
@@ -702,8 +789,8 @@ public class MainActivity extends AppCompatActivity {
         menu_principal("Caja inicial: " + String.valueOf(cajita));
     }
 
-    private boolean esCredito(String cuadratura, String montoAbono, String montoCuota) {
-        //Log.v("esCredito_0", "Main.\n\nmontoAbono: " + montoAbono + "\nmontoCuota: " + montoCuota + "\n\n.");
+    private boolean esCredito (String cuadratura, String montoAbono, String montoCuota) {
+        Log.v("esCredito_0", "Main.\n\nmontoAbono: " + montoAbono + "\nmontoCuota: " + montoCuota + "\n\n.");
         boolean flagCuadra,flagAbono;
         String[] splitCuadraturaCuotas = cuadratura.split("__");
         flagCuadra = false;
@@ -716,12 +803,14 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
+        Log.v("esCredito_1", "Main.\n\nflagCuadra: " + flagCuadra + "\nmontoCuota: " + montoCuota + "\n\n.");
         int montoAbonado = Integer.parseInt(montoAbono);
         if (montoAbonado > 0) {
             flagAbono = false;
         } else {
             flagAbono = true;
         }
+        Log.v("esCredito_2", "Main.\n\nflagAbono: " + flagAbono + "\nmontoCuota: " + montoCuota + "\n\n.");
         return (flagCuadra & flagAbono);
     }
 
@@ -748,15 +837,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (new GuardarArchivo(caja, contenido, getApplicationContext()).guardarFile()) {
-            Toast.makeText(this, "Caja se ha actualizado correctamente!!!", Toast.LENGTH_SHORT).show();
-            //Log.v("actualizarCaja_0", "Main.\n\nContenido del archivo:\n\n" + imprimir_archivo(caja) + "\n\n.");
-        } else {
-            Toast.makeText(this, "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-        }
+        new GuardarArchivo(caja, contenido, getApplicationContext()).guardarFile();
         contenido = "";
         String[] archivos = fileList();
         if (archivo_existe(archivos, "cajax_caja_.txt")) {
@@ -787,27 +868,10 @@ public class MainActivity extends AppCompatActivity {
             flagCajaxNoCreada = true;
         }
 
-        if (flagCajaxNoCreada) {
-            //Do nothing.
-        } else {
+        if (!flagCajaxNoCreada) {
             new BorrarArchivo("cajax_caja_.txt", getApplicationContext());
-            if (new GuardarArchivo("cajax_caja_.txt", contenido, getApplicationContext()).guardarFile()) {
-                //Log.v("actualizarCaja_4", "Nuevo_credito.\n\nContenido del archivo:\n\n" + imprimir_archivo("cajax_caja_.txt") + "\n\n.");
-            } else {
-                Toast.makeText(this, "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
-                Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-            }
+            new GuardarArchivo("cajax_caja_.txt", contenido, getApplicationContext()).guardarFile();
         }
-
-      /*  if (flagCajaxCompleta) {
-            //Do nothing.
-        } else {
-            new AgregarLinea("estado_archivo_separador_arriba", "cajax_caja_.txt", getApplicationContext());
-        }
-        //Log.v("actualizarCaja_5", "Main.\n\nflagCajaxCompleta: " + flagCajaxCompleta + "\n\ncaja.txt:\n\n" + imprimir_archivo(caja) + "\n\ncajax_caja_.txt:\n\n" + imprimir_archivo("cajax_caja_.txt") + "\n\n.");
-*/
     }
 
     private void guardar_datos_cobrador () {
@@ -829,19 +893,11 @@ public class MainActivity extends AppCompatActivity {
             br.close();
             archivo.close();
             new BorrarArchivo(cobrador, getApplicationContext());
-            if (new GuardarArchivo(cobrador, archivo_completo.toString(), getApplicationContext()).guardarFile()) {
-                //Log.v("guardar_datos_cobrador0", "Main.\n\nContenido del archivo:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
-            } else {
-                Toast.makeText(this, "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
-                Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-            }
-            //Log.v("guardar_datos_cobrador1", "Main.\n\narchivo cobrador: " + cobrador + "\n\nContenido del archivo:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
+            new GuardarArchivo(cobrador, archivo_completo.toString(), getApplicationContext()).guardarFile();
+            //Log.v("guard_dat_cobr_0", "Main.\n\narchivo cobrador: " + cobrador + "\n\nContenido del archivo:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void abonar(){
@@ -855,6 +911,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void menu_principal (String messag) {
+        Log.v("concretarGuardado_0", "Main.\n\ncontenido2:\n" + contenidoCier2 + "\n\ncontenido:\n" + contenidoCier +
+                "\n\ncontenido del archivo cierre.txt:\n\n" + imprimirArchivo("cierre.txt") +
+                "\n\ncontenido del archivo cierre_cierre.txt:\n\n" + imprimirArchivo("cierre_cierre_.txt") + "\n\n.");
         Intent menu_principal = new Intent(this, MenuPrincipal.class);
         menu_principal.putExtra("mensaje", messag);
         startActivity(menu_principal);
@@ -865,7 +924,6 @@ public class MainActivity extends AppCompatActivity {
     private void crear_archivoS () throws IOException {
 
         String[] archivos = fileList();
-
         /////////////////Se crea el archivo cobrador.txt///////////////
         if (!archivo_existe(archivos, cobrador)) {
             new CrearArchivo(cobrador, getApplicationContext());
@@ -895,11 +953,18 @@ public class MainActivity extends AppCompatActivity {
             new CrearArchivo("cierre.txt", getApplicationContext());
             new AgregarLinea("fecha 00", "cierre.txt", getApplicationContext());
         }
-
         if (!archivo_existe(archivos, "cierre_cierre_.txt")) {
             new CrearArchivo("cierre_cierre_.txt", getApplicationContext());
-            new AgregarLinea("fecha 00", "cierre_cierre_.txt", getApplicationContext());
             new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////
+
+        ////////////////////// archivo estado_online.txt ////////////////////////////////////
+
+        if (!archivo_existe(archivos, "estado_online.txt")) {
+            new CrearArchivo("estado_online.txt", getApplicationContext());
+            new AgregarLinea("amarillo" ,"estado_online.txt", getApplicationContext());
         }
 
         /////////////////////////////////////////////////////////////////////////////////////
@@ -909,13 +974,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void salir() {
         try {
-            Toast.makeText(this, "Cobrador inactivo\nLa app se cierra ahora...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getApplicationContext(), "Cobrador inactivo\nLa app se cierra ahora...", Toast.LENGTH_LONG).show();
             Thread.sleep(1500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         try {
-            Toast.makeText(this, "Cobrador inactivo\nLa app se cierra ahora...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getApplicationContext(), "Cobrador inactivo\nLa app se cierra ahora...", Toast.LENGTH_LONG).show();
             Thread.sleep(1500);
             finish();
             System.exit(0);
@@ -1277,24 +1342,6 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
-    private void pedir_caja () {
-        /*boton_submit.setVisibility(View.VISIBLE);
-        boton_submit.setClickable(true);
-        tv_esperar.setVisibility(View.VISIBLE);
-        String string = "Ingrese el monto inicial de caja...";
-        tv_esperar.setText(string);
-        et_ID.setEnabled(true);
-        et_ID.setVisibility(View.VISIBLE);
-        et_ID.setText("");
-        et_ID.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-        et_ID.setInputType(InputType.TYPE_CLASS_NUMBER);
-        et_ID.setFocusableInTouchMode(true);
-        String string2 = "MONTO CAJA INICIAL";
-        et_ID.setHint(string2);
-        et_ID.requestFocus();
-        text_listener();*/
-    }
-
     private void autenticar_cobrador (String codigo) {
         ID_cobrador = codigo;
         ocultar_todito();
@@ -1346,31 +1393,8 @@ public class MainActivity extends AppCompatActivity {
             et_ID.setFocusableInTouchMode(false);
             et_ID.setEnabled(false);
             verificar_password(ID_cobrador);
-        } /*else if (tv_esperar.getText().toString().equals("Ingrese el monto inicial de caja...")) {
-            if (!et_ID.getText().toString().equals("")) {
-                String string = "Conectando, por favor espere...";
-                tv_esperar.setText(string);
-                et_ID.setFocusableInTouchMode(false);
-                et_ID.setEnabled(false);
-                cajita = et_ID.getText().toString();
-                guardar_caja();
-            }
-        }*/
-    }
-
-    /*private void guardar_caja () throws IOException {
-        if (new GuardarArchivo(caja, "caja " + cajita, getApplicationContext()).guardarFile()) {
-            Log.v("guardar_caja_0", "Main.\n\nContenido del archivo:\n\n" + imprimir_archivo(caja) + "\n\n.");
-        } else {
-            Toast.makeText(this, "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
         }
-        cargarData();
-    }*/
-
-    //Funciones comunes//
+    }
 
     private void esperar () {
         ocultar_todito();
@@ -1403,9 +1427,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void boton_atras() {
-        //ocultar_teclado();
-        //finish();
-        //System.exit(0);
         Toast.makeText(this, "Espere a que termine la operacion...", Toast.LENGTH_LONG).show();
     }
 
@@ -1416,7 +1437,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void ocultar_todito() {
-        //Log.v("ocultar_todito", "Se hace todo invisible");
         tv_esperar.setVisibility(View.VISIBLE);
         String string = "Ingrese su codigo de cobrador...";
         tv_esperar.setText(string);
@@ -1424,7 +1444,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String imprimirArchivo (String file_name){
-
         String[] archivos = fileList();
         StringBuilder contenido = new StringBuilder();//Aqui se lee el contenido del archivo guardado.
         if (archivo_existe(archivos, file_name)) {//Archivo nombre_archivo es el archivo que vamos a imprimir

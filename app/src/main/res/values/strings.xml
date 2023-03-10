@@ -81,5 +81,6 @@
     <string name="cedula_exists">El numero de cedula ingresado ya existe!</string>
     <string name="adelantarIntereses">Adelantar intereses</string>
     <string name="saludo_estado"> Estado del cliente</string>
+    <string name="gastos_banca">GASTOS/VIATICOS</string>
 
 </resources>

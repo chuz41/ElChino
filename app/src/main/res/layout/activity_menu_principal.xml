@@ -31,10 +31,10 @@
         android:onClick="banca"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_saludoMenu"
-        app:layout_constraintVertical_bias="0.823"
+        app:layout_constraintVertical_bias="0.74"
         tools:text="@string/banca_reciv_entreg" />
 
     <Button
@@ -55,12 +55,12 @@
         android:layout_height="wrap_content"
         android:onClick="registrar_cliente_nuevo"
         android:text="@string/bt_registrar"
-        app:layout_constraintBottom_toTopOf="@+id/bt_banca"
+        app:layout_constraintBottom_toTopOf="@+id/bt_gastos"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.488"
+        app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.237" />
+        app:layout_constraintVertical_bias="0.198" />
 
     <Button
         android:id="@+id/bt_estado_cliente"
@@ -82,5 +82,47 @@
         android:layout_marginTop="28dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/presence_away" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/presence_online" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/presence_busy" />
+
+    <Button
+        android:id="@+id/bt_gastos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="gastos"
+        android:text="@string/gastos_banca"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_saludoMenu"
+        app:layout_constraintVertical_bias="0.936" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

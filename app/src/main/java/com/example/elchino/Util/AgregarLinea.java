@@ -96,7 +96,7 @@ public class AgregarLinea {
                 Linea = Linea + "\nestado_archivo_separador_abajo";
                 try {
                     if (new GuardarArchivo(File, Linea, ContexT.getApplicationContext()).guardarFile()) {
-                        Log.v("AgregarLinea(Polyform)_0", "AgregarLinea.\n\nContenido del archivo:\n\n" + imprimirArchivo() + "\n\n.");
+                        Log.v("AgregarLinea(Polyform)_1", "AgregarLinea.\n\nContenido del archivo:\n\n" + imprimirArchivo() + "\n\n.");
                     } else {
                         Toast.makeText(ContexT.getApplicationContext(), "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
                         Toast.makeText(ContexT.getApplicationContext(), "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
@@ -109,15 +109,17 @@ public class AgregarLinea {
             }
         } else {
             String archivoCreado = new CrearArchivo(File, ContexT.getApplicationContext()).getFile();
-            Log.v("AgregarLinea(Polyform)_1", "AgregarLinea.\n\nResultado de la creacion del archivo:\n\n" + archivoCreado + "\n\n.");
+            Log.v("AgregarLinea(Polyform)_2", "AgregarLinea.\n\nResultado de la creacion del archivo:\n\n" + archivoCreado + "\n\n.");
+            try {
+                Log.v("AgregarLinea(Polyform)_3", "AgregarLinea.\n\nFile to add: " + File + "\n\nArchivo completo: " + contenido.toString() + "\n\n.");
+                OutputStreamWriter archivo = new OutputStreamWriter(ContexT.getApplicationContext().openFileOutput(File, Activity.MODE_PRIVATE));
+                archivo.write(contenido.toString());
+                archivo.flush();
+                archivo.close();
+            } catch (IOException e) {
+            }
         }
-        try {
-            OutputStreamWriter archivo = new OutputStreamWriter(ContexT.getApplicationContext().openFileOutput(File, Activity.MODE_PRIVATE));
-            archivo.write(ArchivoCompleto);
-            archivo.flush();
-            archivo.close();
-        } catch (IOException e) {
-        }
+
     }
 
     private String imprimirArchivo (){

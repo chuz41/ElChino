@@ -41,10 +41,16 @@
         </activity>
         <activity
             android:name=".CuadraturaActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".BancaActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GastosActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Nuevo_creditoActivity"
             android:exported="false"

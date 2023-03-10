@@ -44,7 +44,7 @@ public class BancaActivity extends AppCompatActivity {
     private String cliente_recibido = "";
     private String caja = "caja.txt";
     private TextView tv_caja;
-    private String credit_ID = "";
+    private String credit_ID = "banca";
     private Date hoy_LD = Calendar.getInstance().getTime();
 
     @Override
@@ -72,14 +72,7 @@ public class BancaActivity extends AppCompatActivity {
         tv_caja.setHint("Caja...");
         mostrar_caja();
         separarFecha();
-        try {
-            corregir_archivos();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (cliente_recibido.equals("")) {
-            //Do nothing.
-        } else {
+        if (!cliente_recibido.equals("")) {
             flag_client_reciv = true;
             cliente_ID = cliente_recibido;
         }
@@ -94,45 +87,6 @@ public class BancaActivity extends AppCompatActivity {
         mes = datosFecha.getMes();
         dia = datosFecha.getDia();
         fecha = dia;
-    }
-
-    private void corregir_archivos () throws IOException {
-
-        //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
-
-        String archivos[] = fileList();
-        boolean flag_borrar = false;
-        if (archivo_existe(archivos, "cierre.txt")) {
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput("cierre.txt"));
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                String[] split = linea.split(" ");
-                int fecha_file = Integer.parseInt(split[1]);
-                int hoy_fecha = Integer.parseInt(fecha);
-                Log.v("corregir_archivos0", "Nuevo_credito.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
-                if (fecha_file != hoy_fecha) {
-                    flag_borrar = true;
-                } else {
-                    //Do nothing.
-                }
-                br.close();
-                archivo.close();
-            } catch (IOException e) {
-            }
-        } else {
-            new AgregarLinea("fecha " + fecha, "cierre.txt", getApplicationContext());
-            new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
-        }
-        if (flag_borrar) {
-            new BorrarArchivo("cierre.txt", getApplicationContext());
-            new AgregarLinea("fecha " + fecha, "cierre.txt", getApplicationContext());
-            new BorrarArchivo("cierre_cierre_.txt", getApplicationContext());
-            new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
-        }
-
-        /////////////////////////////////////////////////////////////////////////////////////
-
     }
 
     private void mostrar_caja () {
@@ -202,14 +156,17 @@ public class BancaActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (new GuardarArchivo("cajax_caja_.txt", contenido, getApplicationContext()).guardarFile()) {
-            Log.v("actualizar_disponible_2", "Banca.\n\nContenido del archivo:\n\n" + imprimir_archivo("cajax_caja_.txt") + "\n\n.");
-        } else {
-            Toast.makeText(this, "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-        }
+        new GuardarArchivo("cajax_caja_.txt", contenido, getApplicationContext()).guardarFile();
+        String string = "Transaccion realizada. Monto: " + String.valueOf(monto_abono);
+        salir(string);
+    }
+
+    private void salir (String s) {
+        Intent activity_volver = new Intent(this, MenuPrincipal.class);
+        activity_volver.putExtra("mensaje", s);
+        startActivity(activity_volver);
+        finish();
+        System.exit(0);
     }
 
     private void actualizar_cierre (Integer monto_abono, Integer saldo_caja, String credit_ID) {
@@ -260,11 +217,6 @@ public class BancaActivity extends AppCompatActivity {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                try {
-                    corregir_archivos();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 if (tv_esperar.getText().toString().equals("Digite el monto...")) {
                     et_ID.setVisibility(View.VISIBLE);
                     et_ID.setEnabled(true);
@@ -300,8 +252,6 @@ public class BancaActivity extends AppCompatActivity {
                             bt_entregar.setClickable(true);
                         }
                     }
-                } else {
-                    //TODO: No se sabe que hacer aqui!!!
                 }
             }
             @Override
@@ -309,8 +259,6 @@ public class BancaActivity extends AppCompatActivity {
             }
         });
     }
-
-    //Metodos comunes//
 
     private boolean archivo_existe (String[] archivos, String file_name){
         for (int i = 0; i < archivos.length; i++) {

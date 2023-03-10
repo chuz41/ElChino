@@ -33,6 +33,7 @@ public class SubirArchivo extends Service {
     private String cobrador = "a_sfile_cobrador_sfile_a.txt";
     private String addRowURL = "https://script.google.com/macros/s/AKfycbweyYb-DHVgyEdCWpKoTmvOxDGXleawjAN8Uw9AeJYbZ24t9arB/exec";
     private MyThread myThread = new MyThread();
+    private final String estadoOnline = "estado_online.txt";
 
     @Override
     public void onCreate () {
@@ -76,6 +77,7 @@ public class SubirArchivo extends Service {
         private void cargarArchivos () throws JSONException {
             String archivos[] = fileList();
             boolean matarFor = false;
+            String archivoSubir = "ninguno";
             for (int i = 0; i < archivos.length; i++) {
                 try {
                     InputStreamReader archivo = new InputStreamReader(thisContext.getApplicationContext().openFileInput(archivos[i]));//Se abre archivo
@@ -111,10 +113,36 @@ public class SubirArchivo extends Service {
                     e.printStackTrace();
                 }
                 if (matarFor) {
-                    subirArchivo(archivos[i]);
+                    archivoSubir = archivos[i];
+                    Log.v("cargarArchivos_0", "SubirArchivo.\n\nArchivo a subir: " + archivoSubir + "\n\nSe matara al ciclo for.\n\n.");
                     break;
                 }
             }
+            Log.v("cargarArchivos_1", "SubirArchivo.\n\nArchivo a subir: " + archivoSubir + "\n\nSe ha matado o ha terminado el ciclo for.\n\n.");
+            if (!verificar_internet()) {
+                cambiarEstado("rojo");
+            }
+            if (archivoSubir.equals("ninguno")) {
+                cambiarEstado("verde");
+            } else {
+                cambiarEstado("amarillo");
+            }
+            if (!verificar_internet()) {
+                cambiarEstado("rojo");
+            } else {
+                if (!archivoSubir.equals("ninguno")) {
+                    subirArchivo(archivoSubir);
+                }
+            }
+        }
+
+        private void cambiarEstado(String estado) {
+            try {
+                new BorrarArchivo(estadoOnline, thisContext.getApplicationContext());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            new AgregarLinea(estado, estadoOnline, thisContext.getApplicationContext());
         }
 
         private boolean esAbono (String file) {
@@ -129,6 +157,7 @@ public class SubirArchivo extends Service {
                         Log.v("esAbono_0", "SubirArchivo.\n\nlinea: " + linea + "\n\n.");
                         if (Integer.parseInt(split[1]) > 0) {
                             flag = true;
+                            break;
                         }
                     }
                     linea = br.readLine();
@@ -142,14 +171,13 @@ public class SubirArchivo extends Service {
         }
 
         private void subirArchivo (String file) throws JSONException {
-
             String spreadSheet = null;
             try {
-                Log.v("SubirArchivo_-1", "SubirArchivo.\n\nFile: " + cobrador + "\n\ncontenido:\n\n" + imprimirArchivo(cobrador) + "\n\n.");
+                Log.v("SubirArchivo_0", "SubirArchivo.\n\nFile: " + cobrador + "\n\ncontenido:\n\n" + imprimirArchivo(cobrador) + "\n\n.");
                 InputStreamReader archivo = new InputStreamReader(thisContext.getApplicationContext().openFileInput(cobrador));
                 BufferedReader br = new BufferedReader(archivo);
                 String linea = br.readLine();
-                Log.v("SubirArchivo_-0", "SubirArchivo.\n\nFile: " + file + "\n\nlinea: " + linea + "\n\n.");
+                Log.v("SubirArchivo_1", "SubirArchivo.\n\nFile: " + cobrador + "\n\nlinea: " + linea + "\n\n.");
                 while (linea != null) {
                     String[] split = linea.split(" ");
                     if (sheet.equals("clientes")) {
@@ -182,20 +210,40 @@ public class SubirArchivo extends Service {
             }
             String spid = spreadSheet;
             String json_string = "";
-            Log.v("subirArchivo_1", "SubirArchivo.\n\nSpreadSheetId: " + spid + "\n\nSheet: " + sheet + "\n\nfile: " + file + "\n\n.");
-            try {
-                InputStreamReader archivo = new InputStreamReader(thisContext.getApplicationContext().openFileInput(file));
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();
-                while (linea != null && !linea.isEmpty()) {
-                    String[] split = linea.split("_separador_");
-                    json_string = json_string + split[1] + "_n_";
-                    linea = br.readLine();
+            Log.v("subirArchivo_2", "SubirArchivo.\n\nSpreadSheetId: " + spid + "\n\nSheet: " + sheet + "\n\nfile: " + file + "\n\n.");
+            if (sheet.equals("cierre")) {
+                try {
+                    InputStreamReader archivo = new InputStreamReader(thisContext.getApplicationContext().openFileInput(file));
+                    BufferedReader br = new BufferedReader(archivo);
+                    String linea = br.readLine();
+                    while (linea != null && !linea.isEmpty()) {
+                        String[] split = linea.split("_separador_");
+                        if (!linea.contains("estado_archivo")) {
+                            Log.v("subirArchivo_3", "SubirArchivo.\n\nlinea: " + linea + "\n\n.");
+                            json_string = json_string + split[0] + "_n_" + split[1] + "_n_" + split[2] + "_n_" + split[3] + "_l_";;
+                        }
+                        linea = br.readLine();
+                    }
+                    br.close();
+                    archivo.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                br.close();
-                archivo.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else {
+                try {
+                    InputStreamReader archivo = new InputStreamReader(thisContext.getApplicationContext().openFileInput(file));
+                    BufferedReader br = new BufferedReader(archivo);
+                    String linea = br.readLine();
+                    while (linea != null && !linea.isEmpty()) {
+                        String[] split = linea.split("_separador_");
+                        json_string = json_string + split[1] + "_n_";
+                        linea = br.readLine();
+                    }
+                    br.close();
+                    archivo.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             Log.v("subirArchivo_4", "SubirArchivo.\n\njsonString:\n" + json_string + "\n\n.");
             JSONObject jsonObject = TranslateUtil.string_to_Json(json_string, spid, sheet);
@@ -245,13 +293,13 @@ public class SubirArchivo extends Service {
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                // TODO: Handle error
+                                subirNuevo(jsonObject, file);
                             }
                         });
                 requestQueue.add(jsonObjectRequest);// Add the request to the RequestQueue.
             } else {//No hay internet!!!
                 Toast.makeText(thisContext.getApplicationContext(),  "Conectese a Intenet...", Toast.LENGTH_LONG).show();
-                Log.v("SubirNuevo_2","SubirArchivo.\n\nPara registrar al vendedor en el servidor, debe estar conectado a internet.\n\n.");
+                Log.v("SubirNuevo_2","SubirArchivo.\n\nPara subir el archivo en el servidor, debe estar conectado a internet.\n\n.");
                 esperar(1);
             }
         }
@@ -305,14 +353,7 @@ public class SubirArchivo extends Service {
                 archivo.close();
                 new BorrarArchivo(file, thisContext.getApplicationContext());
                 new GuardarArchivo(contenido, file, thisContext);
-                if (new GuardarArchivo(file, contenido, getApplicationContext()).guardarFile()) {
-                    Log.v("cambiar_bandera_0", "SubirArchivo.\n\nArchivo: " + file + "\n\n.");
-                } else {
-                    Toast.makeText(thisContext.getApplicationContext(), "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
-                    Toast.makeText(thisContext.getApplicationContext(), "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                    Toast.makeText(thisContext.getApplicationContext(), "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                    Toast.makeText(thisContext.getApplicationContext(), "Informe a soporte tecnico!", Toast.LENGTH_LONG).show();
-                }
+                new GuardarArchivo(file, contenido, getApplicationContext()).guardarFile();
                 Log.v("cambiarBandera_1", "SubirArchivo\n\nArchivo: " + file + "\n\nContenido del archivo: \n\n" + imprimirArchivo(file) + "\n\n.");
                 try {
                     cargarArchivos();
@@ -347,7 +388,7 @@ public class SubirArchivo extends Service {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         if (!isConnected) {//No hay internet...
-            Toast.makeText(thisContext.getApplicationContext(),  "Conectese a Intenet...", Toast.LENGTH_LONG).show();
+            //Toast.makeText(thisContext.getApplicationContext(),  "Conectese a Intenet...", Toast.LENGTH_LONG).show();
             return false;
         } else {
             //Si esta conectado a internet.

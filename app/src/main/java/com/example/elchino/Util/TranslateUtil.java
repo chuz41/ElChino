@@ -13,13 +13,27 @@ public class TranslateUtil {
         jsonObject.put("spreadsheet_id", spreadSheetId);
         jsonObject.put("sheet", sheet);
         JSONArray rowsArray = new JSONArray();
-        String[] split = s.split("_n_");// la letra "l" representa la linea.
-        JSONArray row = new JSONArray();
-        for (int i = 0; i < split.length; i++) {
-            row.put(split[i]);
+        if (sheet.equals("cierre")) {
+            String[] split = s.split("_l_");// la letra "l" representa la linea.
+            for (int i = 0; i < split.length; i++) {
+                String[] split2 = split[i].split("_n_");
+                JSONArray row = new JSONArray();
+                row.put(split2[0]);
+                row.put(split2[1]);
+                row.put(split2[2]);
+                row.put(split2[3]);
+                rowsArray.put(row);
+            }
+            jsonObject.put("rows", rowsArray);
+        } else {
+            String[] split = s.split("_n_");// la letra "l" representa la linea.
+            JSONArray row = new JSONArray();
+            for (int i = 0; i < split.length; i++) {
+                row.put(split[i]);
+            }
+            rowsArray.put(row);
+            jsonObject.put("rows", rowsArray);
         }
-        rowsArray.put(row);
-        jsonObject.put("rows", rowsArray);
         return jsonObject;
     }
 

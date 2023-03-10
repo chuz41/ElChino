@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,41 +26,42 @@ public class MenuPrincipal extends AppCompatActivity {
     private String dia;
     private String mes;
     private String anio;
-    private String hora;
-    private String fecha;
-    private String minuto;
-    private Button bt_nuevo_cliente;
-    private Button bt_estado_cliente;
-    private Button bt_cierre;
-    //private Button bt_refinanciar;
-    //private Button bt_nuevo_credito;
-    private Button bt_banca;
-    private TextView tv_saludo;
-    private TextView tv_fecha;
     private boolean flag_salir = false;
-    private String mensaje_recibido = "";
     private TextView tv_caja;
-    private String caja = "caja.txt";
+    private ImageView amarillo;
+    private ImageView verde;
+    private ImageView rojo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         flag_salir = false;
         setContentView(R.layout.activity_menu_principal);
-        bt_nuevo_cliente = (Button) findViewById(R.id.bt_nuevo_cliente);
-        bt_estado_cliente = (Button) findViewById(R.id.bt_estado_cliente);
-        bt_cierre = (Button) findViewById(R.id.bt_cierre);
-        bt_banca = (Button) findViewById(R.id.bt_banca);
+        amarillo = (ImageView) findViewById(R.id.imageView);
+        verde = (ImageView) findViewById(R.id.imageView2);
+        rojo = (ImageView) findViewById(R.id.imageView3);
+        amarillo.setVisibility(View.INVISIBLE);
+        verde.setVisibility(View.INVISIBLE);
+        rojo.setVisibility(View.INVISIBLE);
+        Button bt_nuevo_cliente = (Button) findViewById(R.id.bt_nuevo_cliente);
+        Button bt_estado_cliente = (Button) findViewById(R.id.bt_estado_cliente);
+        Button bt_cierre = (Button) findViewById(R.id.bt_cierre);
+        Button bt_gastos = (Button) findViewById(R.id.bt_gastos);
+        //private Button bt_refinanciar;
+        //private Button bt_nuevo_credito;
+        Button bt_banca = (Button) findViewById(R.id.bt_banca);
         bt_banca.setText("ENTREGAR/RECIBIR FONDOS DE BANCA");
         //bt_refinanciar = (Button) findViewById(R.id.bt_refinanciar);
         //bt_nuevo_credito = (Button) findViewById(R.id.bt_nuevo_credito);
-        tv_saludo = (TextView) findViewById(R.id.tv_saludoMenu);
-        tv_fecha = (TextView) findViewById(R.id.tv_fecha);
+        TextView tv_saludo = (TextView) findViewById(R.id.tv_saludoMenu);
+        TextView tv_fecha = (TextView) findViewById(R.id.tv_fecha);
         tv_caja = (TextView) findViewById(R.id.tv_caja);
         tv_caja.setHint("Caja...");
+        mostrarEstado();
         mostrar_caja();
         separarFecha();
-        //verArchivos();//debug function!
+        Log.v("onCreate_0", "MenuPrincipal.\n\nSe inicia con la presentacion de los archivos...\n\n.");
+        verArchivos();//debug function!
         try {
             corregirArchivos();
         } catch (IOException e) {
@@ -67,7 +69,7 @@ public class MenuPrincipal extends AppCompatActivity {
         }
         tv_fecha.setText(dia + "/" + mes + "/" + anio);
         tv_saludo.setText("Menu principal");
-        mensaje_recibido = getIntent().getStringExtra( "mensaje");
+        String mensaje_recibido = getIntent().getStringExtra("mensaje");
         boolean flagServicio = false;
         if (mensaje_recibido.equals("null") || (mensaje_recibido == "")) {
             //Do nothing.
@@ -86,14 +88,49 @@ public class MenuPrincipal extends AppCompatActivity {
         }
     }
 
+    private void verArchivos () {
+        String[] files = fileList();
+        int cont = 0;
+        for (String file : files) {
+            Log.v("verArchivos_" + cont, "MenuPrincipal.\n\nfile: " + file + "\n\ncontenido:\n\n" + imprimir_archivo(file) + "\n\n.");
+            cont++;
+        }
+    }
+
+    private void mostrarEstado() {
+        try {
+            InputStreamReader archivo = new InputStreamReader(openFileInput("estado_online.txt"));
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();
+            Log.v("mostrarEstado_0", "MenuPrincipar.\n\nlinea: " + linea + "\n\n.");
+            if (linea.equals("verde")) {
+                verde.setVisibility(View.VISIBLE);
+                rojo.setVisibility(View.INVISIBLE);
+                amarillo.setVisibility(View.INVISIBLE);
+            } else if (linea.equals("amarillo")) {
+                verde.setVisibility(View.INVISIBLE);
+                rojo.setVisibility(View.INVISIBLE);
+                amarillo.setVisibility(View.VISIBLE);
+            } else if (linea.equals("rojo")) {
+                verde.setVisibility(View.INVISIBLE);
+                rojo.setVisibility(View.VISIBLE);
+                amarillo.setVisibility(View.INVISIBLE);
+            }
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void separarFecha () {
         SepararFechaYhora datosFecha = new SepararFechaYhora(null);
-        hora = datosFecha.getHora();
-        minuto = datosFecha.getMinuto();
+        String hora = datosFecha.getHora();
+        String minuto = datosFecha.getMinuto();
         anio = datosFecha.getAnio();
         mes = datosFecha.getMes();
         dia = datosFecha.getDia();
-        fecha = dia;
+        String fecha = dia;
     }
 
     private void corregirArchivos () throws IOException {
@@ -105,10 +142,14 @@ public class MenuPrincipal extends AppCompatActivity {
                 InputStreamReader archivo = new InputStreamReader(openFileInput("cierre.txt"));
                 BufferedReader br = new BufferedReader(archivo);
                 String linea = br.readLine();
-                String[] split = linea.split(" ");
-                int fecha_file = Integer.parseInt(split[1]);
-                int hoy_fecha = Integer.parseInt(dia);
-                if (fecha_file != hoy_fecha) {
+                if (linea != null) {
+                    String[] split = linea.split(" ");
+                    int fecha_file = Integer.parseInt(split[1]);
+                    int hoy_fecha = Integer.parseInt(dia);
+                    if (fecha_file != hoy_fecha) {
+                        flag_borrar = true;
+                    }
+                } else {
                     flag_borrar = true;
                 }
                 br.close();
@@ -126,12 +167,11 @@ public class MenuPrincipal extends AppCompatActivity {
             new BorrarArchivo("cierre_cierre_.txt", getApplicationContext());
             new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
         }
-
         /////////////////////////////////////////////////////////////////////////////////////
-
     }
 
     private void mostrar_caja() {
+        String caja = "caja.txt";
         tv_caja.setText(imprimir_archivo(caja));
     }
 
@@ -150,6 +190,15 @@ public class MenuPrincipal extends AppCompatActivity {
         banca.putExtra("msg", "");
         banca.putExtra("cliente_recivido", "");
         startActivity(banca);
+        finish();
+        System.exit(0);
+    }
+
+    public void gastos(View view){
+        Intent gastos = new Intent(this, GastosActivity.class);
+        gastos.putExtra("msg", "");
+        gastos.putExtra("cliente_recivido", "");
+        startActivity(gastos);
         finish();
         System.exit(0);
     }
@@ -195,8 +244,6 @@ public class MenuPrincipal extends AppCompatActivity {
         finish();
         System.exit(0);
     }
-
-    //Metodos comunes//
 
     private boolean archivo_existe (String[] archivos, String file_name){
         for (int i = 0; i < archivos.length; i++) {

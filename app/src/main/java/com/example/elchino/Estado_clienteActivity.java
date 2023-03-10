@@ -13,14 +13,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.elchino.Util.AgregarLinea;
 import com.example.elchino.Util.BorrarArchivo;
 import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.SepararFechaYhora;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -82,6 +79,8 @@ public class Estado_clienteActivity extends AppCompatActivity {
         bt_estado_cuenta = findViewById(R.id.bt_estado_cuenta);
         bt_estado_cuenta.setVisibility(View.INVISIBLE);
         bt_find_name = findViewById(R.id.bt_find_name);
+        String string = "CAMBIAR";
+        bt_find_name.setText(string);
         sp_opciones = findViewById(R.id.sp_opciones);
         sp_opciones.setEnabled(false);
         sp_opciones.setVisibility(View.INVISIBLE);
@@ -91,7 +90,7 @@ public class Estado_clienteActivity extends AppCompatActivity {
         String fechaSaludo = fecha + "/" + mes + "/" + anio;
         tv_fecha.setText(fechaSaludo);
         try {
-            corregir_archivos();
+            corregirArchivos();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -119,20 +118,23 @@ public class Estado_clienteActivity extends AppCompatActivity {
         System.exit(0);
     }
 
-    private void corregir_archivos () throws IOException {
+    private void corregirArchivos () throws IOException {
         //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
-        String[] archivos = fileList();
+        String archivos[] = fileList();
         boolean flag_borrar = false;
         if (archivo_existe(archivos, "cierre.txt")) {
             try {
                 InputStreamReader archivo = new InputStreamReader(openFileInput("cierre.txt"));
                 BufferedReader br = new BufferedReader(archivo);
                 String linea = br.readLine();
-                String[] split = linea.split(" ");
-                int fecha_file = Integer.parseInt(split[1]);
-                int hoy_fecha = Integer.parseInt(fecha);
-                //Log.v("corregir_archivos_1", "Estado_cliente.\n\nfecha_file: " + fecha_file + "\nfecha_hoy: " + hoy_fecha + "\n\n");
-                if (fecha_file != hoy_fecha) {
+                if (linea != null) {
+                    String[] split = linea.split(" ");
+                    int fecha_file = Integer.parseInt(split[1]);
+                    int hoy_fecha = Integer.parseInt(fecha);
+                    if (fecha_file != hoy_fecha) {
+                        flag_borrar = true;
+                    }
+                } else {
                     flag_borrar = true;
                 }
                 br.close();
@@ -141,11 +143,14 @@ public class Estado_clienteActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else {
-            new AgregarLinea("fecha " + fecha, "cierre.txt", getApplicationContext());
+            new AgregarLinea("fecha " + fecha, "cierre.txt", getApplicationContext());//La clase AgregarLinea crea el archivo en caso de que este no exista.
+            new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
         }
         if (flag_borrar) {
             new BorrarArchivo("cierre.txt", getApplicationContext());
             new AgregarLinea("fecha " + fecha, "cierre.txt", getApplicationContext());
+            new BorrarArchivo("cierre_cierre_.txt", getApplicationContext());
+            new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
         }
         /////////////////////////////////////////////////////////////////////////////////////
     }
@@ -653,6 +658,8 @@ public class Estado_clienteActivity extends AppCompatActivity {
         cuadra_tura.putExtra("msg", "");
         cuadra_tura.putExtra("cuadratura", "null");
         cuadra_tura.putExtra("cliente_recivido", cliente_ID);
+        obtenerNombreCliente();
+        cuadra_tura.putExtra("nombreCliente", nombre_cliente + " " + apellido1_cliente);
         Log.v("estado_cuenta_0", "Estado_cliente.\n\nCliente recibido: " + cliente_ID + "\n\n.");
         cuadra_tura.putExtra("cambio", "0");
         cuadra_tura.putExtra("monto_creditito", "0");
@@ -661,6 +668,32 @@ public class Estado_clienteActivity extends AppCompatActivity {
         startActivity(cuadra_tura);
         finish();
         System.exit(0);
+    }
+
+    private void obtenerNombreCliente () {
+        String nombreArchivo = cliente_ID + "_C_.txt";
+        if (archivo_existe(fileList(), nombreArchivo)) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput(nombreArchivo));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                while (linea != null) {
+                    Log.v("Digite_cedula", ".\n\nlinea:\n\n" + linea + "\n\n.");
+                    String[] split = linea.split("_separador_");
+                    if (split[0].equals("nombre_cliente")) {
+                        nombre_cliente = split[1];
+                    }
+                    if (split[0].equals("apellido1_cliente")) {
+                        apellido1_cliente = split[1];
+                    }
+                    linea = br.readLine();
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void msg (String msg) {

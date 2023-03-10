@@ -470,7 +470,6 @@ public class AbonarActivity extends AppCompatActivity {
                     Matcher matcher = pattern.matcher(archivos[i]);
                     boolean matchFound = matcher.find();
                     if (matchFound) {
-                        //TODO: Abrir archivo y leerlo.
                         try {
                             InputStreamReader archivo = new InputStreamReader(openFileInput(archivos[i]));
                             BufferedReader br = new BufferedReader(archivo);
@@ -502,10 +501,9 @@ public class AbonarActivity extends AppCompatActivity {
                             br.close();
                             archivo.close();
                         } catch (IOException e) {
+                            e.printStackTrace();
                         }
                         break;
-                    } else {
-                        //Continue with the execution.
                     }
                 }
             }
@@ -987,9 +985,7 @@ public class AbonarActivity extends AppCompatActivity {
                 } else if (split[0].equals("ID_credito")) {
                     credit_ID = split[1];
                 } else if (split[0].equals("estado_archivo")) {
-                    if (split[1].equals("abajo")) {
-                        //Do nothing. Dejar la linea igual!
-                    } else {
+                    if (!split[1].equals("abajo")) {
                         linea = linea.replace("arriba", "abajo");
                     }
                 } else if (split[0].equals("monto_abono")) {
@@ -997,8 +993,6 @@ public class AbonarActivity extends AppCompatActivity {
                     linea = linea.replace("monto_abono_separador_" + split[1], "monto_abono_separador_" + String.valueOf(montoIngresado));
                 } else if (split[0].equals("cuadratura")) {
                     cuadratura = split[1];
-                } else {
-                    //Do nothing. La linea se queda igual
                 }
                 contenido = contenido + linea + "\n";
                 linea = br.readLine();
@@ -1015,11 +1009,26 @@ public class AbonarActivity extends AppCompatActivity {
             Log.v("actualizarClienteAde_4", "Abonar.\n\nContenido del archivo:\n\n" + imprimir_archivo(archivoCreado) + "\n\n.");
             actualizarCaja(montoIngresado);
             actualizar_cierre(montoIngresado, obtener_caja(), credit_ID);
-            mensaje_imprimir = mensaje_imprimir + "Monto abonado: " + montoIngresado + " colones.\n";
+            String montoIngresado_s = String.valueOf(montoIngresado);
+            char[] chars = montoIngresado_s.toCharArray();
+            if (chars.length == 2) {
+                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+            } else if (chars.length == 3) {
+                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+            } else if (chars.length == 4) {
+                montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+            } else if (chars.length == 5) {
+                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+            } else if (chars.length == 6) {
+                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+            } else if (chars.length == 7) {
+                montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+            }
+            mensaje_imprimir = mensaje_imprimir + "Monto abonado:\n" + montoIngresado_s + " colones.\n";
             mensaje_imprimir = mensaje_imprimir + "Correspondiente a intereses.\n\n";
             mensaje_imprimir = mensaje_imprimir + "******************************\n";
-            mensaje_imprimir = mensaje_imprimir + "Abono a intereses: " + montoIngresado + " colones.\n";
-            mensaje_imprimir = mensaje_imprimir + "Anobo al capital: 0 colones.\n";
+            mensaje_imprimir = mensaje_imprimir + "Abono a intereses:\n" + montoIngresado_s + " colones.\n";
+            mensaje_imprimir = mensaje_imprimir + "Anobo al capital: 0,00 colones.\n";
             presentar_cuadratura();
         } else {
             Toast.makeText(this, "*** ERROR al crear el archivo. ***", Toast.LENGTH_LONG).show();
@@ -1110,8 +1119,42 @@ public class AbonarActivity extends AppCompatActivity {
         int monto_temporal_fix = monto_temporal;
         if (monto_ingresado > 0) {
             if (Integer.parseInt(interes_mora_total) > 0) {
-                mensaje_imprimir = mensaje_imprimir + "Monto abonado: " + monto_ingresado + " colones.\n";
-                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
+                String montoIngresado_s = String.valueOf(monto_ingresado);
+                char[] chars = montoIngresado_s.toCharArray();
+                if (chars.length == 1) {
+                    montoIngresado_s = String.valueOf(chars[0]) + ",00";
+                } else if (chars.length == 2) {
+                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                } else if (chars.length == 3) {
+                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                } else if (chars.length == 4) {
+                    montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                } else if (chars.length == 5) {
+                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                } else if (chars.length == 6) {
+                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                } else if (chars.length == 7) {
+                    montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                }
+                String interes_mora_total_s = String.valueOf(interes_mora_total);
+                chars = interes_mora_total_s.toCharArray();
+                if (chars.length == 1) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + ",00";
+                } else if (chars.length == 2) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                } else if (chars.length == 3) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                } else if (chars.length == 4) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                } else if (chars.length == 5) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                } else if (chars.length == 6) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                } else if (chars.length == 7) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                }
+                mensaje_imprimir = mensaje_imprimir + "Monto abonado:\n" + montoIngresado_s + " colones.\n";
+                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios:\n" + interes_mora_total_s + " colones.\n";
                 mensaje_imprimir = mensaje_imprimir + "******************************\n\n";
             }
         }
@@ -1139,9 +1182,43 @@ public class AbonarActivity extends AppCompatActivity {
             morosidad = "M";
             interes_mora_total = "0";
             if (monto_ingresado > 0) {
-                mensaje_imprimir = mensaje_imprimir + "Monto abonado: " + monto_ingresado + " colones\n";
-                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
-                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + "0" + "\n******************************\n";
+                String montoIngresado_s = String.valueOf(monto_ingresado);
+                char[] chars = montoIngresado_s.toCharArray();
+                if (chars.length == 1) {
+                    montoIngresado_s = String.valueOf(chars[0]) + ",00";
+                } else if (chars.length == 2) {
+                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                } else if (chars.length == 3) {
+                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                } else if (chars.length == 4) {
+                    montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                } else if (chars.length == 5) {
+                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                } else if (chars.length == 6) {
+                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                } else if (chars.length == 7) {
+                    montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                }
+                String interes_mora_total_s = String.valueOf(interes_mora_total);
+                chars = interes_mora_total_s.toCharArray();
+                if (chars.length == 1) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + ",00";
+                } else if (chars.length == 2) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                } else if (chars.length == 3) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                } else if (chars.length == 4) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                } else if (chars.length == 5) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                } else if (chars.length == 6) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                } else if (chars.length == 7) {
+                    interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                }
+                mensaje_imprimir = mensaje_imprimir + "Monto abonado:\n" + montoIngresado_s + " colones\n";
+                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios:\n" + interes_mora_total_s + " colones.\n";
+                mensaje_imprimir = mensaje_imprimir + "Abono al capital:    " + "0,00 colones" + "\n******************************\n";
             }
             monto_abono = monto_ingresado;
             return flag;
@@ -1173,9 +1250,54 @@ public class AbonarActivity extends AppCompatActivity {
                         String diferencia_fechas = String.valueOf(DateUtilities.daysBetween(hoy_LD, fecha_cuadrito_LD));
                         if (monto_ingresado > 0) {
                             int monto_abonado_I = Integer.parseInt(split_1[2]) + monto_temporal;
+
+                            String montoIngresado_s = String.valueOf(monto_abonado_I);
+                            Log.v("debug1", "\n\nmonto_abonado_I: " + monto_abonado_I + "\n\n.");
+                            char[] chars = montoIngresado_s.toCharArray();
+                            if (chars.length == 1) {
+                                montoIngresado_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+                            Log.v("debug1", "\n\nmontoIngresado_s: " + montoIngresado_s + "\n\n.");
+
+                            String montoIngresadoT_s = String.valueOf(monto_temporal);
+                            montoIngresadoT_s = montoIngresadoT_s.replace("-", "");
+                            chars = montoIngresadoT_s.toCharArray();
+                            if (chars.length == 1) {
+                                montoIngresadoT_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                montoIngresadoT_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                montoIngresadoT_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                montoIngresadoT_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                montoIngresadoT_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                montoIngresadoT_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                montoIngresadoT_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+
+                            if (monto_temporal > 0) {
+                                montoIngresadoT_s = "-" + montoIngresadoT_s;
+                            }
+
+
                             mensaje_imprimir = mensaje_imprimir + "\n\nPaga la cuota # " + numero_cuota + "\nde manera parcial.\nMonto abonado\ncuota #" +
-                                    split_1[1] + " de " + total_cuotas + ": " + monto_abonado_I + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": " +
-                                    String.valueOf(0 - monto_temporal) + " colones.\n";
+                                    split_1[1] + " de " + total_cuotas + ":\n" + montoIngresado_s + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ":\n" +
+                                    montoIngresadoT_s + " colones.\n";
                         }
                         if (Integer.parseInt(diferencia_fechas) > 0) {//Significa que esta atrasado.
                             morosidad = "M";
@@ -1185,18 +1307,90 @@ public class AbonarActivity extends AppCompatActivity {
                             }
                         } else if (Integer.parseInt(diferencia_fechas) <= 0 ) {
                             morosidad = "D";
-                        } else {
-                            //Do nothing.
                         }
                         int saldo_cuadro = Integer.parseInt(split_1[2]);
                         saldo_cuadro = 0 - monto_temporal;//Did it:Que pasa si el monto ingresado es mayor al monto de una cuota o de todas juntas?
                         int monto_abono_c = Integer.parseInt(split_1[2]) - saldo_cuadro;
                         proximo_abono = split_1[3];
                         if (monto_ingresado > 0) {
-                            mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ": " + monto_abono_c + "\n";
-                            mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado: " + monto_ingresado + " colones.\n";
-                            mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
-                            mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + monto_temporal_fix + "\n******************************\n";
+                            String montoIngresado_s = String.valueOf(monto_ingresado);
+                            char[] chars = montoIngresado_s.toCharArray();
+                            if (chars.length == 1) {
+                                montoIngresado_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+
+                            String montoAbono_s = String.valueOf(monto_abono_c);
+                            Log.v("Debug_datos", "\n\nmonto_abono_c: " + monto_abono_c + "\n\n.");
+                            chars = montoAbono_s.toCharArray();
+                            if (chars.length == 1) {
+                                montoAbono_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                montoAbono_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                montoAbono_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                montoAbono_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                montoAbono_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                montoAbono_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                montoAbono_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+                            Log.v("Debug_datos", "\n\nmontoAbono_s: " + montoAbono_s + "\n\n.");
+
+                            String interes_mora_total_s = String.valueOf(interes_mora_total);
+                            chars = interes_mora_total_s.toCharArray();
+                            if (chars.length == 1) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+
+                            String tempoFix_s = String.valueOf(monto_temporal_fix);
+                            chars = tempoFix_s.toCharArray();
+                            if (chars.length == 1) {
+                                tempoFix_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                tempoFix_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                tempoFix_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+
+                            mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ":\n" + montoAbono_s + " colones.\n";
+                            mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado:\n" + montoIngresado_s + " colones.\n";
+                            mensaje_imprimir = mensaje_imprimir + "Intereses moratorios:\n" + interes_mora_total_s + " colones.\n";
+                            mensaje_imprimir = mensaje_imprimir + "Abono al capital:\n" + tempoFix_s + " colones.\n******************************\n";
                             saldo_mas_intereses = saldo_mas_intereses - monto_temporal_fix;
                         }
                         interes_mora_total = "0";
@@ -1217,26 +1411,172 @@ public class AbonarActivity extends AppCompatActivity {
                             flag = cuadratura;
                             if (monto_ingresado > 0) {
                                 if (cambio > 0) {
-                                    mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ": " + split_1[2] +
+                                    String montoIngresado_s = String.valueOf(split_1[2]);
+                                    Log.v("debug2", "\n\nsplit_1[2]: " + split_1[2] + "\n\n.");
+                                    char[] chars = montoIngresado_s.toCharArray();
+                                    if (chars.length == 1) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + ",00";
+                                    } else if (chars.length == 2) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                                    } else if (chars.length == 3) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                                    } else if (chars.length == 4) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                                    } else if (chars.length == 5) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                                    } else if (chars.length == 6) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                                    } else if (chars.length == 7) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                                    }
+                                    Log.v("debug2", "\n\nmontoIngresado_s: " + montoIngresado_s + "\n\n.");
+                                    String montoCambio_s = String.valueOf(split_1[2]);
+                                    chars = montoCambio_s.toCharArray();
+                                    if (chars.length == 1) {
+                                        montoCambio_s = String.valueOf(chars[0]) + ",00";
+                                    } else if (chars.length == 2) {
+                                        montoCambio_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                                    } else if (chars.length == 3) {
+                                        montoCambio_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                                    } else if (chars.length == 4) {
+                                        montoCambio_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                                    } else if (chars.length == 5) {
+                                        montoCambio_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                                    } else if (chars.length == 6) {
+                                        montoCambio_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                                    } else if (chars.length == 7) {
+                                        montoCambio_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                                    }
+                                    mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ":\n" + montoIngresado_s +
                                             " colones.\nSaldo pendiente\ncuota #" + split_1[1] +
-                                            ": 0 colones.\nCambio: " + cambio + " colones.\n";
+                                            ": 0,00 colones.\nCambio:\n" + montoCambio_s + " colones.\n";
                                 } else {
-                                    mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ": " +
-                                            split_1[2] + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0 colones.\n";
+                                    String montoIngresado_s = String.valueOf(split_1[2]);
+                                    char[] chars = montoIngresado_s.toCharArray();
+                                    Log.v("debug3", "\n\nsplit_1[2]: " + split_1[2] + "\n\n.");
+                                    if (chars.length == 1) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + ",00";
+                                    } else if (chars.length == 2) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                                    } else if (chars.length == 3) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                                    } else if (chars.length == 4) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                                    } else if (chars.length == 5) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                                    } else if (chars.length == 6) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                                    } else if (chars.length == 7) {
+                                        montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                                    }
+                                    Log.v("debug3", "\n\nmontoIngresado_s: " + montoIngresado_s + "\n\n.");
+
+                                    mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ":\n" +
+                                            montoIngresado_s + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0,00 colones.\n";
                                 }
-                                mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado: " + String.valueOf(monto_ingresado - cambio) +
+
+                                String interes_mora_total_s = String.valueOf(interes_mora_total);
+                                char[] chars = interes_mora_total_s.toCharArray();
+                                if (chars.length == 1) {
+                                    interes_mora_total_s = String.valueOf(chars[0]) + ",00";
+                                } else if (chars.length == 2) {
+                                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                                } else if (chars.length == 3) {
+                                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                                } else if (chars.length == 4) {
+                                    interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                                } else if (chars.length == 5) {
+                                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                                } else if (chars.length == 6) {
+                                    interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                                } else if (chars.length == 7) {
+                                    interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                                }
+
+                                String tempoFix_s = String.valueOf(monto_temporal_fix - cambio);
+                                tempoFix_s = tempoFix_s.replace("-", "");
+                                chars = tempoFix_s.toCharArray();
+                                if (chars.length == 1) {
+                                    tempoFix_s = String.valueOf(chars[0]) + ",00";
+                                } else if (chars.length == 2) {
+                                    tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                                } else if (chars.length == 3) {
+                                    tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                                } else if (chars.length == 4) {
+                                    tempoFix_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                                } else if (chars.length == 5) {
+                                    tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                                } else if (chars.length == 6) {
+                                    tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                                } else if (chars.length == 7) {
+                                    tempoFix_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                                }
+
+                                if ((monto_temporal_fix - cambio) < 0) {
+                                    tempoFix_s = "-" + tempoFix_s;
+                                }
+
+                                String montoIngresado_s = String.valueOf(monto_ingresado - cambio);
+                                montoIngresado_s = montoIngresado_s.replace("-", "");
+                                chars = montoIngresado_s.toCharArray();
+                                if (chars.length == 1) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + ",00";
+                                } else if (chars.length == 2) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                                } else if (chars.length == 3) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                                } else if (chars.length == 4) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                                } else if (chars.length == 5) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                                } else if (chars.length == 6) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                                } else if (chars.length == 7) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                                }
+
+                                if ((monto_ingresado - cambio) < 0) {
+                                    montoIngresado_s = "-" + montoIngresado_s;
+                                }
+
+                                mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado:\n" + montoIngresado_s +
                                         " colones.\n";
-                                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
-                                mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + String.valueOf(monto_temporal_fix - cambio) +
-                                        "\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
+                                mensaje_imprimir = mensaje_imprimir + "Intereses moratorios:\n" + interes_mora_total_s + " colones.\n";
+                                mensaje_imprimir = mensaje_imprimir + "Abono al capital:\n" + tempoFix_s +
+                                        " colones.\n\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
                                 saldo_mas_intereses = saldo_mas_intereses - (monto_temporal_fix - cambio);
                             }
                             monto_abono = monto_ingresado - cambio;
                             return flag;
                         } else {
                             if (monto_ingresado > 0) {
-                                mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ": " +
-                                        split_1[2] + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0 colones.\n";
+
+                                String montoIngresado_s = String.valueOf(split_1[2]);
+                                char[] chars = montoIngresado_s.toCharArray();
+                                Log.v("debug4", "\n\nsplit_1[2]: " + split_1[2] + "\n\nchars.length: " + chars.length + " \n\n.");
+                                for (char c : chars) {
+                                    Log.v("forDebug_1", "char: " + c);
+                                }
+                                if (chars.length == 1) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + ",00";
+                                } else if (chars.length == 2) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                                } else if (chars.length == 3) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                                } else if (chars.length == 4) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                                } else if (chars.length == 5) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                                } else if (chars.length == 6) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                                } else if (chars.length == 7) {
+                                    montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                                }
+                                Log.v("debug4", "\n\nmontoIngresado_s: " + montoIngresado_s + "\n\n.");
+
+
+                                mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ":\n" +
+                                        montoIngresado_s + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0,00 colones.\n";
                             }
                         }
                     } else if (monto_temporal == 0) {//Alcanza para pagar esta cuota pero no sobra nada. Debe retornar!!!
@@ -1287,12 +1627,91 @@ public class AbonarActivity extends AppCompatActivity {
                             proximo_abono = fecha_cuadrito;
                         }
                         if (monto_ingresado > 0) {
-                            mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ": " + split_1[2] +
-                                    " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0 colones\n";
-                            mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado: " + monto_ingresado + " colones.\n";
-                            mensaje_imprimir = mensaje_imprimir + "Intereses moratorios: " + interes_mora_total + "\n";
-                            mensaje_imprimir = mensaje_imprimir + "Abono al capital:     " + monto_temporal_fix +
-                                    "\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
+
+                            String montoIngresado_s = String.valueOf(split_1[2]);
+                            char[] chars = montoIngresado_s.toCharArray();
+                            Log.v("debug5", "\n\nsplit_1[2]: " + split_1[2] + "\n\nchars.length: " + chars.length + " \n\n.");
+                            for (char c : chars) {
+                                Log.v("forDebug_2", "char: " + c);
+                            }
+                            if (chars.length == 1) {
+                                montoIngresado_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                montoIngresado_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+                            Log.v("debug5", "\n\nmontoIngresado_s: " + montoIngresado_s + "\n\n.");
+
+                            String montoIngresadRo_s = String.valueOf(monto_ingresado);
+                            chars = montoIngresadRo_s.toCharArray();
+                            if (chars.length == 1) {
+                                montoIngresadRo_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                montoIngresadRo_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                montoIngresadRo_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                montoIngresadRo_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                montoIngresadRo_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                montoIngresadRo_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                montoIngresadRo_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+
+                            String interes_mora_total_s = String.valueOf(interes_mora_total);
+                            chars = interes_mora_total_s.toCharArray();
+                            if (chars.length == 1) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+
+                            String tempoFix_s = String.valueOf(monto_temporal_fix);
+                            chars = tempoFix_s.toCharArray();
+                            if (chars.length == 1) {
+                                tempoFix_s = String.valueOf(chars[0]) + ",00";
+                            } else if (chars.length == 2) {
+                                tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + ",00";
+                            } else if (chars.length == 3) {
+                                tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + ",00";
+                            } else if (chars.length == 4) {
+                                tempoFix_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + ",00";
+                            } else if (chars.length == 5) {
+                                tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + "." + String.valueOf(chars[2]) + String.valueOf(chars[3]) + String.valueOf(chars[4]) + ",00";
+                            } else if (chars.length == 6) {
+                                tempoFix_s = String.valueOf(chars[0]) + String.valueOf(chars[1]) + String.valueOf(chars[2]) + "." + String.valueOf(chars[3]) + String.valueOf(chars[4]) + String.valueOf(chars[5]) + ",00";
+                            } else if (chars.length == 7) {
+                                tempoFix_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
+                            }
+
+
+                            mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ":\n" + montoIngresado_s +
+                                    " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0,00 colones\n";
+                            mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado:\n" + montoIngresadRo_s + " colones.\n";
+                            mensaje_imprimir = mensaje_imprimir + "Intereses moratorios:\n" + interes_mora_total_s + " colones.\n";
+                            mensaje_imprimir = mensaje_imprimir + "Abono al capital:\n" + tempoFix_s +
+                                    " colones.\n******************************\n\nFecha proximo abono:\n" + proximo_abono + "\n";
                             saldo_mas_intereses = saldo_mas_intereses - monto_temporal_fix;
                         }
                         interes_mora_total = "0";
@@ -1303,15 +1722,12 @@ public class AbonarActivity extends AppCompatActivity {
                 } else if (Integer.parseInt(split_1[2]) < 0) {//Nunca debe ser negativo el monto pendiente
                     Log.v("Obtener_cuadratura3", ".\n\nERROR EN DATO DE ARCHIVO\n\nContenido del archivo: \n\n" +
                             imprimir_archivo(archivo_prestamo) + "\n\n.");
-                } else if (Integer.parseInt(split_1[2]) == 0) {//Esta cuota ya ha sido pagada, continuar...
-                    //Do nothing. Continue...
                 }
             }
             Log.v("Obtener_cuadratura_pF", ".\n\nERROR EN RETORNO\n\nContenido del archivo: \n\n" + imprimir_archivo(archivo_prestamo) +
                     "\n\ncuadratura:\n\n" + cuadratura + "\n\n.");
             return cuadratura;
         } else {
-            //Do nothing. Never come here!!!
             Log.v("Obtener_cuadratura_else", ".\n\nERROR EN DATO DE ARCHIVO\n\nContenido del archivo: \n\n" +
                     imprimir_archivo(archivo_prestamo) + "\n\n.");
         }
@@ -1703,8 +2119,6 @@ public class AbonarActivity extends AppCompatActivity {
                     }
                     interes_mora_total = String.valueOf(intereses_morato_archivo);
                     interes_mora_parcial = interes_mora_total;
-                } else {
-                    //Do nothing.
                 }
                 linea = br.readLine();
             }
@@ -1731,9 +2145,7 @@ public class AbonarActivity extends AppCompatActivity {
                     et_ID.setInputType(InputType.TYPE_CLASS_NUMBER);
                     et_ID.setFocusableInTouchMode(true);
                     et_ID.requestFocus();
-                    if (String.valueOf(s).equals("")) {
-                        //Do nothing.
-                    } else {
+                    if (!String.valueOf(s).equals("")) {
                         bt_consultar.setClickable(true);
                         bt_consultar.setEnabled(true);
                     }
@@ -1757,8 +2169,6 @@ public class AbonarActivity extends AppCompatActivity {
                             }
                         }
                     }
-                } else {
-                    //Do nothing.
                 }
             }
             @Override
@@ -1797,8 +2207,6 @@ public class AbonarActivity extends AppCompatActivity {
             startActivity(activity_volver);
             finish();
             System.exit(0);
-        } else {
-            //Do nothing.
         }
     }
 

@@ -157,12 +157,23 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
 
     private boolean idExiste (String iD) {
         boolean flag = false;
+        String archivoEncontrado = "ninguno";
         String archivos[] = fileList();
         for (int i = 0; i < archivos.length; i++) {
-            if (archivos[i].contains(iD + "_C_.txt")) {
+            if (archivos[i].contains(iD)) {
                 flag = true;
+                archivoEncontrado = archivos[i];
                 break;
             }
+            String probador = iD + "_C_.txt";
+            if (probador.contains(archivos[i])) {
+                flag = true;
+                archivoEncontrado = archivos[i];
+                break;
+            }
+        }
+        if (!archivoEncontrado.equals("ninguno")) {
+            Log.v("idExiste_0", "Registrar_cliente_nuevo.\n\narchivoEncontrado: " + archivoEncontrado + "\n\n.");
         }
         return flag;
     }
