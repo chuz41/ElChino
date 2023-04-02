@@ -103,9 +103,7 @@ public class AbonarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_abonar);
         String mensaje_recibido = getIntent().getStringExtra( "msg");
-        if (mensaje_recibido.equals("")) {
-            //Do nothing.
-        } else {
+        if (!mensaje_recibido.equals("")) {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
         }
         chb_adelantarIntereses = (CheckBox) findViewById(R.id.chb_adelantarIntereses);
@@ -144,11 +142,7 @@ public class AbonarActivity extends AppCompatActivity {
         }
         String[] split_fecha_hoy_string = fecha_hoy_string.split("-");
         fecha_hoy_string = split_fecha_hoy_string[2] + "/" + split_fecha_hoy_string[1] + "/" + split_fecha_hoy_string[0];
-        if (cliente_recibido.equals("")) {
-            //Do nothing.
-        } else if (cliente_recibido.equals("CERO")) {
-            //Do nothing.
-        } else {
+        if (!cliente_recibido.equals("") && !cliente_recibido.equals("CERO")) {
             flag_client_reciv = true;
             cliente_ID = cliente_recibido;
             try {
