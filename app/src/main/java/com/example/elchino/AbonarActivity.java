@@ -242,14 +242,14 @@ public class AbonarActivity extends AppCompatActivity {
         String archivos[] = fileList();
         Log.v("llenando_spinner0", ".\n\nCantidad de archivos: " + archivos.length + "\n\n.");
         if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
-            Log.v("llenando_spinner1", "********ERROR***************Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+            Log.v("llenar_spinner_1", "********ERROR***************Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
         } else {
             for (int i = 0; i < archivos.length; i++) {
                 Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(archivos[i]);
                 boolean matchFound = matcher.find();
                 if (matchFound) {
-                    Log.v("llenando_spinner2", ".\n\nFile: " + archivos[i] + "\n\n.");
+                    Log.v("llenar_spinner_2", ".\n\nFile: " + archivos[i] + "\n\n.");
                     try {
                         String fecha_next_abono = "";
                         String intereses_mora = "1";
@@ -273,7 +273,7 @@ public class AbonarActivity extends AppCompatActivity {
                             String[] split = linea.split("_separador_");
                             if (split[0].equals("proximo_abono")) {
                                 fecha_next_abono = split[1];
-                                Log.v("llenar_spinner2.5", "Abonar.\n\nfecha_next_abono: " + fecha_next_abono + "\n\n.");
+                                Log.v("llenar_spinner_3", "Abonar.\n\nfecha_next_abono: " + fecha_next_abono + "\n\n.");
                             }
                             if (split[0].equals("plazo")) {
                                 plazoz = split[1];
@@ -301,7 +301,7 @@ public class AbonarActivity extends AppCompatActivity {
                             factor_semanas = 4;
                         } else {
                             factor_semanas = -1;
-                            //ERROR
+                            Log.v("llenar_spinner_4", "Error!!! No debe llegar aqui!");
                         }
                         String saldo_plus_s = obtener_saldo_plus(cuadratura_pre);
                         String intereses_moritas = obtener_intereses_moratorios(monto_prestado, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
@@ -315,8 +315,6 @@ public class AbonarActivity extends AppCompatActivity {
                         saldo_mas_intereses_s = String.valueOf(saldo_mas_intereses_I);
                         if (Integer.parseInt(saldo_plus_s) > 1000) {
                             creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
-                        } else {
-                            //Do nothing.
                         }
                     } catch (IOException e) {
                     } catch (ParseException e) {
@@ -402,9 +400,7 @@ public class AbonarActivity extends AppCompatActivity {
                                     deuda = deuda + Integer.parseInt(splitCuadra_vals[2]);
                                     Log.v("revisando_creditos4", "Abonar. Deuda: " + deuda + ".");
                                 }
-                                if (deuda < 1000) {
-                                    //Do nothing. Credito ya ha sido cancelado casi en su totalidad, por lo que se toma como cancelado al 100% y no se muestra.
-                                } else {
+                                if (deuda >= 1000) {
                                     lista_archivos = lista_archivos + archivos[i] + "_sep_";//Significa que es un credito activo.
                                     Log.v("revisando_creditos5", "Abonar.\n\nlista_archivos:\n\n" + lista_archivos + "\n\n.");
                                 }
@@ -414,6 +410,7 @@ public class AbonarActivity extends AppCompatActivity {
                         br.close();
                         archivo.close();
                     } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -547,8 +544,6 @@ public class AbonarActivity extends AppCompatActivity {
                 }
             }
             presentar_monto_a_pagar(monto_a_pagar, interesMoraTotal, montoAPagar);
-        } else {
-            //Do nothing.
         }
     }
 
@@ -593,13 +588,9 @@ public class AbonarActivity extends AppCompatActivity {
                         linea = linea.replace(split[1], String.valueOf(monto_nuevo));
                     } else if (split[0].equals("estado_archivo")) {
                         flagCajaxCompleta = true;
-                        if (split[1].equals("abajo")) {
-                            //Do nothing. Let the line same.
-                        } else {
+                        if (!split[1].equals("abajo")) {
                             linea = linea.replace("arriba", "abajo");
                         }
-                    } else {
-                        //Do nothing. Let the line same.
                     }
                     contenido = contenido + linea + "\n";
                     Log.v("actualizarCaja_2", "Nuevo_credito.\n\nLinea:\n\n" + linea + "\n\n.");
@@ -617,10 +608,7 @@ public class AbonarActivity extends AppCompatActivity {
             Log.v("actualizarCaja_3", "Nuevo_credito.\n\ncontenido de cajax_caja_.txt:\n\n" + imprimir_archivo("cajax_caja_.txt") + "\n\n.");
             flagCajaxNoCreada = true;
         }
-
-        if (flagCajaxNoCreada) {
-            //Do nothing.
-        } else {
+        if (!flagCajaxNoCreada) {
             new BorrarArchivo("cajax_caja_.txt", getApplicationContext());
             if (new GuardarArchivo("cajax_caja_.txt", contenido, getApplicationContext()).guardarFile()) {
                 Log.v("actualizarCaja_4", "Nuevo_credito.\n\nContenido del archivo:\n\n" + imprimir_archivo("cajax_caja_.txt") + "\n\n.");
@@ -632,9 +620,7 @@ public class AbonarActivity extends AppCompatActivity {
             }
         }
         Log.v("Debug_cajax_caja", "Abonar.\n\nflagCajaxCompleta: " + flagCajaxCompleta + ".\n\n.");
-        if (flagCajaxCompleta) {
-            //Do nothing.
-        } else {
+        if (!flagCajaxCompleta) {
             new AgregarLinea("estado_archivo_separador_abajo", "cajax_caja_.txt", getApplicationContext());
         }
 
@@ -681,15 +667,13 @@ public class AbonarActivity extends AppCompatActivity {
                     morosidad = split[1];
                 } else if (split[0].equals("intereses_moratorios")) {
                     interes_mora_total_s = split[1];
-                } else {
-                    //Do nothing. Continue...
                 }
                 contenido = contenido + linea + "\n";
                 linea = br.readLine();
             }
             br.close();
             archivo.close();
-            Log.v("prosesar_abono2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\nPlazo: " + plazo + "\n\n.");
+            Log.v("prosesar_abono_2", ".\n\nArchivo: " + file_name + "\n\nContenido del archivo:\n\n" + imprimir_archivo(file_name) + "\n\nPlazo: " + plazo + "\n\n.");
             String[] piezas = plazo.split("_");
             if (piezas[1].equals("quincenas")) {
                 factor_semanas = 2;
@@ -699,7 +683,7 @@ public class AbonarActivity extends AppCompatActivity {
                 factor_semanas = 4;
             } else {
                 factor_semanas = -1;
-                //ERROR
+                Log.v("procesar_abono_3", "Error al obtener el factor de semanas.");
             }
             String intereses_moritas = obtener_intereses_moratorios(monto_prestado_final, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
             subir_solicitud(monto_digitado, mensaje_solicitud);
@@ -707,6 +691,7 @@ public class AbonarActivity extends AppCompatActivity {
             intereses_monroe = Integer.parseInt(interes_mora_total_s);//Son los intereses guardados en el archivo. calculados en un periodo que se abono solo parte de los intereses.
             actualizar_archivo_credito();
         } catch (IOException | ParseException e) {
+            e.printStackTrace();
         }
     }
 
@@ -1283,12 +1268,9 @@ public class AbonarActivity extends AppCompatActivity {
                             } else if (chars.length == 7) {
                                 montoIngresadoT_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
-
                             if (monto_temporal > 0) {
                                 montoIngresadoT_s = "-" + montoIngresadoT_s;
                             }
-
-
                             mensaje_imprimir = mensaje_imprimir + "\n\nPaga la cuota # " + numero_cuota + "\nde manera parcial.\nMonto abonado\ncuota #" +
                                     split_1[1] + " de " + total_cuotas + ":\n" + montoIngresado_s + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ":\n" +
                                     montoIngresadoT_s + " colones.\n";
@@ -1324,7 +1306,6 @@ public class AbonarActivity extends AppCompatActivity {
                             } else if (chars.length == 7) {
                                 montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
-
                             String montoAbono_s = String.valueOf(monto_abono_c);
                             Log.v("Debug_datos", "\n\nmonto_abono_c: " + monto_abono_c + "\n\n.");
                             chars = montoAbono_s.toCharArray();
@@ -1344,7 +1325,6 @@ public class AbonarActivity extends AppCompatActivity {
                                 montoAbono_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
                             Log.v("Debug_datos", "\n\nmontoAbono_s: " + montoAbono_s + "\n\n.");
-
                             String interes_mora_total_s = String.valueOf(interes_mora_total);
                             chars = interes_mora_total_s.toCharArray();
                             if (chars.length == 1) {
@@ -1362,7 +1342,6 @@ public class AbonarActivity extends AppCompatActivity {
                             } else if (chars.length == 7) {
                                 interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
-
                             String tempoFix_s = String.valueOf(monto_temporal_fix);
                             chars = tempoFix_s.toCharArray();
                             if (chars.length == 1) {
@@ -1380,7 +1359,6 @@ public class AbonarActivity extends AppCompatActivity {
                             } else if (chars.length == 7) {
                                 tempoFix_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
-
                             mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ":\n" + montoAbono_s + " colones.\n";
                             mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado:\n" + montoIngresado_s + " colones.\n";
                             mensaje_imprimir = mensaje_imprimir + "Intereses moratorios:\n" + interes_mora_total_s + " colones.\n";
@@ -1468,7 +1446,6 @@ public class AbonarActivity extends AppCompatActivity {
                                     mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ":\n" +
                                             montoIngresado_s + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0,00 colones.\n";
                                 }
-
                                 String interes_mora_total_s = String.valueOf(interes_mora_total);
                                 char[] chars = interes_mora_total_s.toCharArray();
                                 if (chars.length == 1) {
@@ -1486,7 +1463,6 @@ public class AbonarActivity extends AppCompatActivity {
                                 } else if (chars.length == 7) {
                                     interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                                 }
-
                                 String tempoFix_s = String.valueOf(monto_temporal_fix - cambio);
                                 tempoFix_s = tempoFix_s.replace("-", "");
                                 chars = tempoFix_s.toCharArray();
@@ -1505,11 +1481,9 @@ public class AbonarActivity extends AppCompatActivity {
                                 } else if (chars.length == 7) {
                                     tempoFix_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                                 }
-
                                 if ((monto_temporal_fix - cambio) < 0) {
                                     tempoFix_s = "-" + tempoFix_s;
                                 }
-
                                 String montoIngresado_s = String.valueOf(monto_ingresado - cambio);
                                 montoIngresado_s = montoIngresado_s.replace("-", "");
                                 chars = montoIngresado_s.toCharArray();
@@ -1528,11 +1502,9 @@ public class AbonarActivity extends AppCompatActivity {
                                 } else if (chars.length == 7) {
                                     montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                                 }
-
                                 if ((monto_ingresado - cambio) < 0) {
                                     montoIngresado_s = "-" + montoIngresado_s;
                                 }
-
                                 mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado:\n" + montoIngresado_s +
                                         " colones.\n";
                                 mensaje_imprimir = mensaje_imprimir + "Intereses moratorios:\n" + interes_mora_total_s + " colones.\n";
@@ -1544,7 +1516,6 @@ public class AbonarActivity extends AppCompatActivity {
                             return flag;
                         } else {
                             if (monto_ingresado > 0) {
-
                                 String montoIngresado_s = String.valueOf(split_1[2]);
                                 char[] chars = montoIngresado_s.toCharArray();
                                 Log.v("debug4", "\n\nsplit_1[2]: " + split_1[2] + "\n\nchars.length: " + chars.length + " \n\n.");
@@ -1567,14 +1538,11 @@ public class AbonarActivity extends AppCompatActivity {
                                     montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                                 }
                                 Log.v("debug4", "\n\nmontoIngresado_s: " + montoIngresado_s + "\n\n.");
-
-
                                 mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ":\n" +
                                         montoIngresado_s + " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0,00 colones.\n";
                             }
                         }
                     } else if (monto_temporal == 0) {//Alcanza para pagar esta cuota pero no sobra nada. Debe retornar!!!
-                        //
                         cuadratura = cuadratura.replace(split_1[0] + "_" + split_1[1] + "_" + split_1[2] + "_" + split_1[3],
                                 split_1[0] + "_" + split_1[1] + "_0_" + split_1[3]);
                         String fecha_cuadrito = split_1[3];
@@ -1621,7 +1589,6 @@ public class AbonarActivity extends AppCompatActivity {
                             proximo_abono = fecha_cuadrito;
                         }
                         if (monto_ingresado > 0) {
-
                             String montoIngresado_s = String.valueOf(split_1[2]);
                             char[] chars = montoIngresado_s.toCharArray();
                             Log.v("debug5", "\n\nsplit_1[2]: " + split_1[2] + "\n\nchars.length: " + chars.length + " \n\n.");
@@ -1644,7 +1611,6 @@ public class AbonarActivity extends AppCompatActivity {
                                 montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
                             Log.v("debug5", "\n\nmontoIngresado_s: " + montoIngresado_s + "\n\n.");
-
                             String montoIngresadRo_s = String.valueOf(monto_ingresado);
                             chars = montoIngresadRo_s.toCharArray();
                             if (chars.length == 1) {
@@ -1662,7 +1628,6 @@ public class AbonarActivity extends AppCompatActivity {
                             } else if (chars.length == 7) {
                                 montoIngresadRo_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
-
                             String interes_mora_total_s = String.valueOf(interes_mora_total);
                             chars = interes_mora_total_s.toCharArray();
                             if (chars.length == 1) {
@@ -1680,7 +1645,6 @@ public class AbonarActivity extends AppCompatActivity {
                             } else if (chars.length == 7) {
                                 interes_mora_total_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
-
                             String tempoFix_s = String.valueOf(monto_temporal_fix);
                             chars = tempoFix_s.toCharArray();
                             if (chars.length == 1) {
@@ -1698,8 +1662,6 @@ public class AbonarActivity extends AppCompatActivity {
                             } else if (chars.length == 7) {
                                 tempoFix_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
-
-
                             mensaje_imprimir = mensaje_imprimir + "\nMonto abonado\ncuota #" + split_1[1] + " de " + total_cuotas + ":\n" + montoIngresado_s +
                                     " colones.\nSaldo pendiente\ncuota #" + split_1[1] + ": 0,00 colones\n";
                             mensaje_imprimir = mensaje_imprimir + "\n******************************\nMonto abonado:\n" + montoIngresadRo_s + " colones.\n";
@@ -1792,6 +1754,7 @@ public class AbonarActivity extends AppCompatActivity {
                             archivo.close();
                         }
                     } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -1823,9 +1786,7 @@ public class AbonarActivity extends AppCompatActivity {
                             tv_esperar.requestFocus();
                             try {
                                 presentar_info_credito(sp_plazos.getSelectedItem().toString());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (InterruptedException e) {
+                            } catch (IOException | InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -1917,7 +1878,7 @@ public class AbonarActivity extends AppCompatActivity {
                                 factor_semanas = 4;
                             } else {
                                 factor_semanas = -1;
-                                //ERROR
+                                Log.v("presentar_info_credito1", "*****ERROR*********Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
                             }
                             String intereses_moritas = obtener_intereses_moratorios(monto_prestado, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                             interes_mora_total = intereses_moritas;
@@ -1944,8 +1905,6 @@ public class AbonarActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         break;
-                    } else {
-                        //Continue with the execution.
                     }
                 }
             }
@@ -1962,7 +1921,7 @@ public class AbonarActivity extends AppCompatActivity {
                 file_to_consult = cliente_ID + "_P_" + num_credit + "_P_";
             }
             if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
-                Log.v("present_info_credito12", "**********ERROR************Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
+                Log.v("present_info_credito2", "**********ERROR************Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
             } else {
                 for (int i = 0; i < archivos.length; i++) {
                     Pattern pattern = Pattern.compile(file_to_consult, Pattern.CASE_INSENSITIVE);
@@ -2032,7 +1991,7 @@ public class AbonarActivity extends AppCompatActivity {
                                 factor_semanas = 4;
                             } else {
                                 factor_semanas = -1;
-                                //ERROR
+                                Log.v("present_info_credito3", "**********ERROR************Abonar.\n\nFactor de semanas: " + factor_semanas + "\n\n");
                             }
                             String intereses_moritas = obtener_intereses_moratorios(monto_prestado, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                             interes_mora_total = intereses_moritas;
@@ -2056,9 +2015,7 @@ public class AbonarActivity extends AppCompatActivity {
                             consultar(null);;
                         } catch (IOException e) {
                             e.printStackTrace();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
+                        } catch (InterruptedException | ParseException e) {
                             e.printStackTrace();
                         }
                     }
@@ -2262,8 +2219,6 @@ public class AbonarActivity extends AppCompatActivity {
             startActivity(activity_volver);
             finish();
             System.exit(0);
-        } else {
-            //Do nothing.
         }
     }
 

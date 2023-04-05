@@ -16,7 +16,7 @@ public class DateUtilities {
     private static String mes;
     private static String anio;
     private static String fecha;
-    private static Map<String, Integer> meses = new HashMap<String, Integer>();
+    private static Map<String, Integer> meses = new HashMap<>();
 
     public static int daysBetween (Date fecha_inicio, Date fecha_final) {
         int diferencia;
@@ -34,6 +34,8 @@ public class DateUtilities {
         return date;
     }
 
+
+    //What the method addDays() do?
     public static Date addDays (Date fecha_inicio, int days) {
         Date date;
         Calendar calendar = Calendar.getInstance();
@@ -102,13 +104,11 @@ public class DateUtilities {
             }
         } else if (fecha_init == fecha_end) {
             date = calendar.getTime();
-        } else {
         }
         return date;
     }
 
     public static Date addMonths (Date fecha, int months){
-
         String[] split = fecha.toString().split(" ");
         int fecha_init = Integer.parseInt(split[2]);
         int suma = months * 4;
@@ -136,7 +136,6 @@ public class DateUtilities {
             }
         } else if (fecha_init == fecha_end) {
             date = calendar.getTime();
-        } else {
         }
         Log.v("addMonths0", "DateUtilities.\n\nfecha inicial:\n\n" + fecha + "\n\nfecha final:\n\n" + date + "\n\n.");
         return date;
@@ -155,14 +154,12 @@ public class DateUtilities {
         String date;
         llenar_mapa_meses();
         separar_fechaYhora(fechaLd);
-
         if (mes.length() == 1) {
             mes = "0" + mes;
         }
         if (fecha.length() == 1) {
             fecha = "0" + fecha;
         }
-
         date = anio + "-" + mes + "-" + fecha;
         return date;
     }
