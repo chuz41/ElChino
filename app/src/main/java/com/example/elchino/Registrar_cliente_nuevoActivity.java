@@ -41,13 +41,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     private String monto_disponibleS = "";
     private String ID_clienteS = "";
     private String file_content = "";
-    private EditText et_ID;
     private TextView tv_esperar;
-    private String hora;
-    private String minuto;
-    private String anio;
-    private String mes;
-    private String dia;
     private Button confirmar;
 
     @Override
@@ -66,18 +60,8 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         monto_disponible = (TextInputLayout) findViewById(R.id.monto_disponible);
         tv_esperar = (TextView) findViewById(R.id.tv_esperar);
         confirmar = (Button) findViewById(R.id.bt_confirmar);
-        et_ID = (EditText) findViewById(R.id.et_ID);
+        EditText et_ID = (EditText) findViewById(R.id.et_ID);
         et_ID.setVisibility(View.INVISIBLE);
-        separarFecha();
-    }
-
-    private void separarFecha () {
-        SepararFechaYhora datosFecha = new SepararFechaYhora(null);
-        hora = datosFecha.getHora();
-        minuto = datosFecha.getMinuto();
-        anio = datosFecha.getAnio();
-        mes = datosFecha.getMes();
-        dia = datosFecha.getDia();
     }
 
     public void confirm(View view) {
@@ -126,29 +110,29 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     }
 
     private String imprimir_archivo(String file_name){
-
-        String archivos[] = fileList();
-        String contenido = "";//Aqui se lee el contenido del archivo guardado.
+        String[] archivos = fileList();
+        StringBuilder contenido = new StringBuilder();//Aqui se lee el contenido del archivo guardado.
         if (archivo_existe(archivos, file_name)) {//Archivo nombre_archivo es el archivo que vamos a imprimir
             try {
                 InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));//Se abre archivo
                 BufferedReader br = new BufferedReader(archivo);
                 String linea = br.readLine();//Se lee archivo
                 while (linea != null) {
-                    contenido = contenido + linea + "\n";
+                    contenido.append(linea).append("\n");
                     linea = br.readLine();
                 }
                 br.close();
                 archivo.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        return contenido;
+        return contenido.toString();
     }
 
     private boolean archivo_existe (String[] archivos, String file_name){
-        for (int i = 0; i < archivos.length; i++) {
-            if (file_name.equals(archivos[i])) {
+        for (String archivo : archivos) {
+            if (file_name.equals(archivo)) {
                 return true;
             }
         }
@@ -158,17 +142,17 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     private boolean idExiste (String iD) {
         boolean flag = false;
         String archivoEncontrado = "ninguno";
-        String archivos[] = fileList();
-        for (int i = 0; i < archivos.length; i++) {
-            if (archivos[i].contains(iD)) {
+        String[] archivos = fileList();
+        for (String archivo : archivos) {
+            if (archivo.contains(iD)) {
                 flag = true;
-                archivoEncontrado = archivos[i];
+                archivoEncontrado = archivo;
                 break;
             }
             String probador = iD + "_C_.txt";
-            if (probador.contains(archivos[i])) {
+            if (probador.contains(archivo)) {
                 flag = true;
-                archivoEncontrado = archivos[i];
+                archivoEncontrado = archivo;
                 break;
             }
         }
@@ -200,22 +184,19 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
             u0 = u0.replaceAll("[^\\w+]", "");
             Log.v("ID_cliente1", "Registrar_cliente_nuevo.\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\n.");
             if (flag_u0) {
-                if (u0.equals(ID_clienteS)) {
-                    //Do nothing.
-                } else {
+                if (!u0.equals(ID_clienteS)) {
                     Log.v("ID_cliente_sep_1", ".\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\nfile_content:\n\n" + file_content + "\n\n.");
                     u0 = u0.replaceAll("[^\\w+]", "");
                     file_content.replace("ID_cliente_separador_" + ID_clienteS, "ID_cliente_separador_" + u0);
                     Log.v("ID_cliente_sep_2", ".\n\nID_cliente: " + u0 + "\nID_clienteS: " + ID_clienteS + "\n\nfile_content:\n\n" + file_content + "\n\n.");
                 }
                 ID_clienteS = u0;
-                return true;
             } else {
                 String linea = "ID_cliente_separador_" + u0;
                 file_content = file_content + linea + "\n";
                 flag_u0 = true;
-                return true;
             }
+            return true;
         }
     }
 
@@ -223,37 +204,27 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         if (nombre_cliente.getEditText()!=null){
             u1 = nombre_cliente.getEditText().getText().toString().trim();
         }
-
         if (u1.isEmpty()) {
-
             nombre_cliente.setError(getText(R.string.cantempty_nombre));
             return false;
-
         }
-
         else if (u1.length() > 12) {
-
             nombre_cliente.setError(getText(R.string.toolong));
             return false;
         }
-
         else {
             nombre_cliente.setError(null);
-            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u1) {
-                if (u1.equals(nombre_clienteS)) {
-                    //Do nothing.
-                } else {
+                if (!u1.equals(nombre_clienteS)) {
                     file_content.replace("nombre_cliente_separador_" + nombre_clienteS, "nombre_cliente_separador_" + u1);
                 }
                 nombre_clienteS = u1;
-                return true;
             } else {
                 String linea = "nombre_cliente_separador_" + u1;
                 file_content = file_content + linea + "\n";
                 flag_u1 = true;
-                return true;
             }
+            return true;
         }
 
     }
@@ -262,160 +233,115 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         if (apellido1_cliente.getEditText()!=null){
             u2 = apellido1_cliente.getEditText().getText().toString().trim();
         }
-
         if (u2.isEmpty()) {
-
             apellido1_cliente.setError(getText(R.string.cantempty_apellido1));
             return false;
-
         }
-
         else if (u2.length() > 15) {
-
             apellido1_cliente.setError(getText(R.string.toolong_apellido1));
             return false;
         }
-
         else {
             apellido1_cliente.setError(null);
-            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u2) {
-                if (u2.equals(apellido1_clienteS)) {
-                    //Do nothing.
-                } else {
+                if (!u2.equals(apellido1_clienteS)) {
                     file_content.replace("apellido1_cliente_separador_" + apellido1_clienteS, "apellido1_cliente_separador_" + u2);
                 }
                 apellido1_clienteS = u2;
-                return true;
             } else {
                 String linea = "apellido1_cliente_separador_" + u2;
                 file_content = file_content + linea + "\n";
                 flag_u2 = true;
-                return true;
             }
+            return true;
         }
-
     }
 
     public boolean apellido2_cliente () {
         if (apellido2_cliente.getEditText()!=null){
             u3 = apellido2_cliente.getEditText().getText().toString().trim();
         }
-
         if (u3.isEmpty()) {
-
             apellido2_cliente.setError(getText(R.string.cantempty_apellido1));
             return false;
-
         }
-
         else if (u3.length() > 15) {
-
             apellido2_cliente.setError(getText(R.string.toolong_apellido1));
             return false;
         }
-
         else {
             apellido2_cliente.setError(null);
-            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u3) {
-                if (u3.equals(apellido2_clienteS)) {
-                    //Do nothing.
-                } else {
+                if (!u3.equals(apellido2_clienteS)) {
                     file_content.replace("apellido2_cliente_separador_" + apellido2_clienteS, "apellido2_cliente_separador_" + u3);
                 }
                 apellido2_clienteS = u3;
-                return true;
             } else {
                 String linea = "apellido2_cliente_separador_" + u3;
                 file_content = file_content + linea + "\n";
                 flag_u3 = true;
-                return true;
             }
+            return true;
         }
-
     }
 
     public boolean apodo_cliente () {
         if (apodo_cliente.getEditText()!=null){
             u4 = apodo_cliente.getEditText().getText().toString().trim();
         }
-
         if (u4.isEmpty()) {
-
             apodo_cliente.setError(getText(R.string.cantempty_apodo));
             return false;
-
         }
-
         else if (u4.length() > 10) {
-
             apodo_cliente.setError(getText(R.string.toolong_apodo));
             return false;
         }
-
         else {
             apodo_cliente.setError(null);
-            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u4) {
-                if (u4.equals(apodo_clienteS)) {
-                    //Do nothing.
-                } else {
+                if (!u4.equals(apodo_clienteS)) {
                     file_content.replace("apodo_cliente_separador_" + apodo_clienteS, "apodo_cliente_separador_" + u4);
                 }
                 apodo_clienteS = u4;
-                return true;
             } else {
                 String linea = "apodo_cliente_separador_" + u4;
                 file_content = file_content + linea + "\n";
                 flag_u4 = true;
-                return true;
             }
+            return true;
         }
-
     }
 
     public boolean telefono1_cliente () {
         if (telefono1_cliente.getEditText()!=null){
             u12 = telefono1_cliente.getEditText().getText().toString().trim();
         }
-
         if (u12.isEmpty()) {
-
             telefono1_cliente.setError(getText(R.string.cantempty_telefono));
             return false;
-
         }
-
         else if (u12.length() > 8) {
-
             telefono1_cliente.setError(getText(R.string.toolong_telefono));
             return false;
         }
-
         else if (u12.length() < 8) {
-
             telefono1_cliente.setError(getText(R.string.toolow_telefono));
             return false;
         }
-
         else {
             telefono1_cliente.setError(null);
-            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u12) {
-                if (u12.equals(telefono1_clienteS)) {
-                    //Do nothing.
-                } else {
+                if (!u12.equals(telefono1_clienteS)) {
                     file_content.replace("telefono1_cliente_separador_" + telefono1_clienteS, "telefono1_cliente_separador_" + u12);
                 }
                 telefono1_clienteS = u12;
-                return true;
             } else {
                 String linea = "telefono1_cliente_separador_" + u12;
                 file_content = file_content + linea + "\n";
                 flag_u12 = true;
-                return true;
             }
+            return true;
         }
     }
 
@@ -423,78 +349,57 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         if (telefono2_cliente.getEditText()!=null){
             u13 = telefono2_cliente.getEditText().getText().toString().trim();
         }
-
         if (u13.isEmpty()) {
-
             telefono2_cliente.setError(getText(R.string.cantempty_telefono));
             return false;
-
         }
-
         else if (u13.length() > 8) {
-
             telefono2_cliente.setError(getText(R.string.toolong_telefono));
             return false;
         }
-
         else if (u13.length() < 8) {
-
             telefono2_cliente.setError(getText(R.string.toolow_telefono));
             return false;
         }
-
         else {
             telefono2_cliente.setError(null);
-            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u13) {
-                if (u13.equals(telefono2_clienteS)) {
-                    //Do nothing.
-                } else {
+                if (!u13.equals(telefono2_clienteS)) {
                     file_content.replace("telefono2_cliente_separador_" + telefono2_clienteS, "telefono2_cliente_separador_" + u13);
                 }
                 telefono2_clienteS = u13;
-                return true;
             } else {
                 String linea = "telefono2_cliente_separador_" + u13;
                 file_content = file_content + linea + "\n";
                 flag_u13 = true;
-                return true;
             }
+            return true;
         }
-
     }
 
     public boolean notas_cliente () {//Se llena con un onClick listener!!!
         if (notas_cliente.getEditText()!=null){
             u9 = notas_cliente.getEditText().getText().toString().trim();
         }
-
         if (u9.isEmpty()) {
-
             u9 = "Sin notas...";
-
         }
-
         if (u9.length() > 100) {
             notas_cliente.setError(getText(R.string.toolong_notas));
             return false;
         } else {
             notas_cliente.setError(null);
-            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u9) {
-                if (u9.equals(notas_clienteS)) {
-                    //Do nothing.
-                } else {
+                if (!u9.equals(notas_clienteS)) {
                     file_content.replace("notas_cliente_separador_" + notas_clienteS, "notas_cliente_separador_" + u9);
                 }
                 notas_clienteS = u9;
-                return true;
             } else {
                 String linea = "notas_cliente_separador_" + u9;
                 file_content = file_content + linea + "\n";
                 flag_u9 = true;
-                return true;
             }
+            return true;
         }
 
     }
@@ -503,89 +408,63 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
         if (direccion_cliente.getEditText()!=null){
             u10 = direccion_cliente.getEditText().getText().toString().trim();
         }
-
         if (u10.isEmpty()) {
-
             direccion_cliente.setError(getText(R.string.cantempty_direccion));
             return false;
-
         }
-
         else if (u10.length() > 150) {
-
             direccion_cliente.setError(getText(R.string.toolong_direccion));
             return false;
         }
-
         else if (u10.length() < 8) {
-
             direccion_cliente.setError(getText(R.string.toolow_direccion));
             return false;
         }
-
         else {
             direccion_cliente.setError(null);
-            //Do nothing. Este nombre se va a usar en la proxima activity (HorariosagregarActivity.java)
             if (flag_u10) {
-                if (u10.equals(direccion_clienteS)) {
-                    //Do nothing.
-                } else {
+                if (!u10.equals(direccion_clienteS)) {
                     file_content.replace("direccion_cliente_separador_" + direccion_clienteS, "direccion_cliente_separador_" + u10);
                 }
                 direccion_clienteS = u10;
-                return true;
             } else {
                 String linea = "direccion_cliente_separador_" + u10;
                 file_content = file_content + linea + "\n";
                 flag_u10 = true;
-                return true;
             }
+            return true;
         }
-
     }
 
     public boolean monto_disponible () {
         if (monto_disponible.getEditText()!=null){
             u6 = monto_disponible.getEditText().getText().toString().trim();
         }
-
         if (u6.isEmpty()) {
-
             monto_disponible.setError(getText(R.string.cantempty_monto));
             return false;
-
         }
-
         else if (u6.length() > 10000000) {
-
             monto_disponible.setError(getText(R.string.toolong_monto));
             return false;
         }
-
         else if (Integer.parseInt(u6) < 10000) {
             monto_disponible.setError(getText(R.string.toolow_monto));
             return false;
         }
-
         else {
             monto_disponible.setError(null);
-
             //Aqui se programa las acciones que se van a ejecutar con este parametro.
-            //Se crea una linea de texto que se va a agregar al archivo nuevo que se va a crear.
-            //String linea = "Comision_vendedor  " + u7 + "\n";
-            //nuevo_archivo = nuevo_archivo + linea;
+            //Se crea una linea de texto que se va a agregar al archivo nuevo que se va a crear
             if (flag_u6) {
-                if (u6.equals(monto_disponibleS)) {
-                    //Do nothing.
-                } else {
+                if (!u6.equals(monto_disponibleS)) {
                     file_content.replace("monto_disponible_separador_" + monto_disponibleS, "monto_disponible_separador_" + u6);
                 }
                 monto_disponibleS = u6;
-                return true;
             } else {
                 flag_u6 = true;
-                return true;
             }
+            return true;
         }
     }
 
@@ -594,7 +473,7 @@ public class Registrar_cliente_nuevoActivity extends AppCompatActivity {
     private void esperar (String s) {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
         tv_esperar.setText(s);
-        for (int i = 0; i > 10; i++) {
+        for (int i = 0; i < 10; i++) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {

@@ -156,6 +156,7 @@ public class CierreActivity extends AppCompatActivity {
                     br.close();
                     archivo.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
                 }
                 break;
             }
@@ -224,6 +225,7 @@ public class CierreActivity extends AppCompatActivity {
                 archivo.close();
             }
         } catch (IOException e) {
+            e.printStackTrace();
         }
 
         if (abonos.isEmpty() && creditos.isEmpty() && bancas.isEmpty()) {

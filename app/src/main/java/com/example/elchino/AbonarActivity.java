@@ -58,7 +58,6 @@ public class AbonarActivity extends AppCompatActivity {
     private Integer saldo_mas_intereses = 0;
     private Integer tasa = 0;//Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
     private String morosidad = "D";
-    private Integer cantidad_cuotas_pendientes = 0;
     private String archivo_prestamo = "";
     private String plazo = "";
     private EditText et_ID;
@@ -305,7 +304,6 @@ public class AbonarActivity extends AppCompatActivity {
                         String intereses_moritas = obtener_intereses_moratorios(monto_prestado, fecha_next_abono);//Aqui se obtienen los intereses moratorios hasta hoy.
                         interes_mora_total = intereses_moritas;
                         interes_mora_parcial = interes_mora_total;
-                        cuadratura_pre = obtener_cuadratura(cuadratura_pre, fecha_next_abono, factor_semanas, 0, fecha_credito, "n");
                         saldo_mas_intereses_s = obtener_saldo_al_dia(saldo_mas_intereses_s, fecha_next_abono, intereses_mora, monto_prestado);
                         cuotas_morosas = obtener_cuotas_morosas(cuadratura_bkup);
                         double saldo_mas_intereses_D = Double.parseDouble(saldo_mas_intereses_s);
@@ -520,7 +518,7 @@ public class AbonarActivity extends AppCompatActivity {
             Log.v("Prestamo_a_consultar1", ".\n\nPrestamo que se va a abonar: " + et_ID.getText().toString() + "\n\n.");
             String[] parts_prestamo = et_ID.getText().toString().split(" ");
             monto_a_pagar = 0;
-            cantidad_cuotas_pendientes = Integer.parseInt(parts_prestamo[3]);
+            Integer cantidad_cuotas_pendientes = Integer.parseInt(parts_prestamo[3]);
             morosidad = parts_prestamo[2];
             monto_cuota = obtener_monto_cuota(parts_prestamo[0]);
             int montoAPagar = 0;

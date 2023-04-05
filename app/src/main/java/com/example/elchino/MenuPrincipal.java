@@ -71,9 +71,7 @@ public class MenuPrincipal extends AppCompatActivity {
         tv_saludo.setText("Menu principal");
         String mensaje_recibido = getIntent().getStringExtra("mensaje");
         boolean flagServicio = false;
-        if (mensaje_recibido.equals("null") || (mensaje_recibido == "")) {
-            //Do nothing.
-        } else {
+        if (!(mensaje_recibido.equals("null")) && !(mensaje_recibido == "")) {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
         }
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
@@ -125,12 +123,9 @@ public class MenuPrincipal extends AppCompatActivity {
 
     private void separarFecha () {
         SepararFechaYhora datosFecha = new SepararFechaYhora(null);
-        String hora = datosFecha.getHora();
-        String minuto = datosFecha.getMinuto();
         anio = datosFecha.getAnio();
         mes = datosFecha.getMes();
         dia = datosFecha.getDia();
-        String fecha = dia;
     }
 
     private void corregirArchivos () throws IOException {
@@ -167,7 +162,6 @@ public class MenuPrincipal extends AppCompatActivity {
             new BorrarArchivo("cierre_cierre_.txt", getApplicationContext());
             new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
         }
-        /////////////////////////////////////////////////////////////////////////////////////
     }
 
     private void mostrar_caja() {
@@ -292,6 +286,7 @@ public class MenuPrincipal extends AppCompatActivity {
                 br.close();
                 archivo.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return contenido;

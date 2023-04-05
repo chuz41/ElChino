@@ -431,7 +431,6 @@ public class CuadraturaActivity extends AppCompatActivity {
             } else {
                 interes_mora_parcial = "0";
             }
-
         }
         flag = interes_mora_parcial;
         interes_mora_total = interes_mora_parcial;
@@ -696,19 +695,17 @@ public class CuadraturaActivity extends AppCompatActivity {
     }
 
     private void presentar_cuadratura () throws ParseException {
-
         String cuadratura_print = generar_cuadra_print();
-
         if (mensaje_imprimir_pre == null) {
             mensaje_imprimir_pre = "*****  ESTADO DE CUENTA  *****\n";
         } else if (mensaje_imprimir_pre.equals("")) {
             mensaje_imprimir_pre = "*****  CREDITO APROBADO  *****\n";
         }
-
         mensaje_imprimir = "\n\nFecha: " + dia + "/" + mes + "/" + anio + "\n\n\n***** Prestamos El Chino *****\n\nCliente: " +
-                nombreCliente + "\nCedula: " + cliente_ID + "\n\n\n******************************\n\n" + mensaje_imprimir_pre + "\n******************************\n\n" +
-                cuadratura_print + "Estimado cliente, no olvide\nrevisar su tiquete antes de\nque se retire el cobrador.\n\nSi necesita dinero,\nllame a " + cobrador_s + "\nTelefono: " + telefono_s + "\n\n\n\n\n";
-
+                nombreCliente + "\nCedula: " + cliente_ID + "\n\n\n******************************\n\n" + mensaje_imprimir_pre +
+                "\n******************************\n\n" + cuadratura_print +
+                "Estimado cliente, no olvide\nrevisar su tiquete antes de\nque se retire el cobrador.\n\nSi necesita dinero,\nllame a " +
+                cobrador_s + "\nTelefono: " + telefono_s + "\n\n\n\n\n";
         bt_consultar.setEnabled(false);
         bt_consultar.setVisibility(View.INVISIBLE);
         tv_esperar.setText("");
@@ -787,7 +784,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         int cuottas = 0;
         for (String s : split) {
             String[] split_1 = s.split("_");
-
             String montoIngresado_s = String.valueOf(split_1[2]);
             char[] chars = montoIngresado_s.toCharArray();
             Log.v("debug0", "\n\nsplit_1[2]: " + split_1[2] + "\n\nchars.length: " + chars.length + " \n\n.");
@@ -810,7 +806,6 @@ public class CuadraturaActivity extends AppCompatActivity {
                 montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
             }
             Log.v("debug0", "\n\nmontoIngresado_s: " + montoIngresado_s + "\n\n.");
-
             flag.append("\nCuota ").append(split_1[0]).append(" ").append(split_1[1]).append(":\n").append(montoIngresado_s).append(" colones.\nFecha de pago: ").append(split_1[3]).append("\n");
             if (Integer.parseInt(split_1[2]) > 0) {//Significa que tiene esta cuota pendiente.
                 cuottas = cuottas + 1;
@@ -829,7 +824,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         for (int key : botones.keySet()) {
             treeMap.put(key, botones.get(key));
         }
-
         return treeMap;
     }
 
@@ -874,7 +868,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         Log.v("obt_monto_cuota", ".\n\nString: "+ s + "\n\nCliente ID: " + cliente_ID + "\n\nCantidd de archivos: " + archivos.length + "\n\nSplit[0]: " + split[0] + "\n\nSplit[1]: " + split[1] + "\n\n.");
         if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
             Log.v("obtener_monto_cuota.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
-            //Do nothing.
         } else {
             for (int i = 0; i < archivos.length; i++) {
                 Pattern pattern = Pattern.compile(cliente_ID + "_P_" + s + "_P_", Pattern.CASE_INSENSITIVE);
@@ -893,7 +886,6 @@ public class CuadraturaActivity extends AppCompatActivity {
                             InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));
                             BufferedReader br = new BufferedReader(archivo);
                             String linea = br.readLine();
-
                             while (linea != null) {
                                 Log.v("file_found", ".\n\nLinea: " + linea + "\n\n.");
                                 String[] splitre = linea.split("_separador_");
@@ -920,7 +912,6 @@ public class CuadraturaActivity extends AppCompatActivity {
     private void spinner_listener () {
         sp_plazos.setOnItemSelectedListener(
                 new AdapterView.OnItemSelectedListener() {
-                    
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         //Crear diccionario con la informacion de la loteria seleccionada

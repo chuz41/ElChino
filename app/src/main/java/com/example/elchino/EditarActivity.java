@@ -1,7 +1,6 @@
 package com.example.elchino;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -119,9 +118,6 @@ public class EditarActivity extends AppCompatActivity {
         et_monto_disponible.setVisibility(View.INVISIBLE);
         et_telefono1_cliente.setVisibility(View.INVISIBLE);
         et_telefono2_cliente.setVisibility(View.INVISIBLE);
-
-
-
         String texto = "####!#### CUIDADO!!! ####!####\n\nEstimado usuario, se recomienda\nseguir los siguientes consejos:\n\n" +
                 "1. Recuerde que todo cambio que\ntenga que ver con las cuentas debe\nser aprobado por la banca.\n\n" +
                 "2. Debe estar seguro que el cambio\nque va a realizar sea\nABSOLUTAMENTE necesario.\n\n" +
@@ -129,12 +125,10 @@ public class EditarActivity extends AppCompatActivity {
                 "4. Se recomienda tomar nota manual\ndel cambio que aqui se va a realizar.\n\n" +
                 "5. NO DEJE ESPACIOS EN BLANCO!!!";
         tv_mensaje.setText(texto);
-
     }
 
     public void editar_cliente (View view) {
         ocultar_todo();
-
         tv_ID_cliente.setEnabled(true);
         et_ID_cliente.setEnabled(true);
         tv_nombre_cliente.setEnabled(true);
@@ -157,7 +151,6 @@ public class EditarActivity extends AppCompatActivity {
         et_telefono2_cliente.setEnabled(true);
         tv_puntuacion_cliente.setEnabled(true);
         et_puntuacion_cliente.setEnabled(true);
-
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput(archivo_cliente));
             BufferedReader br = new BufferedReader(archivo);
@@ -168,7 +161,6 @@ public class EditarActivity extends AppCompatActivity {
                     ID_cliente = split[1];
                     tv_ID_cliente.setText("Identificacion");
                     et_ID_cliente.setText(ID_cliente);
-                    text_listener_ID();
                 }
                 if (split[0].equals("nombre_cliente")) {
                     nombre_cliente = split[1];
@@ -225,8 +217,8 @@ public class EditarActivity extends AppCompatActivity {
             br.close();
             archivo.close();
         } catch (IOException e) {
+            e.printStackTrace();
         }
-
         et_ID_cliente.setHint("Identificacion...");
         et_nombre_cliente.setHint("Nombre...");
         et_apellido1_cliente.setHint("Primer apellido...");
@@ -238,7 +230,6 @@ public class EditarActivity extends AppCompatActivity {
         et_monto_disponible.setHint("Monto disponible...");
         et_telefono1_cliente.setHint("Telefono 1...");
         et_telefono2_cliente.setHint("Telefono 2...");
-
     }
 
     public void confirmar (View view) throws IOException {
@@ -251,10 +242,8 @@ public class EditarActivity extends AppCompatActivity {
                 InputStreamReader archivo = new InputStreamReader(openFileInput(archivo_cliente));
                 BufferedReader br = new BufferedReader(archivo);
                 String linea = br.readLine();
-
                 while (linea != null) {
                     String[] split = linea.split("_separador_");
-
                     if (split[0].equals("ID_cliente")) {
                         ID_cliente = et_ID_cliente.getText().toString();
                         if (ID_cliente.equals("")) {
@@ -270,10 +259,8 @@ public class EditarActivity extends AppCompatActivity {
                                 tv_ID_cliente.setEnabled(false);
                                 et_ID_cliente.setEnabled(false);
                                 msg("La identificacion del cliente no se puede cambiar!!!");
-                                //linea = linea.replace(split[1], ID_cliente);
                             }
                         }
-
                     } else if (split[0].equals("nombre_cliente")) {
                         nombre_cliente = et_nombre_cliente.getText().toString();
                         if (nombre_cliente.equals("")) {
@@ -290,8 +277,6 @@ public class EditarActivity extends AppCompatActivity {
                                 linea = linea.replace(split[1], nombre_cliente);
                             }
                         }
-
-
                     } else if (split[0].equals("apellido1_cliente")) {
                         apellido1_cliente = et_apellido1_cliente.getText().toString();
                         if (apellido1_cliente.equals("")) {
@@ -345,7 +330,6 @@ public class EditarActivity extends AppCompatActivity {
                         if (notas_cliente.equals("")) {
                             notas_cliente = "Sin notas...";
                         }
-
                         if (notas_cliente.contains("\n")) {
                             flag = false;
                             msg("Error en notas del cliente.");
@@ -377,15 +361,12 @@ public class EditarActivity extends AppCompatActivity {
                             flag = false;
                             msg("Monto disponible vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
                         } else {
-
                             if (monto_disponible.contains("\n")) {
                                 flag = false;
                                 msg("Error en monto disponible.");
                             } else {
                                 boolean isNumeric = monto_disponible.matches("[+-]?\\d*(\\.\\d+)?");
-
                                 if (isNumeric) {
-
                                     if (Integer.valueOf(monto_disponible) < 1000 | Long.valueOf(monto_disponible) > 30000000) {
                                         flag = false;
                                         msg("Monto disponible debe ser un numero valido!");
@@ -394,13 +375,11 @@ public class EditarActivity extends AppCompatActivity {
                                         et_monto_disponible.setEnabled(false);
                                         linea = linea.replace(split[1], monto_disponible);
                                     }
-
                                 } else {
                                     flag = false;
                                     msg("Monto disponible debe ser un numero!");
                                 }
                             }
-
                         }
                     } else if (split[0].equals("telefono1_cliente")) {
                         telefono1_cliente = et_telefono1_cliente.getText().toString();
@@ -433,7 +412,6 @@ public class EditarActivity extends AppCompatActivity {
                             }
                         }
                     } else if (split[0].equals("puntuacion_cliente")) {
-
                         puntuacion_cliente = et_puntuacion_cliente.getText().toString();
                         puntuacion_cliente.replace("\n", "");
                         puntuacion_cliente.replace(" ", "");
@@ -441,16 +419,12 @@ public class EditarActivity extends AppCompatActivity {
                             flag = false;
                             msg("Puntuacion vacio.\n\nDebe llenar todos los\ncampos para poder editar!");
                         } else {
-
-
                             if (puntuacion_cliente.contains("\n")) {
                                 flag = false;
                                 msg("Error en puntuacion del cliente.");
                             } else {
                                 boolean isNumeric = puntuacion_cliente.matches("[+-]?\\d*(\\.\\d+)?");
-
                                 if (isNumeric) {
-
                                     if (Integer.valueOf(puntuacion_cliente) < 1 | Integer.valueOf(puntuacion_cliente) > 9) {
                                         flag = false;
                                         msg("Puntuacion debe ser un numero del 1 al 9.");
@@ -459,16 +433,12 @@ public class EditarActivity extends AppCompatActivity {
                                         et_puntuacion_cliente.setEnabled(false);
                                         linea = linea.replace(split[1], puntuacion_cliente);
                                     }
-
-
                                 } else {
                                     flag = false;
                                     msg("Puntuacion debe ser un numero del 1 al 9.");
                                 }
                             }
                         }
-                    } else {
-                        //Do nothing. La linea se queda igual.
                     }
                     contenido = contenido + linea + "\n";
                     linea = br.readLine();
@@ -477,6 +447,7 @@ public class EditarActivity extends AppCompatActivity {
                 br.close();
                 archivo.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         if (flag) {
@@ -489,7 +460,6 @@ public class EditarActivity extends AppCompatActivity {
             Toast.makeText(this, "ARCHIVO CORROMPIDO!\nNo se realizo ninguna accion!", Toast.LENGTH_LONG).show();
             mostrar_todo();
         }
-
     }
 
     public void editar_credito (View view) {
@@ -571,6 +541,7 @@ public class EditarActivity extends AppCompatActivity {
             archivo.flush();
             archivo.close();
         }catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -583,13 +554,12 @@ public class EditarActivity extends AppCompatActivity {
 
     public  void guardar (String contenido, String file_name) throws IOException {
         try {
-            //borrar_archivo(file_name);
-            //crear_archivo(file_name);
             OutputStreamWriter archivo = new OutputStreamWriter(openFileOutput(file_name, Activity.MODE_PRIVATE));
             archivo.write(contenido);
             archivo.flush();
             archivo.close();
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -605,29 +575,6 @@ public class EditarActivity extends AppCompatActivity {
         startActivity(activity_volver);
         finish();
         System.exit(0);
-    }
-
-    private void text_listener_ID () {
-
-        /*//Implementacion de un text listener
-        et_ID_cliente.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                if (s.length() < 10 | s.length() > 13 ){
-                    //msg("Entrada incorrecta!!! s: " + s);
-                } else {
-
-                }
-
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });*/
     }
 
     private void msg (String msg) {

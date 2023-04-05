@@ -120,7 +120,7 @@ public class Estado_clienteActivity extends AppCompatActivity {
 
     private void corregirArchivos () throws IOException {
         //////// ARCHIVO cierre  ////////////////////////////////////////////////////////////
-        String archivos[] = fileList();
+        String[] archivos = fileList();
         boolean flag_borrar = false;
         if (archivo_existe(archivos, "cierre.txt")) {
             try {
@@ -152,7 +152,6 @@ public class Estado_clienteActivity extends AppCompatActivity {
             new BorrarArchivo("cierre_cierre_.txt", getApplicationContext());
             new AgregarLinea("estado_archivo_separador_arriba", "cierre_cierre_.txt", getApplicationContext());
         }
-        /////////////////////////////////////////////////////////////////////////////////////
     }
 
     private void mostrar_caja () {
@@ -504,8 +503,6 @@ public class Estado_clienteActivity extends AppCompatActivity {
                 break;
             case "Sat":
                 flag = "Sabado";
-                break;
-            default:
                 break;
         }
         return flag;

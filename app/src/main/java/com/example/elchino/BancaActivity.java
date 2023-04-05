@@ -39,7 +39,6 @@ public class BancaActivity extends AppCompatActivity {
     private Button bt_recibir;
     private String cliente_ID = "";
     private TextView tv_saludo;
-    private String monto_disponible = "";
     private boolean flag_client_reciv = false;
     private String cliente_recibido = "";
     private String caja = "caja.txt";
@@ -52,9 +51,7 @@ public class BancaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_banca);
         String mensaje_recibido = getIntent().getStringExtra( "msg");
-        if (mensaje_recibido.equals("")) {
-            //Do nothing.
-        } else {
+        if (!mensaje_recibido.equals("")) {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
         }
         cliente_recibido = getIntent().getStringExtra( "cliente_recivido");
@@ -109,8 +106,6 @@ public class BancaActivity extends AppCompatActivity {
             } else if (operador.equals("restar")) {
                 monto_nuevo = Integer.parseInt(split[1]) - monto_abono;
                 monto_caja_mostrar = monto_abono * -1;
-            } else {
-                //Do nothing.
             }
             linea = linea.replace(split[1], String.valueOf(monto_nuevo));
             contenido = linea;
@@ -139,13 +134,9 @@ public class BancaActivity extends AppCompatActivity {
                 if (split[0].equals("caja")) {
                     linea = linea.replace(split[1], String.valueOf(monto_nuevo));
                 } else if (split[0].equals("estado_archivo")) {
-                    if (split[1].equals("abajo")) {
-                        //Do nothing. Let the line same.
-                    } else {
+                    if (!split[1].equals("abajo")) {
                         linea = linea.replace("arriba", "abajo");
                     }
-                } else {
-                    //Do nothing. Let the line same.
                 }
                 contenido = contenido + linea + "\n";
                 Log.v("actualizar_disponible_1", "Banca.\n\nLinea:\n\n" + linea + "\n\n.");
@@ -209,7 +200,6 @@ public class BancaActivity extends AppCompatActivity {
     }
 
     private void text_listener () {
-
         //Implementacion de un text listener
         et_ID.addTextChangedListener(new TextWatcher() {
             @Override
@@ -226,9 +216,7 @@ public class BancaActivity extends AppCompatActivity {
                     bt_entregar.setEnabled(false);
                     bt_recibir.setClickable(false);
                     bt_recibir.setEnabled(false);
-                    if (String.valueOf(s).equals("")) {
-                        //Do nothing.
-                    } else {
+                    if (!String.valueOf(s).equals("")) {
                         bt_recibir.setEnabled(true);
                         bt_recibir.setClickable(true);
                         String monto_en_caja = "0";
@@ -283,7 +271,6 @@ public class BancaActivity extends AppCompatActivity {
     }
 
     private String imprimir_archivo(String file_name){
-
         String archivos[] = fileList();
         String contenido = "";//Aqui se lee el contenido del archivo guardado.
         if (archivo_existe(archivos, file_name)) {//Archivo nombre_archivo es el archivo que vamos a imprimir
@@ -298,6 +285,7 @@ public class BancaActivity extends AppCompatActivity {
                 br.close();
                 archivo.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return contenido;

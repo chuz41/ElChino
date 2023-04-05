@@ -197,7 +197,6 @@ public class GastosActivity extends AppCompatActivity {
     }
 
     private void text_listener () {
-
         //Implementacion de un text listener
         et_ID.addTextChangedListener(new TextWatcher() {
             @Override
@@ -279,6 +278,7 @@ public class GastosActivity extends AppCompatActivity {
                 br.close();
                 archivo.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return contenido;
