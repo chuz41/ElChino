@@ -147,9 +147,7 @@ public class AbonarActivity extends AppCompatActivity {
             cliente_ID = cliente_recibido;
             try {
                 consultar(null);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -316,8 +314,7 @@ public class AbonarActivity extends AppCompatActivity {
                         if (Integer.parseInt(saldo_plus_s) > 1000) {
                             creditos = creditos + "#" + numero_de_credito + " " + saldo_mas_intereses_s + " " + morosidad + " " + cuotas_morosas + "___";
                         }
-                    } catch (IOException e) {
-                    } catch (ParseException e) {
+                    } catch (IOException | ParseException e) {
                         e.printStackTrace();
                     }
                 }
@@ -623,7 +620,6 @@ public class AbonarActivity extends AppCompatActivity {
         if (!flagCajaxCompleta) {
             new AgregarLinea("estado_archivo_separador_abajo", "cajax_caja_.txt", getApplicationContext());
         }
-
     }
 
     private void procesar_abono2 () throws IOException {
@@ -756,6 +752,7 @@ public class AbonarActivity extends AppCompatActivity {
             actualizar_cierre(monto_abono, obtener_caja(), credit_ID);
             actualizar_archivo_cliente(archivo_prestamo);
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -941,9 +938,6 @@ public class AbonarActivity extends AppCompatActivity {
             montoIngresado = Integer.parseInt(et_ID.getText().toString());
             et_ID.setEnabled(false);
             actualizarCreditoAdelanto();
-        } else {
-            //TODO any other function!
-            //Do nothing for now.
         }
     }
 
@@ -1023,9 +1017,7 @@ public class AbonarActivity extends AppCompatActivity {
 
     private void subir_solicitud (Integer monto_perdonador, String mensaje_solicitud) throws IOException {
 
-        if (monto_perdonador <= 0 || mensaje_solicitud.equals("") || mensaje_solicitud.equals(null) || mensaje_solicitud.isEmpty()) {
-            //Do nothing.
-        } else {
+        if (monto_perdonador > 0 && !mensaje_solicitud.equals("") && !mensaje_solicitud.equals(null) && !mensaje_solicitud.isEmpty()) {
             monto_perdonado = monto_perdonador;
             long ID_solic_final = 9000000;
             String solicitud_ID_S = "";
@@ -1033,7 +1025,6 @@ public class AbonarActivity extends AppCompatActivity {
             String archivos[] = fileList();
             Log.v("subir_solicitud_0", "Abonar.\n\nTotal de archivos: " + archivos.length + "\n\n.");
             Log.v("subir_solicitud_1", "Abonar.\n\ncobrador_ID_S: " + cobrador_ID_S + "\n\n.");
-
             for (int i = 0; i < archivos.length; i++) {
                 Pattern pattern = Pattern.compile(cobrador_ID_S + "_S_", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(archivos[i]);
@@ -1060,10 +1051,10 @@ public class AbonarActivity extends AppCompatActivity {
                         br.close();
                         archivo.close();
                     } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
-
             ID_solic_final++;
             solicitud_ID = cobrador_ID_S + "S" + String.valueOf(ID_solic_final);
             long contador_name = ID_solic_final - 9000000;
@@ -1229,7 +1220,6 @@ public class AbonarActivity extends AppCompatActivity {
                         String diferencia_fechas = String.valueOf(DateUtilities.daysBetween(hoy_LD, fecha_cuadrito_LD));
                         if (monto_ingresado > 0) {
                             int monto_abonado_I = Integer.parseInt(split_1[2]) + monto_temporal;
-
                             String montoIngresado_s = String.valueOf(monto_abonado_I);
                             Log.v("debug1", "\n\nmonto_abonado_I: " + monto_abonado_I + "\n\n.");
                             char[] chars = montoIngresado_s.toCharArray();
@@ -1249,7 +1239,6 @@ public class AbonarActivity extends AppCompatActivity {
                                 montoIngresado_s = String.valueOf(chars[0]) + "." + String.valueOf(chars[1]) + String.valueOf(chars[2]) + String.valueOf(chars[3]) + "." + String.valueOf(chars[4]) + String.valueOf(chars[5]) + String.valueOf(chars[6]) + ",00";
                             }
                             Log.v("debug1", "\n\nmontoIngresado_s: " + montoIngresado_s + "\n\n.");
-
                             String montoIngresadoT_s = String.valueOf(monto_temporal);
                             montoIngresadoT_s = montoIngresadoT_s.replace("-", "");
                             chars = montoIngresadoT_s.toCharArray();
@@ -2188,6 +2177,7 @@ public class AbonarActivity extends AppCompatActivity {
             archivo.write(ArchivoCompleto);
             archivo.flush();
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -2232,7 +2222,6 @@ public class AbonarActivity extends AppCompatActivity {
     }
 
     private String imprimir_archivo (String file_name){
-
         String archivos[] = fileList();
         String contenido = "";//Aqui se lee el contenido del archivo guardado.
         if (archivo_existe(archivos, file_name)) {//Archivo nombre_archivo es el archivo que vamos a imprimir
@@ -2247,6 +2236,7 @@ public class AbonarActivity extends AppCompatActivity {
                 br.close();
                 archivo.close();
             } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return contenido;
