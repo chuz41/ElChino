@@ -192,15 +192,19 @@ public class CierreActivity extends AppCompatActivity {
                 while (linea != null) {
                     split = linea.split(" ");
                     int lalrgo = split.length;
-                    Log.v("generar_cierre0", "Cierre.\n\ncont: " + cont_abonar + "\n\nlargo_split: " + lalrgo + "\n\n.");
+                    Log.v("generar_cierre0", "Cierre.\n\ncont: " + cont_abonar + "\n\nlargo_split: " + lalrgo + "\n\nlinea:\n\n" + linea + "\n\n.");
                     String persona = new String();
+                    String personaRuta = new String();
                     if (lalrgo == 3) {
                         persona = "cobrador";
                     } else if (lalrgo == 4) {
                         persona = split[3];
-                        String splitPersona[] = persona.split("_P_");
-                        String nombreCliente = getNombreCliente(splitPersona[0]);
-                        persona = nombreCliente;
+                        personaRuta = persona;
+                        if (persona.contains("_P_")) {
+                            String splitPersona[] = persona.split("_P_");
+                            String nombreCliente = getNombreCliente(splitPersona[0]);
+                            persona = nombreCliente;
+                        }
                     }
                     String tipo = split[0];
                     String monto = split[1];
@@ -215,6 +219,13 @@ public class CierreActivity extends AppCompatActivity {
                         creditos.put(cont_creditos, frase);
                         cont_creditos++;
                     } else if (tipo.equals("banca")) {
+                        String[] splitFrase = frase.split(" ");
+                        int largoSplitFrase = splitFrase.length;
+                        if (largoSplitFrase == 3) {
+                            frase = frase + " " + personaRuta;
+                        } else {
+                            frase = frase.replace(persona, personaRuta);
+                        }
                         Log.v("generar_cierre3", "Cierre.\n\ncont: " + cont_bancas + "\n\nvalue: " + frase + "\n\n.");
                         bancas.put(cont_bancas, frase);
                         cont_bancas++;
@@ -227,7 +238,6 @@ public class CierreActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         if (abonos.isEmpty() && creditos.isEmpty() && bancas.isEmpty()) {
             msg("Sin movimientos el dia de hoy!!!");
             contenido_cierre = contenido_cierre +
@@ -238,6 +248,7 @@ public class CierreActivity extends AppCompatActivity {
                 contenido_cierre = contenido_cierre + "#*#*#* ABONOS RECIBIDOS *#*#*#\n\n";
                 for (Integer key : abonos.keySet()) {
                     String value = abonos.get(key);
+                    //value es igual a: tipo + " " + monto + " " + caja + " " + persona
                     String[] split_value = value.split(" ");
                     int monto_tempo = Integer.parseInt(split_value[1]);
                     balance_general_abonos = balance_general_abonos + monto_tempo;
@@ -277,17 +288,27 @@ public class CierreActivity extends AppCompatActivity {
                     String value = bancas.get(key);
                     String[] split_value = value.split(" ");
                     int valor_monto = Integer.parseInt(split_value[1]);
+                    Log.v("generar_cierre6", "Cierre.\n\nsplit_value.lenght: " + split_value.length + "\n\nvalue: " + value + "\n\n.");
+                    String persona = split_value[3];
                     String pre_mensaje = "";
-                    if (valor_monto < 0) {
-                        pre_mensaje = "Se entrega a banca:";
-                        valor_monto = valor_monto * -1;
-                        balance_general_banca_recibe = balance_general_banca_recibe + valor_monto;
+                    if (persona.equals("banca")) {
+                        if (valor_monto < 0) {
+                            pre_mensaje = "Se entrega a banca:";
+                            valor_monto = valor_monto * -1;
+                            balance_general_banca_recibe = balance_general_banca_recibe + valor_monto;
+                        } else {
+                            pre_mensaje = "Se recibe de banca:";
+                            balance_general_banca_entrega = balance_general_banca_entrega + valor_monto;
+                        }
+                        contenido_cierre = contenido_cierre + pre_mensaje + ":\nMonto: " +
+                                String.valueOf(valor_monto) + " colones.\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
                     } else {
-                        pre_mensaje = "Se recibe de banca:";
+                        persona = persona.replace("_", " ");
+                        pre_mensaje = "Se utilizan " + (-1 * valor_monto) + " colones\nde los fondos de caja para\ncubrir gastos de ruta.\n\nNotas:\n"
+                                + persona + "\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
+                        contenido_cierre = contenido_cierre + pre_mensaje;
                         balance_general_banca_entrega = balance_general_banca_entrega + valor_monto;
                     }
-                    contenido_cierre = contenido_cierre + pre_mensaje + ":\nMonto: " +
-                            String.valueOf(valor_monto) + " colones.\n\n*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#\n\n";
                 }
             }
             contenido_cierre = contenido_cierre + "\nFirma cobrador:\n\n__________________\nNombre: " + apodo_cobrador + ".\n\n" +

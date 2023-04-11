@@ -44,17 +44,21 @@ public class GastosActivity extends AppCompatActivity {
     private String cliente_recibido = "";
     private String caja = "caja.txt";
     private TextView tv_caja;
-    private String credit_ID = "banca";
+    private String credit_ID = "ruta";
     private Date hoy_LD = Calendar.getInstance().getTime();
+    private EditText et_notasGastos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_banca);
+        setContentView(R.layout.activity_gastos);
         String mensaje_recibido = getIntent().getStringExtra( "msg");
         if (!mensaje_recibido.equals("")) {
             Toast.makeText(this, mensaje_recibido, Toast.LENGTH_LONG).show();
         }
+        et_notasGastos = (EditText) findViewById(R.id.et_notasGastos);
+        et_notasGastos.setText("");
+        //et_notasGastos.setVisibility(View.INVISIBLE);
         TextView tv_abonar = (TextView) findViewById(R.id.tv_abonar);
         String string = "Registrar gasto de ruta";
         tv_abonar.setText(string);
@@ -125,7 +129,7 @@ public class GastosActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        actualizar_cierre(monto_caja_mostrar, obtener_caja(), credit_ID);
+        actualizar_cierre(monto_caja_mostrar, obtener_caja());
         contenido = "";
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput("cajax_caja_.txt"));
@@ -162,14 +166,18 @@ public class GastosActivity extends AppCompatActivity {
         System.exit(0);
     }
 
-    private void actualizar_cierre (Integer monto_abono, Integer saldo_caja, String credit_ID) {
-        String linea_cierre = "banca " + String.valueOf(monto_abono) + " " + saldo_caja + " " + credit_ID;
+    private void actualizar_cierre (Integer monto_abono, Integer saldo_caja) {
+        String notas = et_notasGastos.getText().toString();
+        notas = notas.replace("\n", "");
+        notas = notas.replace(" ", "_");
+        Log.v("actualizar_cierre_0", "Gastos.\n\nNotas: " + notas + "\n\n.");
+        String linea_cierre = "banca " + String.valueOf(monto_abono) + " " + saldo_caja + " " + notas;
         new AgregarLinea(linea_cierre, "cierre.txt", getApplicationContext());
-        String lineaCierre = "banca_separador_" + String.valueOf(monto_abono) + "_separador_" + saldo_caja + "_separador_" + credit_ID;
+        String lineaCierre = "banca_separador_" + String.valueOf(monto_abono) + "_separador_" + saldo_caja + "_separador_" + notas;
         new AgregarLinea(lineaCierre, "cierre_cierre_.txt", getApplicationContext(), "cierre");
     }
 
-    private Integer obtener_caja() {
+    private Integer obtener_caja () {
         int monto_caja = 0;
         try {
             InputStreamReader archivo = new InputStreamReader(openFileInput(caja));
@@ -188,7 +196,21 @@ public class GastosActivity extends AppCompatActivity {
     public void abonar (View view) throws IOException {
         bt_entregar.setClickable(false);
         bt_entregar.setEnabled(false);
-        actualizar_disponible("restar");
+        String notas = et_notasGastos.getText().toString();
+        if (notas.isEmpty()) {
+            bt_entregar.setEnabled(true);
+            bt_entregar.setClickable(true);
+            et_notasGastos.setError("Digite las notas del gasto...");
+            et_notasGastos.requestFocus();
+        } else if (notas.length() > 30) {
+            bt_entregar.setEnabled(true);
+            bt_entregar.setClickable(true);
+            et_notasGastos.setError("Maximo 30 caracteres...");
+            et_notasGastos.setText("");
+            et_notasGastos.requestFocus();
+        } else {
+            actualizar_disponible("restar");
+        }
     }
 
     public void recibir (View view) {

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BancaActivity">
+
+    <TextView
+        android:id="@+id/tv_esperar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/abonar_recibir"
+        app:layout_constraintBottom_toTopOf="@+id/et_ID"
+        app:layout_constraintStart_toStartOf="@+id/et_ID" />
+
+    <EditText
+        android:id="@+id/et_ID"
+        android:layout_width="305dp"
+        android:layout_height="48dp"
+        android:hint="@string/monto..."
+        android:inputType="number"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.204" />
+
+    <Button
+        android:id="@+id/bt_recibir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="recibir"
+        android:text="@string/recibir"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.166"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_ID"
+        app:layout_constraintVertical_bias="0.334" />
+
+    <Button
+        android:id="@+id/bt_entregar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="abonar"
+        android:text="@string/abonar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.831"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_ID"
+        app:layout_constraintVertical_bias="0.334" />
+
+    <TextView
+        android:id="@+id/tv_saludo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_abonar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/abonar_fondos"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/bt_entregar"
+        app:layout_constraintStart_toStartOf="@+id/bt_entregar" />
+
+    <TextView
+        android:id="@+id/tv_recibir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/recibir_fondos"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/bt_recibir"
+        app:layout_constraintStart_toStartOf="@+id/bt_recibir" />
+
+    <TextView
+        android:id="@+id/tv_caja"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/et_notasGastos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/et_gastos"
+        app:layout_constraintBottom_toTopOf="@+id/tv_abonar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_ID"
+        app:layout_constraintVertical_bias="0.481" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
