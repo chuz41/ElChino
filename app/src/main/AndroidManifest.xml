@@ -3,14 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="false"
@@ -24,6 +25,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ElChino"
         tools:targetApi="31">
+        <activity
+            android:name=".MesesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".QuincenasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Pagan_hoy"
+            android:exported="false" />
+        <activity
+            android:name=".MorososActivity"
+            android:exported="false" />
         <activity
             android:name=".CierreActivity"
             android:exported="false">
@@ -85,7 +98,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".Util.SubirArchivo"/>
+        <service android:name=".Util.SubirArchivo" />
     </application>
 
 </manifest>

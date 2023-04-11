@@ -82,5 +82,14 @@
     <string name="adelantarIntereses">Adelantar intereses</string>
     <string name="saludo_estado"> Estado del cliente</string>
     <string name="gastos_banca">GASTOS/VIATICOS</string>
+    <string name="whatsapp">Compartir - Imprimir</string>
+    <string name="btMorosos">VER MOROSOS</string>
+    <string name="morosos">SIN CLIENTES MOROSOS...</string>
+    <string name="cobrosHoy">PAGAN HOY</string>
+    <string name="sinmorosos">Sin cobros para hoy...</string>
+    <string name="btRepQuincenal">QUINCENAS</string>
+    <string name="btRepMensual">MESES</string>
+    <string name="sinclientesquincenales">Sin clientes quincenales...</string>
+    <string name="sinclientesmensuales">Sin clientes mensuales...</string>
 
 </resources>

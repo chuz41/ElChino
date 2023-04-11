@@ -3,8 +3,21 @@ package com.example.elchino;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -23,8 +36,12 @@ import com.example.elchino.Util.DateUtilities;
 import com.example.elchino.Util.SepararFechaYhora;
 import org.json.JSONException;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,6 +54,8 @@ import java.util.regex.Pattern;
 public class CuadraturaActivity extends AppCompatActivity {
 
     private String abonar = "";
+    private Button whatsapp;
+    private TextView tvWhatsApp;
     private Integer intereses_monroe = 0;
     private String imprimir_intermedio = "";
     private Button bt_imprimir;
@@ -89,9 +108,11 @@ public class CuadraturaActivity extends AppCompatActivity {
     private String mensaje_imprimir_pre = "";
     private String cobrador_s = "";
     private String telefono_s = "";
+    private String telefono = "";
     private Date hoy_LD;
     private String fecha_hoy_string;
     private String nombreCliente;
+    private final String stringHola = "Hola mundo!";
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +120,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cuadratura);
         String mensaje_recibido = getIntent().getStringExtra( "msg");
         abonar = getIntent().getStringExtra("abonar");
+        telefono = getIntent().getStringExtra("telefono");
         cuadratura = getIntent().getStringExtra( "cuadratura");
         nombreCliente = getIntent().getStringExtra("nombreCliente");
         String cambio = getIntent().getStringExtra("cambio");
@@ -108,6 +130,10 @@ public class CuadraturaActivity extends AppCompatActivity {
         TextView tv_cambio = findViewById(R.id.tv_cambio);
         bt_imprimir = findViewById(R.id.bt_imprimir);
         bt_imprimir.setVisibility(View.INVISIBLE);
+        whatsapp = findViewById(R.id.whatsapp);
+        whatsapp.setVisibility(View.INVISIBLE);
+        tvWhatsApp = findViewById(R.id.tvWhatsApp);
+        tvWhatsApp.setVisibility(View.INVISIBLE);
         tv_cambio.setVisibility(View.INVISIBLE);
         int cambio_int = Integer.parseInt(cambio);
         if (cambio_int > 0) {
@@ -239,6 +265,197 @@ public class CuadraturaActivity extends AppCompatActivity {
             text_listener();
         }
     }
+
+    //Send an image to a phone number trhow whatsapp.
+    public void sendImage () {
+        Intent sendIntent0 = new Intent();
+        sendIntent0.setAction(Intent.ACTION_VIEW);
+        String uri0 = "whatsapp://send?phone=" + telefono + "&text=" + "Hola " + nombreCliente;
+        sendIntent0.setData(Uri.parse(uri0));
+        try {
+            startActivity(sendIntent0);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "Whatsapp have not been installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void sendImage2 (String path) {
+
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+
+        sendIntent.setPackage("com.whatsapp");
+
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "Estado de cuenta.");
+        Log.v("sendImage_0", "Cuadratura.\n\nPath: " + path + "\n\n.");
+        //String uri = "whatsapp://send?phone=" + telefono + "&text=" + "Hola " + nombreCliente + ", te envio tu estado de cuenta.";
+        //String uri = "whatsapp://send?phone=" + telefono + "&png=" + path;
+        //sendIntent.setData(Uri.parse(uri));
+        Uri uri = Uri.parse(path);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        sendIntent.setType("image/*");
+
+        try {
+            startActivity(sendIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "Whatsapp have not been installed.", Toast.LENGTH_SHORT).show();
+        }
+
+
+        //sendIntent.setData(Uri.parse(uri));
+
+
+        /*sendIntent.putExtra(Intent.EXTRA_TEXT, "Hola " + nombreCliente + ", te envio tu estado de cuenta.");
+        sendIntent.putExtra("jid", telefono + "@s.whatsapp.net");
+        sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
+        sendIntent.setType("image/png");
+        sendIntent.setPackage("com.whatsapp");*/
+        //startActivity(sendIntent);
+    }
+
+    //Create an image that contains a text messege. The image is saved in the external storage and the path of the image is returned.
+    private void createImage () {
+        Resources resources = this.getApplicationContext().getResources();
+        float scale = resources.getDisplayMetrics().density;
+        String[] split_mensaje_imprimir = mensaje_imprimir.split("\n");
+        int longTiquet = split_mensaje_imprimir.length;
+        Bitmap bitmap = Bitmap.createBitmap((int) (150 * scale), (int) (longTiquet * 13 * scale), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        bitmap.eraseColor(Color.WHITE);
+        Paint paint = new Paint();
+        paint.setColor(Color.DKGRAY);
+        paint.setTextSize(24);
+        paint.setAntiAlias(true);
+        paint.setFakeBoldText(true);
+        Rect bounds = new Rect();
+        paint.getTextBounds(mensaje_imprimir, 0, mensaje_imprimir.length(), bounds);
+        int x = 10;
+        int y = 35;
+        for (int i = 0; i < split_mensaje_imprimir.length; i++) {
+            canvas.drawText(split_mensaje_imprimir[i], x, y, paint);
+            y += paint.descent() - paint.ascent();
+        }
+        String path = Environment.getExternalStorageDirectory().toString();
+        Toast.makeText(this, "Path: " + path, Toast.LENGTH_LONG).show();
+        path = path + "/Download/ElChino/";
+        OutputStream fOut = null;
+        Integer counter = 0;
+        File file = new File(path, "image" + counter.toString() + ".png");
+        file.getParentFile().mkdirs();
+        while (file.exists() && !file.isDirectory()) {
+            counter++;
+            file = new File(path, "image" + counter.toString() + ".png");
+        }
+        try {
+            file.createNewFile();
+            fOut = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 75, fOut);
+            bitmap.recycle();
+            fOut.flush();
+            fOut.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Toast.makeText(getApplicationContext(), "Path: " + path, Toast.LENGTH_LONG).show();
+        Log.v("whatsapp_0", "Cuadratura.\n\nfile Absolute Path:\n" + file.getAbsolutePath() + "\n\n.");
+        sendImage();
+
+        //Make a wait pause in the current thread
+
+        esperar(file.getAbsolutePath());
+
+
+    }
+
+    private void esperar (String path) {
+        ocultar_todito();
+        //Toast.makeText(this, "Cliente no posee creditos activos!", Toast.LENGTH_LONG).show();
+        //String string = "Cliente no posee creditos activos!";
+        //tv_esperar.setText(string);
+        for (int i = 0; i < 1; i++) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        sendImage2(path);
+    }
+
+
+
+   /* public void sendImage(String path) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "Hola");
+        sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + path));
+        sendIntent.setType("image/png");
+        sendIntent.setPackage("com.whatsapp");
+        //startActivity(sendIntent);
+    }
+
+    //Send a text messege to whatsapp.
+    public void sendText(String text) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, text);
+        sendIntent.setType("text/plain");
+        sendIntent.setPackage("com.whatsapp");
+        startActivity(sendIntent);
+    }
+
+    //Send a text messege to whatsapp.
+    public void sendText(String text, String number) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, text);
+        sendIntent.putExtra(Intent.EXTRA_PHONE_NUMBER, number);
+        sendIntent.setType("text/plain");
+        sendIntent.setPackage("com.whatsapp");
+        startActivity(sendIntent);
+    }*/
+
+    //create an image, put a text messege contained in a string into the image, save the image in the external storage and return the path of the image.
+    public void whatsapp(View view) {
+        createImage();
+        /*Resources resources = this.getApplicationContext().getResources();
+        float scale = resources.getDisplayMetrics().density;
+        Bitmap bitmap = Bitmap.createBitmap((int) (300 * scale), (int) (300 * scale), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        bitmap.eraseColor(Color.BLACK);
+        Paint paint = new Paint();
+        paint.setColor(Color.YELLOW);
+        paint.setTextSize(14 * scale);
+        paint.setAntiAlias(true);
+        paint.setFakeBoldText(true);
+        Rect bounds = new Rect();
+        paint.getTextBounds(stringHola, 0, stringHola.length(), bounds);
+        int x = (bitmap.getWidth() - bounds.width()) / 2;
+        int y = (bitmap.getHeight() + bounds.height()) / 2;
+        canvas.drawText(stringHola, x * scale, y * scale, paint);
+        String path = Environment.getExternalStorageDirectory().toString();
+        path = path + "/Download/ElChino/";
+        OutputStream fOut = null;
+        Integer counter = 0;
+        File file = new File(path, "image" + counter.toString() + ".jpg");
+        file.getParentFile().mkdirs();
+        while (file.exists() && !file.isDirectory()) {
+            counter++;
+            file = new File(path, "image" + counter.toString() + ".jpg");
+        }
+        try {
+            file.createNewFile();
+            fOut = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+            fOut.flush();
+            fOut.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.v("whatsapp_0", "Cuadratura.\n\nfile Absolute Path:\n" + file.getAbsolutePath() + "\n\n.");*/
+    }
+
+
+//Log.v("whatsapp_0", "Cuadratura.\n\nfile Absolute Path:\n" + file.getAbsolutePath() + "\n\n.");
 
     private void separarFecha () {
         SepararFechaYhora datosFecha = new SepararFechaYhora(hoy_LD);
@@ -775,6 +992,8 @@ public class CuadraturaActivity extends AppCompatActivity {
             Objects.requireNonNull(botones_tree.get(i)).setText(info_boton);
             Objects.requireNonNull(botones_tree.get(i)).setClickable(false);//TODO: Aqui se debe hacer un algoritmo que al tener monto pendiente, se pueda cancelar solo esa cuota.
             bt_imprimir.setVisibility(View.VISIBLE);
+            whatsapp.setVisibility(View.VISIBLE);
+            tvWhatsApp.setVisibility(View.VISIBLE);
         }
     }
 
@@ -1219,6 +1438,8 @@ public class CuadraturaActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         bt_imprimir.setVisibility(View.INVISIBLE);
+        whatsapp.setVisibility(View.INVISIBLE);
+        tvWhatsApp.setVisibility(View.INVISIBLE);
         boton_atras();
     }
 

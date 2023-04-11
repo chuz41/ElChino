@@ -48,6 +48,7 @@ public class Estado_clienteActivity extends AppCompatActivity {
     private String apellido2_cliente = "";
     private String apodo_cliente = "";
     private String archivo_cliente = "";
+    private String telefono = "";
     private Button bt_editar;
     private String mes;
     private String anio;
@@ -656,7 +657,9 @@ public class Estado_clienteActivity extends AppCompatActivity {
         cuadra_tura.putExtra("cuadratura", "null");
         cuadra_tura.putExtra("cliente_recivido", cliente_ID);
         obtenerNombreCliente();
+        obtenerPhoneCliente();
         cuadra_tura.putExtra("nombreCliente", nombre_cliente + " " + apellido1_cliente);
+        cuadra_tura.putExtra("telefono", telefono);
         Log.v("estado_cuenta_0", "Estado_cliente.\n\nCliente recibido: " + cliente_ID + "\n\n.");
         cuadra_tura.putExtra("cambio", "0");
         cuadra_tura.putExtra("monto_creditito", "0");
@@ -667,6 +670,29 @@ public class Estado_clienteActivity extends AppCompatActivity {
         System.exit(0);
     }
 
+    private void obtenerPhoneCliente () {
+        String nombreArchivo = cliente_ID + "_C_.txt";
+        if (archivo_existe(fileList(), nombreArchivo)) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput(nombreArchivo));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                while (linea != null) {
+                    String[] split = linea.split("_separador_");
+                    if (split[0].equals("telefono1_cliente")) {
+                        telefono = split[1];
+                        Log.v("obtenerPhoneCliente_0", "Estado_cliente.\n\nlinea:\n\n" + linea + "\n\ntelefono: " + telefono + "\n\n.");
+                    }
+                    linea = br.readLine();
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void obtenerNombreCliente () {
         String nombreArchivo = cliente_ID + "_C_.txt";
         if (archivo_existe(fileList(), nombreArchivo)) {
@@ -675,7 +701,7 @@ public class Estado_clienteActivity extends AppCompatActivity {
                 BufferedReader br = new BufferedReader(archivo);
                 String linea = br.readLine();
                 while (linea != null) {
-                    Log.v("Digite_cedula", ".\n\nlinea:\n\n" + linea + "\n\n.");
+                    Log.v("obtenerNombreCliente_0", "Estado_cliente.\n\nlinea:\n\n" + linea + "\n\n.");
                     String[] split = linea.split("_separador_");
                     if (split[0].equals("nombre_cliente")) {
                         nombre_cliente = split[1];

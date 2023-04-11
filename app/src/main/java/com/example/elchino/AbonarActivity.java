@@ -1,5 +1,6 @@
 package com.example.elchino;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import java.util.regex.Pattern;
 public class AbonarActivity extends AppCompatActivity {
 
     private Integer monto_abono = 0;
+    private String telefono = "";
     private Integer intereses_moratorios_hoy = 0;
     private CheckBox chb_adelantarIntereses;
     private Integer monto_a_pagar = 0;
@@ -67,29 +69,24 @@ public class AbonarActivity extends AppCompatActivity {
     private String anio;
     private Button bt_consultar;
     private String cliente_ID = "";
-    private TextView tv_saludo;
     private String monto_disponible = "0";
     private Boolean flag_client_reciv = false;
     private String cliente_recibido = "";
-    private String caja = "caja.txt";
+    private final String caja = "caja.txt";
     private String credit_ID = "";
-    private Integer cantidad_de_creditos = 0;
-    private String interes_mora = "1";
+    private final String interes_mora = "1";
     private String interes_mora_total = "0";
-    private String lista_archivos = "";
     private String proximo_abono = "";
     private String puntuacion_cliente = "";
     private String cuadratura = "";
     private TextView tv_caja;
     private String nombre_cliente = "";
     private String apellido_cliente = "";
-    private Button bt_cambiar_fecha;
     private Date hoy_LD;
     private String activity_volver;
     private Spinner sp_plazos;
     private String fecha_hoy_string;
     private Button bt_perdon;
-    private String solicitud_ID;
     private Integer monto_digitado = 0;
     private String textoTvEsperar = "";
     private String hintEt_ID = "";
@@ -97,6 +94,7 @@ public class AbonarActivity extends AppCompatActivity {
     private String archivoCredito;
     private Integer montoIngresado = 0;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,17 +117,19 @@ public class AbonarActivity extends AppCompatActivity {
         bt_consultar.setClickable(false);
         bt_consultar.setEnabled(false);
         activity_volver = getIntent().getStringExtra("activity_devolver");
-        tv_saludo = (TextView) findViewById(R.id.tv_saludo);
-        tv_saludo.setText("ABONO A CREDITO");
+        TextView tv_saludo = (TextView) findViewById(R.id.tv_saludo);
+        String string = "ABONO A CREDITO";
+        tv_saludo.setText(string);
         sp_plazos = (Spinner) findViewById(R.id.sp_plazos);
         sp_plazos.setVisibility(View.INVISIBLE);
         tv_caja = (TextView) findViewById(R.id.tv_caja);
-        tv_caja.setHint("Caja...");
-        bt_cambiar_fecha = (Button) findViewById(R.id.bt_cambiar_fecha);
+        string = "Caja...";
+        tv_caja.setHint(string);
+        Button bt_cambiar_fecha = (Button) findViewById(R.id.bt_cambiar_fecha);
         bt_cambiar_fecha.setVisibility(View.INVISIBLE);
         mostrar_caja();
         hoy_LD = Calendar.getInstance().getTime();
-        Log.v("OnCreate0", "Abonar.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
+        Log.v("OnCreate0", "Abonar.\n\nFecha hoy: " + hoy_LD + "\n\n.");
         fecha_hoy_string = DateUtilities.dateToString(hoy_LD);
         Log.v("OnCreate1", "Abonar.\n\nFecha hoy: " + fecha_hoy_string + "\n\n.");
         Log.v("OnCreate2", "Abonar.\n\nFecha hoy: " + hoy_LD.toString() + "\n\n.");
@@ -163,12 +163,15 @@ public class AbonarActivity extends AppCompatActivity {
             textoTvEsperar = tv_esperar.getText().toString();
             hintEt_ID = et_ID.getHint().toString();
             textEt_ID = et_ID.getText().toString();
-            tv_esperar.setText("Digite los intereses adelantados:");
+            String string = "Digite los intereses adelantados:";
+            tv_esperar.setText(string);
             et_ID.setText("");
             et_ID.setInputType(InputType.TYPE_CLASS_NUMBER);
-            et_ID.setHint("Monto adelanto intereses...");
+            string = "Monto adelanto intereses...";
+            et_ID.setHint(string);
             et_ID.requestFocus();
-            bt_perdon.setText("CONFIRMAR");
+            string = "CONFIRMAR";
+            bt_perdon.setText(string);
             bt_perdon.setClickable(true);
             bt_perdon.setEnabled(true);
         } else {
@@ -181,7 +184,8 @@ public class AbonarActivity extends AppCompatActivity {
             et_ID.setHint(hintEt_ID);
             et_ID.setText(textEt_ID);
             et_ID.requestFocus();
-            bt_perdon.setText("PERDONAR");
+            String string = "PERDONAR";
+            bt_perdon.setText(string);
             if (intereses_moratorios_hoy > 0) {
                 bt_perdon.setClickable(true);
                 bt_perdon.setEnabled(true);
@@ -205,12 +209,11 @@ public class AbonarActivity extends AppCompatActivity {
 
     private String obtener_cuotas_morosas (String cuadratura) throws ParseException {
         String[] split1 = cuadratura.split("__");
-        String fecha_next_abono_bkUp = fecha_hoy_string;
-        int length_split1 = split1.length;
+        String fecha_next_abono_bkUp;
         int cont = 0;
-        for (int i = 0; i < length_split1; i++) {
+        for (String s : split1) {
             fecha_next_abono_bkUp = fecha_hoy_string;
-            String[] split = split1[i].split("_");
+            String[] split = s.split("_");
             String fecha_cuadra_S = split[3];
             String[] split_fecha_cuadra_S = fecha_cuadra_S.split("/");
             fecha_cuadra_S = split_fecha_cuadra_S[2] + "-" + split_fecha_cuadra_S[1] + "-" + split_fecha_cuadra_S[0];
@@ -228,15 +231,14 @@ public class AbonarActivity extends AppCompatActivity {
             }
         }
         int cantidad_de_cuotas_pendientes = cont;
-        int c_d_c_p = (int) cantidad_de_cuotas_pendientes;
-        puntuacion_cliente = String.valueOf(Integer.parseInt(puntuacion_cliente) - c_d_c_p);
-        return String.valueOf(c_d_c_p);
+        puntuacion_cliente = String.valueOf(Integer.parseInt(puntuacion_cliente) - (int) cantidad_de_cuotas_pendientes);
+        return String.valueOf((int) cantidad_de_cuotas_pendientes);
     }
 
     private void llenar_spinner () {
         //Plazos y tasas: 5semanas (20%), 6semanas (20%), 9semanas (40%), 3quincenas (25%), 5quincenas (40%)
         String creditos = "Escoja el credito...___";
-        String archivos[] = fileList();
+        String[] archivos = fileList();
         Log.v("llenando_spinner0", ".\n\nCantidad de archivos: " + archivos.length + "\n\n.");
         if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
             Log.v("llenar_spinner_1", "********ERROR***************Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
@@ -365,7 +367,7 @@ public class AbonarActivity extends AppCompatActivity {
         Log.v("revisando_creditos_0", "Abonar.\n\nCliente_ID: " + cliente_ID + "\n\n.");
         boolean flasg = false;
         String flag = "";
-        lista_archivos = "";
+        String lista_archivos = "";
         String archivos[] = fileList();
         Log.v("revisando_creditos_1", ".\n\nAbonar. \n\nTotal de archivos: " + archivos.length + "\n\n.");
         if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
@@ -417,6 +419,7 @@ public class AbonarActivity extends AppCompatActivity {
             int spl_long = split.length;
             flag = String.valueOf(spl_long);
         }
+        Integer cantidad_de_creditos = 0;
         if (Integer.parseInt(flag) == 0) {
             cantidad_de_creditos = 0;
             esperar("Cliente no posee creditos activos!");
@@ -789,9 +792,34 @@ public class AbonarActivity extends AppCompatActivity {
         CuadraturaAc.putExtra("mensaje_imprimir_pre", mensaje_imprimir);
         CuadraturaAc.putExtra("nombreCliente", nombre_cliente + " " + apellido_cliente);
         CuadraturaAc.putExtra("abonar", "abonar" + " " + "abonar");
+        obtenerPhoneCliente();
+        CuadraturaAc.putExtra("telefono", telefono);
         startActivity(CuadraturaAc);
         finish();
         System.exit(0);
+    }
+
+    private void obtenerPhoneCliente () {
+        String nombreArchivo = cliente_ID + "_C_.txt";
+        if (archivo_existe(fileList(), nombreArchivo)) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput(nombreArchivo));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                while (linea != null) {
+                    String[] split = linea.split("_separador_");
+                    if (split[0].equals("telefono1_cliente")) {
+                        telefono = split[1];
+                        Log.v("obtenerPhoneCliente_0", "Nuevo_credito.\n\nlinea:\n\n" + linea + "\n\ntelefono: " + telefono + "\n\n.");
+                    }
+                    linea = br.readLine();
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void actualizar_archivo_cliente (String archivo_P) {
@@ -1054,7 +1082,7 @@ public class AbonarActivity extends AppCompatActivity {
                 }
             }
             ID_solic_final++;
-            solicitud_ID = cobrador_ID_S + "S" + String.valueOf(ID_solic_final);
+            String solicitud_ID = cobrador_ID_S + "S" + String.valueOf(ID_solic_final);
             long contador_name = ID_solic_final - 9000000;
             int contador_name_I = (int) contador_name;
             String file = cobrador_ID_S + "_S_" + String.valueOf(contador_name_I) + "_S_.txt";

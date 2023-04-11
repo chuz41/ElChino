@@ -66,6 +66,7 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
     private Integer fecha_selected = 0;
     private boolean flag_fecha = false;
     private Date hoy_LD = new Date();
+    private String telefono = "";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -646,28 +647,29 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         String flag;
         StringBuilder lista_archivos = new StringBuilder();
         String[] archivos = fileList();
-        if (cliente_ID.contains("*") || cliente_ID.contains(" ")) {
-            Log.v("llenar_spinner0.1", "Abonar.\n\nClienteID: " + cliente_ID + "\n\n");
-        } else {
-            for (String archivo : archivos) {
-                Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
-                Matcher matcher = pattern.matcher(archivo);
-                boolean matchFound = matcher.find();
-                if (matchFound) {
-                    lista_archivos.append(archivo).append("_sep_");
-                }
+        cliente_ID.replace("*", "");
+        cliente_ID.replace(" ", "");
+        for (String archivo : archivos) {
+            Pattern pattern = Pattern.compile(cliente_ID + "_P_", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(archivo);
+            boolean matchFound = matcher.find();
+            if (matchFound) {
+                lista_archivos.append(archivo).append("_sep_");
             }
         }
-        int end_id;
-        if (lista_archivos.toString().equals("")) {
-            flag = "1";
-        } else {
-            String[] split = lista_archivos.toString().split("_sep_");
-            int spl_long = split.length;
-            end_id = spl_long + 1;
-            flag = String.valueOf(end_id);
+
+        int cont = 1;
+        String nombreFile;
+        while (true) {
+            nombreFile = cliente_ID + "_P_" + String.valueOf(cont) + "_P_.txt";
+            if (archivo_existe(fileList(), nombreFile)) {
+                cont++;
+            } else {
+                break;
+            }
         }
-        flag = cliente_ID + "_P_" + flag + "_P_";
+
+        flag = cliente_ID + "_P_" + String.valueOf(cont) + "_P_";
         return flag;
     }
 
@@ -969,9 +971,34 @@ public class Nuevo_creditoActivity extends AppCompatActivity {
         CuadraturaAc.putExtra("activity_devolver", "MenuPrincipal");
         CuadraturaAc.putExtra("mensaje_imprimir_pre", "");
         CuadraturaAc.putExtra("nombreCliente", nombre_cliente + " " + apellido_cliente);
+        obtenerPhoneCliente();
+        CuadraturaAc.putExtra("telefono", telefono);
         startActivity(CuadraturaAc);
         finish();
         System.exit(0);
+    }
+
+    private void obtenerPhoneCliente () {
+        String nombreArchivo = cliente_ID + "_C_.txt";
+        if (archivo_existe(fileList(), nombreArchivo)) {
+            try {
+                InputStreamReader archivo = new InputStreamReader(openFileInput(nombreArchivo));
+                BufferedReader br = new BufferedReader(archivo);
+                String linea = br.readLine();
+                while (linea != null) {
+                    String[] split = linea.split("_separador_");
+                    if (split[0].equals("telefono1_cliente")) {
+                        telefono = split[1];
+                        Log.v("obtenerPhoneCliente_0", "Nuevo_credito.\n\nlinea:\n\n" + linea + "\n\ntelefono: " + telefono + "\n\n.");
+                    }
+                    linea = br.readLine();
+                }
+                br.close();
+                archivo.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void mostrar_caja () {

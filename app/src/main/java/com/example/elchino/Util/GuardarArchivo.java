@@ -38,7 +38,7 @@ public class GuardarArchivo {
                 ClientE.getTelefono1() + "\ntelefono2_cliente_separador_" + ClientE.getTelefono2() + "\nnotas_cliente_separador_" +
                 ClientE.getNotas() + "\ndireccion_cliente_separador_" + ClientE.getDireccion() + "\nmonto_disponible_separador_" +
                 ClientE.getMontoAprobado() + "\npuntuacion_cliente_separador_" + ClientE.getPuntuacion() + "\nestado_archivo_separador_" + Estado;
-        Log.v("guardarCliente_0", "GuardarArchivo.\n\nContenido:\n\n" + contenido + "\n\n.");
+        //Log.v("guardarCliente_0", "GuardarArchivo.\n\nContenido:\n\n" + contenido + "\n\n.");
         try {
             OutputStreamWriter archivo = new OutputStreamWriter(ContexT.getApplicationContext().openFileOutput(File, ContexT.getApplicationContext().MODE_PRIVATE));
             archivo.write(contenido);
@@ -51,7 +51,7 @@ public class GuardarArchivo {
     }
 
     public boolean guardarFile () throws IOException {
-        Log.v("guardarFile_0", "GuardarArchivo.\n\nContenido:\n\n" + Content + "\n\n.");
+        //Log.v("guardarFile_0", "GuardarArchivo.\n\nContenido:\n\n" + Content + "\n\n.");
         try {
             OutputStreamWriter archivo = new OutputStreamWriter(ContexT.getApplicationContext().openFileOutput(File, ContexT.getApplicationContext().MODE_PRIVATE));
             archivo.write(Content);
