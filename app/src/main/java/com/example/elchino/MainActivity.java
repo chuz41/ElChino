@@ -55,6 +55,7 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity {
     private String fecha;
     private final String cobrador = "a_sfile_cobrador_sfile_a.txt";
+    private final String subidos = "subidos";
     private EditText et_ID;
     private TextView tv_esperar;
     private final String spreadsheet_cobradores = "1y5wRGgrkH48EWgd2OWwon_Um42mxN94CdmJSi_XCwvM";
@@ -102,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         hoy_LD = Calendar.getInstance().getTime();
         separarFecha();
         contenidoCier = "fecha " + fecha + "\n";
-
 
         try {
             check_activation();
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);// Add the request to the RequestQueue.
     }
 
-    private void guardarClientes(String[] clientesArrary) {//Depende del formato Json para funcionar.
+    private void guardarClientes (String[] clientesArrary) {//Depende del formato Json para funcionar.
         int divisionesBarra = (clientesArrary.length);
         mostrarBarra("Guardando clientes...", divisionesBarra);
         progressBar.setProgress(0);
@@ -338,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
         //Log.v("bajarInfoCreditos_0", "Main.\n\nsheetLeer: " + sheetLeer + "\n\n.");
         if (keyToRemoveCierre != null) {
             sheetsLeidas.remove(keyToRemoveCierre);
+            bajarInfoCreditos();
         }
         // Formulate the request and handle the response.
         if (sheetLeer != null) {
@@ -511,8 +512,11 @@ public class MainActivity extends AppCompatActivity {
                         cliente = cliente.replace("]", "");
                         cliente = cliente.replace(",", "");
                         cliente = cliente.replace("{", "");
-                        contenidoCier = contenidoCier + tipo + " " + monto + " " + caja + " " + cliente + "\n";
-                        contenidoCier2 = contenidoCier2 + tipo + "_separador_" + monto + "_separador_" + caja + "_separador_" + cliente + "\n";
+                        String data = tipo + " " + monto + " " + caja + " " + cliente;
+                        if (!contenidoCier.contains(data)) {
+                            contenidoCier = contenidoCier + data + "\n";
+                            contenidoCier2 = contenidoCier2 + tipo + "_separador_" + monto + "_separador_" + caja + "_separador_" + cliente + "\n";
+                        }
                         //Log.v("llenarMapas_3", "Main.\n\nDatoCierre: " + datoCierre + "\nfecha: " + fecha + "\n\n.");
                     }
                 }
@@ -699,14 +703,7 @@ public class MainActivity extends AppCompatActivity {
         int fechaSavedInt = Integer.parseInt(fechaSavedComplete);
         int fechaNewInt = Integer.parseInt(fechaNewComplete);
         //Log.v("fechas_0", "Main.\n\nfechaSavedInt: " + fechaSavedInt + "\nfechaNewInt: " + fechaNewInt + "\n\n.");
-
         return fechaSavedInt - fechaNewInt;
-
-        /*if (fechaSavedInt < fechaNewInt) {
-            return true;
-        } else {
-            return false;
-        }*/
     }
 
     private String elejirAdelantoInteres (String s1, String s2, String key1, String key2) {
@@ -766,7 +763,7 @@ public class MainActivity extends AppCompatActivity {
         return key;
     }
 
-    private int saldo(String content, String cuadratura) {
+    private int saldo (String content, String cuadratura) {
         int monto = 0;
         if (content.contains(cuadratura)) {
             //Log.v("saldoERROR_0", "Main.\n\nERROR ERROR ERROR ERROR ERROR ERROR\n\nContent:\n\n" + content + "\n\n.");
@@ -1236,9 +1233,9 @@ public class MainActivity extends AppCompatActivity {
                     //Log.v("Check_activation_1", "Main.\n\nLinea: " + linea + "\n\nFecha: " + fecha + "\n\nsplit[1]: " + split[1] + "\n\nsplit[2]: " + split[2] + "\n\n.");
                     if (split[1].equals("TRUE") && split[2].equals(fecha)) {
                         Toast.makeText(getApplicationContext(), "Bienvenido " + nombre_cobra, Toast.LENGTH_LONG).show();
-                        menu_principal("Bienvenido " + nombre_cobra);
                         br.close();
                         archivo.close();
+                        menu_principal("Bienvenido " + nombre_cobra);
                         break;
                     } else if (split[1].equals("FALSE") && split[2].equals(fecha)) {
                         if (verificar_internet()) {
@@ -1601,7 +1598,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 
-    private boolean verificar_internet() {
+    private boolean verificar_internet () {
         ConnectivityManager cm = (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();

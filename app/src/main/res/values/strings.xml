@@ -92,5 +92,6 @@
     <string name="sinclientesquincenales">Sin clientes quincenales...</string>
     <string name="sinclientesmensuales">Sin clientes mensuales...</string>
     <string name="et_gastos">Notas...</string>
+    <string name="btActualizar">Actualizar</string>
 
 </resources>

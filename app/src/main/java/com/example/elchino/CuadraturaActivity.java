@@ -270,7 +270,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     public void sendImage () {
         Intent sendIntent0 = new Intent();
         sendIntent0.setAction(Intent.ACTION_VIEW);
-        String uri0 = "whatsapp://send?phone=" + telefono + "&text=" + "Hola " + nombreCliente;
+        String uri0 = "whatsapp://send?phone=" + telefono + "&text=" + "Hola " + nombreCliente + "\n\n" + mensaje_imprimir;
         sendIntent0.setData(Uri.parse(uri0));
         try {
             startActivity(sendIntent0);
@@ -293,7 +293,6 @@ public class CuadraturaActivity extends AppCompatActivity {
         Uri uri = Uri.parse(path);
         sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
         sendIntent.setType("image/*");
-
         try {
             startActivity(sendIntent);
         } catch (android.content.ActivityNotFoundException ex) {
