@@ -42,7 +42,9 @@ import com.example.elchino.Util.SepararFechaYhora;
 import com.example.elchino.Util.SubirArchivo;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -105,6 +107,7 @@ public class MenuPrincipal extends AppCompatActivity {
     private Boolean flagTrabajando = false;
     private Button btRepQuincenal;
     private Button btRepMensual;
+    private final String REFRESH = "refresh_refresh_.txt";
 
 
     @Override
@@ -227,7 +230,7 @@ public class MenuPrincipal extends AppCompatActivity {
     }
 
     private void getUserCode () {
-        String code = "";
+        //String code = "";
         check_activation_online();
     }
 
@@ -241,14 +244,14 @@ public class MenuPrincipal extends AppCompatActivity {
 
     public void check_activeUser () {
         String[] archivos = fileList();
-        boolean crear = true;
+        //boolean crear = true;
         for (String s : archivos) {
             Pattern pattern = Pattern.compile("a_sfile_cobrador_sfile_a", Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(s);
             boolean matchFound = matcher.find();
             if (matchFound) {
                 //Log.v("check_activation_0", "Main.\n\nArchivo encontrado: " + s + "\n\nContenido del archivo:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
-                crear = false;
+                //crear = false;
                 try {
                     InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
                     BufferedReader br = new BufferedReader(archivo);
@@ -466,12 +469,37 @@ public class MenuPrincipal extends AppCompatActivity {
         contSheets = splitsheetName.length;
         contSheets = contSheets * 2;
         contadorBarra = 0;
+        String refresh = "";
         mostrarBarra("Descargando creditos...", contSheets);
+        //Leer archivo refresh_refresh_.txt y guardar su contenido en una variable string.
+        try {
+            InputStream inputStream = getApplicationContext().openFileInput(REFRESH);
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+                inputStream.close();
+                bufferedReader.close();
+                refresh = stringBuilder.toString();
+            }
+        } catch (FileNotFoundException e) {
+            Log.e("guardarCreditos_0", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("guardarCreditos_0", "Can not read file: " + e.toString());
+        }
+        Log.v("guardarCreditos_0", "Main.\n\nrefresh: " + refresh + "\n\n.");
         for (String sheets : splitsheetName) {
             //Log.v("guardarCreditos_1", "Main.\n\nsheets: " + sheets + "\n\n.");
             if (!sheets.equals("solicitudes")) {
                 if (!sheetsLeidas.containsKey(sheets)) {
-                    sheetsLeidas.put(sheets, sheets);
+                    if (!refresh.contains(sheets)) {
+                        sheetsLeidas.put(sheets, sheets);
+                        new AgregarLinea(sheets, REFRESH, this.getApplicationContext());
+                    }
                 }
             }
         }
@@ -1179,7 +1207,7 @@ public class MenuPrincipal extends AppCompatActivity {
         RequestQueue requestQueue;
 
         // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+        Cache cache = new DiskBasedCache(getCacheDir(), 256 * 256); // 1MB cap
 
         // Set up the network to use HttpURLConnection as the HTTP client.
         BasicNetwork network = new BasicNetwork(new HurlStack());
@@ -1203,7 +1231,7 @@ public class MenuPrincipal extends AppCompatActivity {
                             //cargarData();
                         } else {
                             String[] split = response.split("ID_cliente");
-                            int progresoMedio = ((split.length) / 2);
+                            //int progresoMedio = ((split.length) / 2);
                             guardarClientes(split);
                             //progressBar.setProgress(progresoMedio);
                         }

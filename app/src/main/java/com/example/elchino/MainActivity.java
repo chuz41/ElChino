@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private String contenidoCier;
     private String contenidoCier2 = "";
     private Boolean flagTrabajando = false;
+    private final String REFRESH = "refresh_refresh_.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -294,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
         data = data.replace("\"", "");
         data = data.replace("[", "");
         data = data.replace("]", "");
-        //Log.v("guardarCreditos_0", "Main.\n\nResponse: " + data + "\n\n.");
+        Log.v("guardarCreditos_0", "Main.\n\nResponse: " + data + "\n\n.");
         //Response: creditos,Wed-Feb-08-2023-abonos,Wed-Feb-08-2023-creditos,Fri-Nov-25-2022-creditos,Fri-Nov-25-2022-abonos,solicitudes,abonos,caja
         String[] splitsheetName = data.split(",");
         contSheets = splitsheetName.length;
@@ -305,11 +306,34 @@ public class MainActivity extends AppCompatActivity {
 
             if (!sheets.equals("solicitudes")) {
                 if (!sheetsLeidas.containsKey(sheets)) {
-                    Log.v("guardarCreditos_1", "Main.\n\nsheets: " + sheets + "\n\n.");
+                    //Log.v("guardarCreditos_1", "Main.\n\nsheets: " + sheets + "\n\n.");
                     sheetsLeidas.put(sheets, sheets);
                 }
             }
         }
+        refreshData();
+    }
+
+    //crear metodo refreshData() que guarde en el archivo "refresh_refresh_.txt" las sheets que se encuentran en el map sheetsLeidas pero excluyendo las que contengan en el nombre la expresion "-cierre" y excluyendo tambien a las que su nombre sea igual a "caja" o a "abonos" o a "creditos" o a "cierre". Ademas, al finalizar dicha operacion debe llamar a llenarMapas("first");.
+    private void refreshData () {
+        String data = "";
+        for (String key : sheetsLeidas.keySet()) {
+            if (!key.contains("-cierre")) {
+                if (!key.equals("caja") && !key.equals("abonos") && !key.equals("creditos") && !key.equals("cierre")) {
+                    data = data + key + "\n";
+                }
+            }
+        }
+        data = data.substring(0, data.length() - 1);
+        Log.v("refreshData_0", "Main.\n\ndata:\n" + data + "\n\n.");
+        try {
+
+            new GuardarArchivo(REFRESH, data, getApplicationContext()).guardarFile();
+
+        } catch (Exception e) {
+            Log.v("refreshData_1", "Main.\n\nException: " + e + "\n\n.");
+        }
+        Log.v("refreshData_2", "Main.\n\nArchivo REFRESH:\n\n" + imprimirArchivo(REFRESH) + "\n\n.");
         llenarMapas("first");
     }
 
@@ -340,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
                 //break;
             }
         }
-        Log.v("bajarInfoCreditos_0", "Main.\n\nsheetLeer: " + sheetLeer + "\n\nkeyToRemoveCierre: " + keyToRemoveCierre + "\n\n.");
+        //Log.v("bajarInfoCreditos_0", "Main.\n\nsheetLeer: " + sheetLeer + "\n\nkeyToRemoveCierre: " + keyToRemoveCierre + "\n\n.");
         if (keyToRemoveCierre != null) {
             sheetsLeidas.remove(keyToRemoveCierre);
             //bajarInfoCreditos();
@@ -353,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
                     response -> {
                         if (response != null) {
                             //("bajarInfoCreditos_1", "Main.\n\nurl: " + url + "\n\n.");
-                            Log.v("bajarInfoCreditos_2", "Main.\n\nresponse:\n\n" + response + "\n\n.");
+                            //Log.v("bajarInfoCreditos_2", "Main.\n\nresponse:\n\n" + response + "\n\n.");
                             if (response.contains("DOCTYPE")) {
                                 //Log.v("bajarInfoCreditos_3", "Main.\n\nDOCTYPE ERROR DOCTYPE ERROR DOCTYPE\n\nresponse:\n\n" + response + "\n\n.");
                                 esperar2(1, "bajarInfoCreditos");
@@ -614,7 +638,7 @@ public class MainActivity extends AppCompatActivity {
                             flagBorrar = true;
                             break;
                         } else {
-                            Log.v("DebugCrearArch_0", "Main.\n\nfileContent:\n\n" + fileContent + "\n\nCuadratura: " + cuadratura + "\n\nfleContenido:\n\n" + fileContenido + "\n\ncuadraturA:" + "\n\n" + cuadratura + "\n\n.");
+                            //Log.v("DebugCrearArch_0", "Main.\n\nfileContent:\n\n" + fileContent + "\n\nCuadratura: " + cuadratura + "\n\nfleContenido:\n\n" + fileContenido + "\n\ncuadraturA:" + "\n\n" + cuadratura + "\n\n.");
                             if (saldo(fileContent, cuadratura) > saldo(fileContenido, cuadraturA)) {
                                 //Se borra key1.
                                 keyBorrar = key1;
@@ -851,10 +875,12 @@ public class MainActivity extends AppCompatActivity {
             progressBar.setProgress(contadorBarra);
             try {
                 new GuardarArchivo(key, archivosGuardar.get(key), getApplicationContext()).guardarFile();
+                String linea = archivosGuardar.get(key);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+        //Log.v("concretarGuardado_1", imprimirArchivo(REFRESH));
         //Log.v("concretarGuardado_0", "Main.\n\nSe han guardado " + archivosGuardar.size() + " creditos.\n\n.");
         menu_principal("Caja inicial: " + String.valueOf(cajita));
     }
@@ -973,7 +999,7 @@ public class MainActivity extends AppCompatActivity {
         contenido = "";
         String[] archivos = fileList();
         if (archivo_existe(archivos, "cajax_caja_.txt")) {
-            //Log.v("actualizarCaja_1", "Main.\n\nfile: " + "cajax_caja_.txt" + "\n\ncontenido del archivo:\n\n" + imprimir_archivo("cajax_caja_.txt") + "\n\n.");
+            //Log.v("actualizarCaja_1", "Main.\n\nfile: " + "cajax_caja_.txt" + "\n\ncontenido del archivo:\n\n" + imprimirArchivo("cajax_caja_.txt") + "\n\n.");
             try {
                 InputStreamReader archivo = new InputStreamReader(openFileInput("cajax_caja_.txt"));
                 BufferedReader br = new BufferedReader(archivo);
@@ -996,34 +1022,13 @@ public class MainActivity extends AppCompatActivity {
             new CrearArchivo("cajax_caja_.txt", getApplicationContext());
             new AgregarLinea("caja_separador_" + String.valueOf(monto_nuevo), "cajax_caja_.txt", getApplicationContext());
             new AgregarLinea("estado_archivo_separador_arriba", "cajax_caja_.txt", getApplicationContext());
-            //Log.v("actualizarCaja_3", "Main.\n\ncontenido de cajax_caja_.txt:\n\n" + imprimir_archivo("cajax_caja_.txt") + "\n\n.");
+            //Log.v("actualizarCaja_3", "Main.\n\ncontenido de cajax_caja_.txt:\n\n" + imprimirArchivo("cajax_caja_.txt") + "\n\n.");
             flagCajaxNoCreada = true;
         }
         if (!flagCajaxNoCreada) {
             new BorrarArchivo("cajax_caja_.txt", getApplicationContext());
             new GuardarArchivo("cajax_caja_.txt", contenido, getApplicationContext()).guardarFile();
         }
-    }
-
-    private String imprimir_archivo (String file_name){
-        String archivos[] = fileList();
-        String contenido = "";//Aqui se lee el contenido del archivo guardado.
-        if (archivo_existe(archivos, file_name)) {//Archivo nombre_archivo es el archivo que vamos a imprimir
-            try {
-                InputStreamReader archivo = new InputStreamReader(openFileInput(file_name));//Se abre archivo
-                BufferedReader br = new BufferedReader(archivo);
-                String linea = br.readLine();//Se lee archivo
-                while (linea != null) {
-                    contenido = contenido + linea + "\n";
-                    linea = br.readLine();
-                }
-                br.close();
-                archivo.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return contenido;
     }
 
     private void guardar_datos_cobrador () {
@@ -1046,7 +1051,7 @@ public class MainActivity extends AppCompatActivity {
             archivo.close();
             new BorrarArchivo(cobrador, getApplicationContext());
             new GuardarArchivo(cobrador, archivo_completo.toString(), getApplicationContext()).guardarFile();
-            //Log.v("guard_dat_cobr_0", "Main.\n\narchivo cobrador: " + cobrador + "\n\nContenido del archivo:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
+            //Log.v("guard_dat_cobr_0", "Main.\n\narchivo cobrador: " + cobrador + "\n\nContenido del archivo:\n\n" + imprimirArchivo(cobrador) + "\n\n.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1255,7 +1260,7 @@ public class MainActivity extends AppCompatActivity {
             Matcher matcher = pattern.matcher(s);
             boolean matchFound = matcher.find();
             if (matchFound) {
-                //Log.v("check_activation_0", "Main.\n\nArchivo encontrado: " + s + "\n\nContenido del archivo:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
+                //Log.v("check_activation_0", "Main.\n\nArchivo encontrado: " + s + "\n\nContenido del archivo:\n\n" + imprimirArchivo(cobrador) + "\n\n.");
                 crear = false;
                 try {
                     InputStreamReader archivo = new InputStreamReader(openFileInput(cobrador));
@@ -1356,7 +1361,7 @@ public class MainActivity extends AppCompatActivity {
                                         spreadsheet_creditos = split2[14];
                                         new BorrarArchivo(cobrador, getApplicationContext());
                                         new GuardarArchivo(cobrador, contenido, getApplicationContext()).guardarFile();
-                                        //Log.v("check_activ_online3", ".Main\n\nArchivo cobrador.txt:\n\n" + imprimir_archivo(cobrador) + "\n\n.");
+                                        //Log.v("check_activ_online3", ".Main\n\nArchivo cobrador.txt:\n\n" + imprimirArchivo(cobrador) + "\n\n.");
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }//Continua trabajando con la app.
