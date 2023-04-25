@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/registrarCLIENTE"
+        android:title="Registrar cliente nuevo" />
+    <item
+        android:id="@+id/estadoCLIENTE"
+        android:title="Estado del cliente" />
+    <item
+        android:id="@+id/verMOROSOS"
+        android:title="Ver morosos" />
+    <item
+        android:id="@+id/paganHOY"
+        android:title="Pagan HOY" />
+    <item
+        android:id="@+id/verQUINCENAS"
+        android:title="Pagos quincenales" />
+    <item
+        android:id="@+id/verMESES"
+        android:title="Pagos mensuales" />
+</menu>

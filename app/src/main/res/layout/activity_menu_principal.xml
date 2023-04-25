@@ -67,32 +67,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btRepQuincenal" />
-
-    <Button
-        android:id="@+id/bt_nuevo_cliente"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="registrar_cliente_nuevo"
-        android:text="@string/bt_registrar"
-        app:layout_constraintBottom_toTopOf="@+id/bt_gastos"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.136" />
-
-    <Button
-        android:id="@+id/bt_estado_cliente"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="estado_cliente"
-        android:text="@string/bt_estado"
-        app:layout_constraintBottom_toTopOf="@+id/bt_banca"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_nuevo_cliente"
-        app:layout_constraintVertical_bias="0.108" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_saludoMenu"
+        app:layout_constraintVertical_bias="0.931" />
 
     <TextView
         android:id="@+id/tv_caja"
@@ -144,57 +120,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_saludoMenu"
         app:layout_constraintVertical_bias="0.896" />
-
-    <Button
-        android:id="@+id/btMorosos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="morosos"
-        android:text="@string/btMorosos"
-        app:layout_constraintBottom_toTopOf="@+id/bt_banca"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.215"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bt_estado_cliente"
-        app:layout_constraintVertical_bias="0.183" />
-
-    <Button
-        android:id="@+id/btPaganHoy"
-        android:layout_width="124dp"
-        android:layout_height="48dp"
-        android:onClick="paganHoy"
-        android:text="@string/cobrosHoy"
-        app:layout_constraintBottom_toBottomOf="@+id/btMorosos"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
-        app:layout_constraintStart_toEndOf="@+id/btMorosos"
-        app:layout_constraintTop_toTopOf="@+id/btMorosos" />
-
-    <Button
-        android:id="@+id/btRepQuincenal"
-        android:layout_width="144dp"
-        android:layout_height="47dp"
-        android:onClick="quincenas"
-        android:text="@string/btRepQuincenal"
-        app:layout_constraintBottom_toTopOf="@+id/bt_banca"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.209"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btMorosos"
-        app:layout_constraintVertical_bias="0.228" />
-
-    <Button
-        android:id="@+id/btRepMensual"
-        android:layout_width="124dp"
-        android:layout_height="51dp"
-        android:onClick="meses"
-        android:text="@string/btRepMensual"
-        app:layout_constraintBottom_toTopOf="@+id/bt_banca"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.846"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btPaganHoy"
-        app:layout_constraintVertical_bias="0.233" />
 
     <Button
         android:id="@+id/btActualizar"

@@ -12,6 +12,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -79,12 +82,8 @@ public class MenuPrincipal extends AppCompatActivity {
     private boolean isSendSmsPermissionGranted = false;
     //private ProgressBar progressBar;
     //private TextView tvProgressBar;
-    private Button bt_nuevo_cliente;
-    private Button bt_estado_cliente;
     private Button bt_cierre;
     private Button bt_gastos;
-    private Button btMorosos;
-    private Button btPaganHoy;
     private Button bt_banca;
     private TextView tv_saludo;
     private TextView tv_fecha;
@@ -105,8 +104,6 @@ public class MenuPrincipal extends AppCompatActivity {
     private String nombre_cobra = "";
     private Integer cajita = 0;
     private Boolean flagTrabajando = false;
-    private Button btRepQuincenal;
-    private Button btRepMensual;
     private final String REFRESH = "refresh_refresh_.txt";
     private final String globalVar = "globalVar_globalVar_.txt";
 
@@ -129,12 +126,8 @@ public class MenuPrincipal extends AppCompatActivity {
         amarillo.setVisibility(View.INVISIBLE);
         verde.setVisibility(View.INVISIBLE);
         rojo.setVisibility(View.INVISIBLE);
-        bt_nuevo_cliente = (Button) findViewById(R.id.bt_nuevo_cliente);
-        bt_estado_cliente = (Button) findViewById(R.id.bt_estado_cliente);
         bt_cierre = (Button) findViewById(R.id.bt_cierre);
         bt_gastos = (Button) findViewById(R.id.bt_gastos);
-        btMorosos = (Button) findViewById(R.id.btMorosos);
-        btPaganHoy = (Button) findViewById(R.id.btPaganHoy);
         //private Button bt_refinanciar;
         //private Button bt_nuevo_credito;
         bt_banca = (Button) findViewById(R.id.bt_banca);
@@ -211,6 +204,49 @@ public class MenuPrincipal extends AppCompatActivity {
             }
         });
         requestPermissions();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.registrarCLIENTE:
+                // Acción al seleccionar la opción 1
+                registrar_cliente_nuevo();
+                return true;
+            case R.id.estadoCLIENTE:
+                // Acción al seleccionar la opción 2
+                estado_cliente();
+                return true;
+            case R.id.verMOROSOS:
+                // Acción al seleccionar la opción 3
+                morosos();
+                return true;
+            case R.id.paganHOY:
+                // Acción al seleccionar la opción 3
+                paganHoy();
+                return true;
+            case R.id.verQUINCENAS:
+                // Acción al seleccionar la opción 3
+                quincenas();
+                return true;
+            case R.id.verMESES:
+                // Acción al seleccionar la opción 3
+                meses();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void menuPrincipalDesp (View view) {
+
     }
 
     private void check_activation_online () {//codigo corresponde al ID del cobrador.
@@ -309,12 +345,8 @@ public class MenuPrincipal extends AppCompatActivity {
         amarillo.setVisibility(View.INVISIBLE);
         verde.setVisibility(View.INVISIBLE);
         rojo.setVisibility(View.INVISIBLE);
-        bt_nuevo_cliente.setVisibility(View.INVISIBLE);
-        bt_estado_cliente.setVisibility(View.INVISIBLE);
         bt_cierre.setVisibility(View.INVISIBLE);
         bt_gastos.setVisibility(View.INVISIBLE);
-        btMorosos.setVisibility(View.INVISIBLE);
-        btPaganHoy.setVisibility(View.INVISIBLE);
         bt_banca.setVisibility(View.INVISIBLE);
         tv_caja.setVisibility(View.INVISIBLE);
         //tv_saludo.setVisibility(View.INVISIBLE);
@@ -332,12 +364,8 @@ public class MenuPrincipal extends AppCompatActivity {
         amarillo.setVisibility(View.VISIBLE);
         verde.setVisibility(View.VISIBLE);
         rojo.setVisibility(View.VISIBLE);
-        bt_nuevo_cliente.setVisibility(View.VISIBLE);
-        bt_estado_cliente.setVisibility(View.VISIBLE);
         bt_cierre.setVisibility(View.VISIBLE);
         bt_gastos.setVisibility(View.VISIBLE);
-        btMorosos.setVisibility(View.VISIBLE);
-        btPaganHoy.setVisibility(View.VISIBLE);
         bt_banca.setVisibility(View.VISIBLE);
         tv_caja.setVisibility(View.VISIBLE);
         //tv_saludo.setVisibility(View.VISIBLE);
@@ -492,6 +520,7 @@ public class MenuPrincipal extends AppCompatActivity {
                 StringBuilder stringBuilder = new StringBuilder();
                 while ( (receiveString = bufferedReader.readLine()) != null ) {
                     stringBuilder.append(receiveString);
+                    stringBuilder.append("\n");
                 }
                 inputStream.close();
                 bufferedReader.close();
@@ -500,16 +529,24 @@ public class MenuPrincipal extends AppCompatActivity {
         } catch (FileNotFoundException e) {
             Log.e("guardarCreditos_0", "File not found: " + e.toString());
         } catch (IOException e) {
-            Log.e("guardarCreditos_0", "Can not read file: " + e.toString());
+            Log.e("guardarCreditos_1", "Can not read file: " + e.toString());
         }
-        Log.v("guardarCreditos_0", "Main.\n\nrefresh: " + refresh + "\n\n.");
+        Log.v("guardarCreditos_2", "Main.\n\nrefresh: " + refresh + "\n\n.");
         for (String sheets : splitsheetName) {
-            //Log.v("guardarCreditos_1", "Main.\n\nsheets: " + sheets + "\n\n.");
+            Log.v("guardarCreditos_3", "Main.\n\nsheets: " + sheets + "\n\n.");
             if (!sheets.equals("solicitudes")) {
-                if (!sheetsLeidas.containsKey(sheets)) {
-                    if (!refresh.contains(sheets)) {
+                if (sheets.equals("caja") || sheets.equals("abonos") || sheets.equals("creditos") || sheets.equals("cierre")) {
+                    Log.v("guardarCreditos_4", "MenuPrincipal.\n\nsheets: " + sheets + "\n\n.");
+                    sheetsLeidas.put(sheets, sheets);
+                }
+            }
+            if (!sheets.equals("solicitudes") && !sheets.contains("-cierre") && !sheets.equals("caja") && !sheets.equals("abonos") && !sheets.equals("creditos") && !sheets.equals("cierre")) {
+                if (!refresh.contains(sheets)) {
+                    Log.v("guardarCreditos_5", "MenuPrincipal.\n\nsheets: " + sheets + "\n\n.");
+                    new AgregarLinea(sheets, REFRESH, this.getApplicationContext());
+                    if (!sheetsLeidas.containsKey(sheets)) {
+                        Log.v("guardarCreditos_6", "MenuPrincipal.\n\nsheets: " + sheets + "\n\n.");
                         sheetsLeidas.put(sheets, sheets);
-                        new AgregarLinea(sheets, REFRESH, this.getApplicationContext());
                     }
                 }
             }
@@ -997,7 +1034,16 @@ public class MenuPrincipal extends AppCompatActivity {
             }
         }
         Log.v("concretarGuardado_0", "Main.\n\nSe han guardado " + archivosGuardar.size() + " creditos.\n\n.");
-        mostrarTodo();
+        menuPrincipal();
+        //mostrarTodo();
+    }
+
+    private void menuPrincipal () {
+        Intent menu_principal = new Intent(this, MenuPrincipal.class);
+        menu_principal.putExtra("mensaje", "Se ha actualizado la base de datos.");
+        startActivity(menu_principal);
+        finish();
+        System.exit(0);
     }
 
     private void llenarMapas (Object response) {
@@ -1401,7 +1447,7 @@ public class MenuPrincipal extends AppCompatActivity {
         System.exit(0);
     }
 
-    public void estado_cliente (View view){
+    private void estado_cliente (){
         Intent estado_cliente = new Intent(this, Estado_clienteActivity.class);
         estado_cliente.putExtra("cliente_ID", "");
         startActivity(estado_cliente);
@@ -1409,14 +1455,14 @@ public class MenuPrincipal extends AppCompatActivity {
         System.exit(0);
     }
 
-    public void paganHoy (View view){
+    private void paganHoy (){
         Intent paganHoy = new Intent(this, Pagan_hoy.class);
         startActivity(paganHoy);
         finish();
         System.exit(0);
     }
 
-    public void quincenas (View view){
+    private void quincenas (){
         if (flag_salir_2) {
             Intent quincenasPagan = new Intent(this, QuincenasActivity.class);
             startActivity(quincenasPagan);
@@ -1427,7 +1473,7 @@ public class MenuPrincipal extends AppCompatActivity {
         }
     }
 
-    public void meses (View view){
+    private void meses (){
         if (flag_salir_2) {
             Intent mesesPagan = new Intent(this, MesesActivity.class);
             startActivity(mesesPagan);
@@ -1438,7 +1484,7 @@ public class MenuPrincipal extends AppCompatActivity {
         }
     }
 
-    public void registrar_cliente_nuevo (View view){
+    private void registrar_cliente_nuevo (){
         Intent registrar_cliente_nuevo = new Intent(this, Registrar_cliente_nuevoActivity.class);
         startActivity(registrar_cliente_nuevo);
         finish();
@@ -1472,7 +1518,7 @@ public class MenuPrincipal extends AppCompatActivity {
         System.exit(0);
     }
 
-    public void morosos (View view){
+    private void morosos (){
         Intent morosos = new Intent(this, MorososActivity.class);
         startActivity(morosos);
         finish();

@@ -93,5 +93,6 @@
     <string name="sinclientesmensuales">Sin clientes mensuales...</string>
     <string name="et_gastos">Notas...</string>
     <string name="btActualizar">Actualizar</string>
+    <string name="btMenu">MENU PRINCIPAL</string>
 
 </resources>
