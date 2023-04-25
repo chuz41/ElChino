@@ -32,11 +32,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.elchino.Util.BluetoothUtil;
+import com.example.elchino.Util.BorrarArchivo;
 import com.example.elchino.Util.DateUtilities;
+import com.example.elchino.Util.GuardarArchivo;
 import com.example.elchino.Util.SepararFechaYhora;
 import org.json.JSONException;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -112,7 +115,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     private Date hoy_LD;
     private String fecha_hoy_string;
     private String nombreCliente;
-    private final String stringHola = "Hola mundo!";
+    private final String globalVar = "globalVar_globalVar_.txt";
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,15 +270,57 @@ public class CuadraturaActivity extends AppCompatActivity {
     }
 
     //Send an image to a phone number trhow whatsapp.
-    public void sendImage () {
-        Intent sendIntent0 = new Intent();
-        sendIntent0.setAction(Intent.ACTION_VIEW);
-        String uri0 = "whatsapp://send?phone=" + telefono + "&text=" + "Hola " + nombreCliente + "\n\n" + mensaje_imprimir;
-        sendIntent0.setData(Uri.parse(uri0));
+    public void sendImage (String path) {
+
+        //Abrir el archivo "globalVar_globalVar_.txt", revisar su contenido, que debe ser una sola linea, y guardarlo en la variable valueglovalVar.
+        String valueGlovalVar = "";
         try {
-            startActivity(sendIntent0);
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(this, "Whatsapp have not been installed.", Toast.LENGTH_SHORT).show();
+            InputStreamReader archivo = new InputStreamReader(openFileInput(globalVar));//Se abre archivo
+            BufferedReader br = new BufferedReader(archivo);
+            String linea = br.readLine();//Se lee archivo
+            while (linea != null) {
+                valueGlovalVar = linea;
+                Log.v("sendImage", "Cuadratura.\n\nLinea: " + linea + "\n\n.");
+                if (linea.equals("imagen") || linea.equals("texto") || linea.equals("error")) {
+                    break;
+                }
+                linea = br.readLine();
+            }
+            br.close();
+            archivo.close();
+        } catch (IOException e) {
+            valueGlovalVar = "error";
+            e.printStackTrace();
+        }
+
+        //Si la variable global es "imagen", enviar la imagen por whatsapp. Si no, enviar el texto por whatsapp.
+
+        if (valueGlovalVar.equals("texto")) {
+            Intent sendIntent0 = new Intent();
+            sendIntent0.setAction(Intent.ACTION_VIEW);
+            String uri0 = "whatsapp://send?phone=" + telefono + "&text=" + "Hola " + nombreCliente + "\n\n" + mensaje_imprimir;
+            sendIntent0.setData(Uri.parse(uri0));
+            try {
+                new BorrarArchivo(globalVar, this.getApplicationContext());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                new GuardarArchivo(globalVar, "imagen", this.getApplicationContext()).guardarFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                startActivity(sendIntent0);
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(this, "Whatsapp have not been installed.", Toast.LENGTH_SHORT).show();
+            }
+        } else if (valueGlovalVar.equals("imagen")) {
+            Log.v("sendImage_1", "Cuadratura.\n\nGlobal variable: " + valueGlovalVar + "\n\n.");//Debe ser imagen.
+            //Make a wait pause in the current thread
+            esperar(path);
+        } else {
+            Log.v("sendImage_2", "Cuadratura.\n\nGlobal variable: " + valueGlovalVar + "\n\n.");//Debe ser error.
         }
     }
 
@@ -356,13 +401,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
         Toast.makeText(getApplicationContext(), "Path: " + path, Toast.LENGTH_LONG).show();
         Log.v("whatsapp_0", "Cuadratura.\n\nfile Absolute Path:\n" + file.getAbsolutePath() + "\n\n.");
-        sendImage();
-
-        //Make a wait pause in the current thread
-
-        esperar(file.getAbsolutePath());
-
-
+        sendImage(file.getAbsolutePath());
     }
 
     private void esperar (String path) {
@@ -414,7 +453,7 @@ public class CuadraturaActivity extends AppCompatActivity {
     }*/
 
     //create an image, put a text messege contained in a string into the image, save the image in the external storage and return the path of the image.
-    public void whatsapp(View view) {
+    public void whatsapp (View view) {
         createImage();
         /*Resources resources = this.getApplicationContext().getResources();
         float scale = resources.getDisplayMetrics().density;

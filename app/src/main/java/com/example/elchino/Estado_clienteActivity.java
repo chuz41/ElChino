@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.elchino.Util.AgregarLinea;
 import com.example.elchino.Util.BorrarArchivo;
 import com.example.elchino.Util.DateUtilities;
+import com.example.elchino.Util.GuardarArchivo;
 import com.example.elchino.Util.SepararFechaYhora;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,6 +54,7 @@ public class Estado_clienteActivity extends AppCompatActivity {
     private String mes;
     private String anio;
     private String fecha;
+    private final String globalVar = "globalVar_globalVar_.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +89,16 @@ public class Estado_clienteActivity extends AppCompatActivity {
         sp_opciones.setVisibility(View.INVISIBLE);
         tv_caja = findViewById(R.id.tv_caja);
         tv_caja.setHint("Caja...");
+        try {
+            new BorrarArchivo(globalVar, this.getApplicationContext());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            new GuardarArchivo(globalVar, "texto", this.getApplicationContext()).guardarFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         separarFecha();
         String fechaSaludo = fecha + "/" + mes + "/" + anio;
         tv_fecha.setText(fechaSaludo);

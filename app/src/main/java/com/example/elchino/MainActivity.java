@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private String contenidoCier2 = "";
     private Boolean flagTrabajando = false;
     private final String REFRESH = "refresh_refresh_.txt";
+    private final String globalVar = "globalVar_globalVar_.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +106,15 @@ public class MainActivity extends AppCompatActivity {
         separarFecha();
         contenidoCier = "fecha " + fecha + "\n";
 
+        if (!archivo_existe(fileList(), globalVar)) {
+            new CrearArchivo(globalVar, this.getApplicationContext());
+        }
+        try {
+            new GuardarArchivo(globalVar, "texto", this.getApplicationContext()).guardarFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Log.v("onCreate_0", "Main.\n\nContenido de glovalVar file:\n\n" + imprimirArchivo(globalVar) + "\n\n.");
         try {
             check_activation();
         } catch (IOException e) {

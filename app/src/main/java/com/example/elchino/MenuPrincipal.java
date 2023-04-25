@@ -108,6 +108,7 @@ public class MenuPrincipal extends AppCompatActivity {
     private Button btRepQuincenal;
     private Button btRepMensual;
     private final String REFRESH = "refresh_refresh_.txt";
+    private final String globalVar = "globalVar_globalVar_.txt";
 
 
     @Override
@@ -144,6 +145,16 @@ public class MenuPrincipal extends AppCompatActivity {
         tv_fecha = (TextView) findViewById(R.id.tv_fecha);
         tv_caja = (TextView) findViewById(R.id.tv_caja);
         tv_caja.setHint("Caja...");
+        try {
+            new BorrarArchivo(globalVar, this.getApplicationContext());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            new GuardarArchivo(globalVar, "texto", this.getApplicationContext()).guardarFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         mostrarEstado();
         mostrar_caja();
         separarFecha();
@@ -1207,7 +1218,7 @@ public class MenuPrincipal extends AppCompatActivity {
         RequestQueue requestQueue;
 
         // Instantiate the cache
-        Cache cache = new DiskBasedCache(getCacheDir(), 256 * 256); // 1MB cap
+        Cache cache = new DiskBasedCache(getCacheDir(), 256 * 256); // 1/4 MB cap
 
         // Set up the network to use HttpURLConnection as the HTTP client.
         BasicNetwork network = new BasicNetwork(new HurlStack());
