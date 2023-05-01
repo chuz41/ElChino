@@ -5,5 +5,5 @@
     android:layout_height="wrap_content"
     android:textSize="22sp"
     android:padding="10sp"
-    android:textColor="#FF070AB8"
+    android:textColor="#FFFFFF"
     xmlns:android="http://schemas.android.com/apk/res/android" />

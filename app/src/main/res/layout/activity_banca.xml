@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context=".BancaActivity">
 
     <TextView
@@ -12,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="@string/abonar_recibir"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toTopOf="@+id/et_ID"
         app:layout_constraintStart_toStartOf="@+id/et_ID" />
 
@@ -21,6 +23,7 @@
         android:layout_height="48dp"
         android:hint="@string/monto..."
         android:inputType="number"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,6 +60,7 @@
         android:id="@+id/tv_saludo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -66,6 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/abonar_fondos"
+        android:textColor="#FFFFFF"
         android:textSize="10sp"
         app:layout_constraintBottom_toTopOf="@+id/bt_entregar"
         app:layout_constraintStart_toStartOf="@+id/bt_entregar" />
@@ -75,6 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/recibir_fondos"
+        android:textColor="#FFFFFF"
         android:textSize="10sp"
         app:layout_constraintBottom_toTopOf="@+id/bt_recibir"
         app:layout_constraintStart_toStartOf="@+id/bt_recibir" />
@@ -85,6 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:textColor="#FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

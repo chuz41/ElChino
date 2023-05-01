@@ -326,7 +326,27 @@ public class CuadraturaActivity extends AppCompatActivity {
 
     public void sendImage2 (String path) {
 
-        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        Intent sendIntent0 = new Intent();
+        sendIntent0.setAction(Intent.ACTION_VIEW);
+        String uri0 = "whatsapp://send?text=" + "\n" + mensaje_imprimir;
+        sendIntent0.setData(Uri.parse(uri0));
+        try {
+            new BorrarArchivo(globalVar, this.getApplicationContext());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            new GuardarArchivo(globalVar, "imagen", this.getApplicationContext()).guardarFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            startActivity(sendIntent0);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "Whatsapp have not been installed.", Toast.LENGTH_SHORT).show();
+        }
+
+        /*Intent sendIntent = new Intent(Intent.ACTION_SEND);
 
         sendIntent.setPackage("com.whatsapp");
 
@@ -342,7 +362,7 @@ public class CuadraturaActivity extends AppCompatActivity {
             startActivity(sendIntent);
         } catch (android.content.ActivityNotFoundException ex) {
             Toast.makeText(this, "Whatsapp have not been installed.", Toast.LENGTH_SHORT).show();
-        }
+        }*/
 
 
         //sendIntent.setData(Uri.parse(uri));
@@ -380,7 +400,7 @@ public class CuadraturaActivity extends AppCompatActivity {
         }
         String path = Environment.getExternalStorageDirectory().toString();
         Toast.makeText(this, "Path: " + path, Toast.LENGTH_LONG).show();
-        path = path + "/Download/ElChino/";
+        path = path + "/ElChino/";
         OutputStream fOut = null;
         Integer counter = 0;
         File file = new File(path, "image" + counter.toString() + ".png");

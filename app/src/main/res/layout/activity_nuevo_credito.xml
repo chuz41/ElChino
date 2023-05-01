@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:drawable/btn_star_big_on"
+    android:background="#000000"
     tools:context=".Nuevo_creditoActivity">
 
 
@@ -13,6 +13,7 @@
         android:layout_width="305dp"
         android:layout_height="48dp"
         android:inputType="textPersonName|text|textCapWords"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:text="@string/identificacion_tv"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toTopOf="@+id/et_ID"
         app:layout_constraintStart_toStartOf="@+id/et_ID" />
 
@@ -60,6 +62,7 @@
         android:id="@+id/tv_saludo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
